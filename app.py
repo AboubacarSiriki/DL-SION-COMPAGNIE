@@ -9,6 +9,11 @@ def index():
     # Rendre le template index.html
     return render_template('index.html')
 
+@app.route('/articles/')
+def articles():
+    # Rendre le template index.html
+    return render_template('articles.html')
+
 # Point d'entrée de l'application
 if __name__ == '__main__':
     # Lancer l'application sur le serveur local
