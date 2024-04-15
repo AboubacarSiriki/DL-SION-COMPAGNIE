@@ -276,7 +276,27 @@ nav .profile-details i{
 .sales-boxes .box .title{
   font-size: 24px;
   font-weight: 500;
+  display:flex;
+  flex-direction:row;
+  align-items:space-between;
+  justify-content: space-between;
   /* margin-bottom: 10px; */
+}
+.sales-boxes .box .title button {
+  font-size: 20px;
+  font-weight: 400;
+  border-radius: 12px; /* Arrondi les bordures */
+  background-color: #3498db; /* Couleur de fond */
+  color: #ffffff; /* Couleur du texte */
+  padding: 10px 20px; /* Espacement interne */
+  border: none; /* Supprime la bordure */
+  cursor: pointer; /* Curseur de la souris */
+  height: 50px;
+}
+
+
+.sales-boxes .box .title button:hover {
+  background-color: #2980b9; /* Changement de couleur au survol */
 }
 .sales-boxes .sales-details li.topic{
   font-size: 20px;

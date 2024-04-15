@@ -5,6 +5,16 @@ app = Flask(__name__)
 
 # Définir une route et la fonction associée
 @app.route('/')
+def login():
+    # Rendre le template index.html
+    return render_template('connexion/login.html')
+
+@app.route('/base', methods=["post","get"])
+def base():
+    # Rendre le template index.html
+    return render_template('index.html')
+
+@app.route('/index')
 def index():
     # Rendre le template index.html
     return render_template('index.html')

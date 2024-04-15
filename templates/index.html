@@ -1,118 +1,10 @@
-<!DOCTYPE html>
-<!-- Website - www.codingnepalweb.com -->
-<html lang="en" dir="ltr">
-  <head>
-    <meta charset="UTF-8" />
-    <title>DL SION COMPAGNIE</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <!-- Boxicons CDN Link -->
-    <link href="https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css" rel="stylesheet" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  </head>
-  <body>
-    <div class="sidebar">
-      <div class="logo-details">
-        <i class="bx bxl-c-plus-plus"></i>
-        <span class="logo_name">DL SION COMPAGNIE</span>
-      </div>
-      <ul class="nav-links">
-        <li>
-          <a href="#" class="active">
-            <i class="bx bx-grid-alt"></i>
-            <span class="links_name">Tableau de bord</span>
-          </a>
-        </li>
-        <li>
-          <a href="{{ url_for('articles') }}">
-            <i class="bx bx-box"></i>
-            <span class="links_name">Articles</span>
-          </a>
-        </li>
-        <li>
-          <a href="#">
-            <i class="bx bx-user"></i>
-            <span class="links_name">clients</span>
-          </a>
-        </li>
-        <li>
-          <a href="#">
-            <i class="bx bx-user"></i>
-            <span class="links_name">fournisseurs</span>
-          </a>
-        </li>
-        <li>
-          <a href="#">
-            <i class="bx bxs-cart-add cart two"></i>
-            <span class="links_name">Ventes</span>
-          </a>
-        </li>
-        <li>
-          <a href="#">
-            <i class="bx bx-cart-alt cart"></i>
-            <span class="links_name">Commandes</span>
-          </a>
-        </li>
-        <li>
-          <a href="#">
-            <i class="bx bx-coin-stack"></i>
-            <span class="links_name">Stock</span>
-          </a>
-        </li>
-        <li>
-          <a href="#">
-            <i class="bx bx-pie-chart-alt-2"></i>
-            <span class="links_name">Rapport</span>
-          </a>
-        </li>
-        <li>
-          <a href="#">
-            <i class="bx bx-message"></i>
-            <span class="links_name">Emailing</span>
-          </a>
-        </li>
-        <li>
-          <a href="#">
-            <i class="bx bx-cog"></i>
-            <span class="links_name">Paramètre</span>
-          </a>
-        </li>
-        <li class="log_out">
-          <a href="#">
-            <i class="bx bx-log-out"></i>
-            <span class="links_name">Déconnexion</span>
-          </a>
-        </li>
-      </ul>
-    </div>
-    <section class="home-section">
-      <nav>
-        <div class="sidebar-button">
-          <i class="bx bx-menu sidebarBtn"></i>
-          <span class="dashboard">Tableau de bord</span>
-        </div>
-        <div class="search-box">
-          <input type="text" placeholder="Rechercher..." />
-          <i class="bx bx-search"></i>
-        </div>
-        <div class="profile-details" id="profile">
-          <img src="{{ url_for('static', filename='image/profile.jpg') }}" alt="" />
-          <span class="admin_name">Responsable</span>
-          <i class="bx bx-chevron-down" id="dropdown-icon"></i>
-        </div>
-    </nav>
-
-      <!-- Ajouter une div distincte pour la liste déroulante -->
-    <div class="dropdown-content" id="dropdown-menu">
-        <a href="#" onclick="selectOption('Profile')">Profile</a>
-        <a href="#" onclick="selectOption('Equipe')">Equipe</a>
-        <a href="#" onclick="selectOption('Deconnexion')">Deconnexion</a>
-    </div>
-
-      <div class="home-content">
+{% extends "base.html"%}
+{% block centre%}
+<div class="home-content">
         <div class="overview-boxes">
           <div class="box">
             <div class="right-side">
-              <div class="box-topic">Total commande</div>
+              <div class="box-topic">Total vente</div>
               <div class="number">60</div>
               <div class="indicator">
                 <i class="bx bx-up-arrow-alt"></i>
@@ -123,7 +15,7 @@
           </div>
           <div class="box">
             <div class="right-side">
-              <div class="box-topic">Total vente</div>
+              <div class="box-topic">Total commande</div>
               <div class="number">500K</div>
               <div class="indicator">
                 <i class="bx bx-up-arrow-alt"></i>
@@ -277,40 +169,4 @@
           </div>
         </div>
       </div>
-    </section>
-
-    <script>
-      let sidebar = document.querySelector(".sidebar");
-      let sidebarBtn = document.querySelector(".sidebarBtn");
-      sidebarBtn.onclick = function () {
-        sidebar.classList.toggle("active");
-        if (sidebar.classList.contains("active")) {
-          sidebarBtn.classList.replace("bx-menu", "bx-menu-alt-right");
-        } else sidebarBtn.classList.replace("bx-menu-alt-right", "bx-menu");
-      };
-    </script>
-
-  <!-- Ajouter du code JavaScript pour gérer l'affichage de la liste déroulante -->
-    <!-- Ajouter du code JavaScript pour gérer la sélection d'un élément de la liste déroulante -->
-    <script>
-
-        // Récupérer l'icône de la liste déroulante et le menu déroulant
-        var dropdownIcon = document.getElementById('dropdown-icon');
-        var dropdownMenu = document.getElementById('dropdown-menu');
-        var profileDiv = document.getElementById('profile');
-
-        // Ajouter un écouteur d'événements pour survoler l'icône
-        profileDiv.addEventListener('mouseenter', function() {
-            // Afficher le menu déroulant en dessous de la div de profil
-            dropdownMenu.style.display = 'block';
-            dropdownMenu.style.left = profileDiv.offsetLeft + 'px';
-            dropdownMenu.style.top = profileDiv.offsetTop + profileDiv.offsetHeight + 'px';
-        });
-
-        // Cacher le menu déroulant lorsque l'utilisateur quitte la liste déroulante
-        dropdownMenu.addEventListener('mouseleave', function() {
-            dropdownMenu.style.display = 'none';
-        });
-    </script>
-  </body>
-</html>
+{% endblock %}
