@@ -477,3 +477,11 @@ nav .profile-details i{
 .dropdown-content a:hover {
     background-color: #f1f1f1;
 }
+.gauche{
+  background-color: #3498db; /* Couleur de fond */
+  color: aliceblue;
+  margin-right: 10px;
+  border-radius: 5px;
+  width: 70%;
+  height: 25px;
+}

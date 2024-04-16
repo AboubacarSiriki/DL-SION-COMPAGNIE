@@ -19,10 +19,37 @@ def index():
     # Rendre le template index.html
     return render_template('index.html')
 
-@app.route('/articles/')
-def articles():
+@app.route('/Produit/')
+def Produit():
     # Rendre le template index.html
-    return render_template('articles.html')
+    return render_template('Produit.html')
+
+@app.route('/clients/')
+def clients():
+    # Rendre le template index.html
+    return render_template('clients.html')
+
+
+@app.route('/fournisseurs/')
+def fournisseurs():
+    # Rendre le template index.html
+    return render_template('fournisseurs.html')
+
+@app.route('/ventes/')
+def ventes():
+    # Rendre le template index.html
+    return render_template('ventes.html')
+
+@app.route('/stock/')
+def stock():
+    # Rendre le template index.html
+    return render_template('stock.html')
+
+@app.route('/commandes/')
+def commandes():
+    # Rendre le template index.html
+    return render_template('commandes.html')
+
 
 # Point d'entrée de l'application
 if __name__ == '__main__':
