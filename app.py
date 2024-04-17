@@ -29,6 +29,16 @@ def clients():
     # Rendre le template index.html
     return render_template('clients.html')
 
+@app.route('/profil/')
+def profil():
+    # Rendre le template index.html
+    return render_template('profil.html')
+
+@app.route('/equipe/')
+def equipe():
+    # Rendre le template index.html
+    return render_template('equipe.html')
+
 
 @app.route('/fournisseurs/')
 def fournisseurs():

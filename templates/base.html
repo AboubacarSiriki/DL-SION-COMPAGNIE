@@ -51,5 +51,26 @@
             dropdownMenu.style.display = 'none';
         });
     </script>
+     <script>
+       // Ouvrir le popup lorsqu'on clique sur le bouton "Ajouter un Produit"
+document.getElementById("open-popup").addEventListener("click", function () {
+    document.getElementById("popup").style.display = "block";
+});
+
+// Fermer le popup lorsqu'on clique sur le bouton de fermeture
+document.getElementById("close-popup").addEventListener("click", function () {
+    document.getElementById("popup").style.display = "none";
+});
+
+// Fermer le popup lorsque l'utilisateur clique en dehors du contenu du popup
+window.onclick = function (event) {
+    var popup = document.getElementById("popup");
+    if (event.target == popup) {
+        popup.style.display = "none";
+    }
+}
+
+     </script>
+
   </body>
 </html>

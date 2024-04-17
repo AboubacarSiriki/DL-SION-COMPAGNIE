@@ -259,15 +259,61 @@ nav .profile-details i{
   /* padding: 0 20px; */
 }
 
+
 /* left box */
 .home-content .sales-boxes .recent-sales{
-  width: 65%;
+  width: 70%;
   background: #fff;
   padding: 20px 30px;
   margin: 0 20px;
   border-radius: 12px;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
 }
+.home-content .sales-boxes .recent-sales1{
+  width: 1000%;
+  background: #fff;
+  padding: 20px 30px;
+  margin: 0 20px;
+  border-radius: 12px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+}
+.home-content .sales-boxes .sales-details1{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction:row
+}
+.home-content .sales-boxes .sales-details1 div{
+  weight: 10%;
+  height: 100px;
+}
+.home-content .sales-boxes .sales-details2 div{
+  weight: 10%;
+  height: 50px;
+}
+.home-content .sales-boxes .sales-details2 .message button {
+  font-size: 15px;
+  font-weight: 400;
+  border-radius: 12px; /* Arrondi les bordures */
+  background-color: #3498db; /* Couleur de fond */
+  color: #ffffff; /* Couleur du texte */
+  padding: 10px 20px; /* Espacement interne */
+  border: none; /* Supprime la bordure */
+  cursor: pointer; /* Curseur de la souris */
+  height: 40px;
+}
+.home-content .sales-boxes .sales-details1 .message button {
+  font-size: 15px;
+  font-weight: 400;
+  border-radius: 12px; /* Arrondi les bordures */
+  background-color: #3498db; /* Couleur de fond */
+  color: #ffffff; /* Couleur du texte */
+  padding: 10px 20px; /* Espacement interne */
+  border: none; /* Supprime la bordure */
+  cursor: pointer; /* Curseur de la souris */
+  height: 40px;
+}
+
 .home-content .sales-boxes .sales-details{
   display: flex;
   align-items: center;
@@ -283,7 +329,7 @@ nav .profile-details i{
   /* margin-bottom: 10px; */
 }
 .sales-boxes .box .title button {
-  font-size: 20px;
+  font-size: 15px;
   font-weight: 400;
   border-radius: 12px; /* Arrondi les bordures */
   background-color: #3498db; /* Couleur de fond */
@@ -291,7 +337,18 @@ nav .profile-details i{
   padding: 10px 20px; /* Espacement interne */
   border: none; /* Supprime la bordure */
   cursor: pointer; /* Curseur de la souris */
-  height: 50px;
+  height: 40px;
+}
+
+.profil {
+    width: 100px; /* Largeur de la div */
+    height: 100px; /* Hauteur de la div */
+    border-radius: 50%; /* Forme circulaire */
+    overflow: hidden; /* Masque tout contenu dépassant de la div */
+    background-image: url('{{ url_for('static', filename='image/profile.jpg') }}'); /* Chemin vers votre image */
+    background-size: cover; /* Ajuste la taille de l'image */
+    background-position: center; /* Centre l'image */
+    border: 2px solid #000;
 }
 
 
@@ -333,7 +390,7 @@ nav .profile-details i{
 
 /* Right box */
 .home-content .sales-boxes .top-sales{
-  width: 35%;
+  width: 25%;
   background: #fff;
   padding: 20px 30px;
   margin: 0 20px 0 0;
@@ -484,4 +541,42 @@ nav .profile-details i{
   border-radius: 5px;
   width: 70%;
   height: 25px;
+}
+
+/* Styles pour le popup */
+.popup {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.popup-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 600px;
+}
+
+/* Bouton pour fermer le popup */
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
 }
