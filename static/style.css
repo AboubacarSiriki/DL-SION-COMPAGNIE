@@ -554,16 +554,43 @@ nav .profile-details i{
     height: 100%;
     overflow: auto;
     background-color: rgba(0, 0, 0, 0.4);
+    margin-button : 20px;
 }
 
 .popup-content {
-    background-color: #fefefe;
+    background-color: #fff;
     margin: 15% auto;
     padding: 20px;
     border: 1px solid #888;
     border-radius: 8px;
     width: 80%;
-    max-width: 600px;
+    max-width: 700px;
+    display: flex; /* Ajout de flexbox */
+    flex-direction: column; /* Les éléments sont disposés en colonne */
+    align-items: center; /* Centrer horizontalement les éléments */
+}
+
+.popup-content form {
+    width: 100%; /* Pour occuper toute la largeur de .popup-content */
+    display: flex; /* Utilisation de flexbox */
+    flex-direction: column; /* Les éléments sont disposés en colonne */
+    align-items: center; /* Centrer les éléments horizontalement */
+
+}
+
+.popup-content form label {
+    width: 100%; /* Occupera toute la largeur */
+    max-width: 400px; /* Largeur maximale */
+    margin-bottom: 10px; /* Espacement entre chaque élément */
+}
+
+.popup-content form input,
+.popup-content form select,
+.popup-content form textarea {
+    width: 100%; /* Occupera toute la largeur */
+    max-width: 400px; /* Largeur maximale */
+    padding: 8px; /* Espacement interne */
+    margin-bottom: 20px; /* Espacement entre chaque élément */
 }
 
 /* Bouton pour fermer le popup */
@@ -572,6 +599,7 @@ nav .profile-details i{
     float: right;
     font-size: 28px;
     font-weight: bold;
+    display:none;
 }
 
 .close:hover,
@@ -579,4 +607,17 @@ nav .profile-details i{
     color: black;
     text-decoration: none;
     cursor: pointer;
+}
+
+.popup-content form button {
+  font-size: 20px;
+  font-weight: 400;
+  border-radius: 12px; /* Arrondi les bordures */
+  background-color: #3498db; /* Couleur de fond */
+  color: #ffffff; /* Couleur du texte */
+  padding: 10px 20px; /* Espacement interne */
+  border: none; /* Supprime la bordure */
+  cursor: pointer; /* Curseur de la souris */
+  height: 50px;
+  width: 50%;
 }
