@@ -56,6 +56,18 @@
                 <li><a href="#">---</a></li>
               </ul>
               <ul class="details">
+                <li class="topic">Produit</li>
+                <li><a href="#">ordinateur</a></li>
+                <li><a href="#">ordinateur</a></li>
+                <li><a href="#">accessoire</a></li>
+                <li><a href="#">mini-otrdinateur</a></li>
+                <li><a href="#">ordinateur</a></li>
+                <li><a href="#">ordinateur</a></li>
+                <li><a href="#">accessoire</a></li>
+                <li><a href="#">ordinarteur</a></li>
+                <li><a href="#">ordinateur</a></li>
+              </ul>
+              <ul class="details">
                 <li class="topic">Quantité</li>
                 <li><a href="#"> 50</a></li>
                 <li><a href="#"> 20</a></li>
@@ -68,19 +80,7 @@
                 <li><a href="#"> 69</a></li>
               </ul>
               <ul class="details">
-                <li class="topic">Nom-Produits  </li>
-                <li><a href="#">ordinateur</a></li>
-                <li><a href="#">ordinateur</a></li>
-                <li><a href="#">accessoire</a></li>
-                <li><a href="#">mini-otrdinateur</a></li>
-                <li><a href="#">ordinateur</a></li>
-                <li><a href="#">ordinateur</a></li>
-                <li><a href="#">accessoire</a></li>
-                <li><a href="#">ordinarteur</a></li>
-                <li><a href="#">ordinateur</a></li>
-              </ul>
-              <ul class="details">
-                <li class="topic">Niveaux de stocks</li>
+                <li class="topic">Niveau</li>
                 <li><a href="#">max</a></li>
                 <li><a href="#">min</a></li>
                 <li><a href="#">max</a></li>
@@ -199,23 +199,43 @@
       <div id="popup" class="popup">
         <div class="popup-content">
             <span class="close" id="close-popup">&times;</span>
-          <h2>Ajout d'un nouveau stock </h2><br>
+          <h2>Ajout de stock</h2><br>
             <form>
-                 <label for="nom">Nom du produit</label>
-                  <input type="text" id="nom" name="nom" required>
-    
-                  <label for="categorie">Categorie</label>
-                  <input type="text" id="categorie" name="categorie" required>
-                        <!-- Ajoutez d'autres options selon vos besoins -->
-                    </select>
-                  <label for="prix">Prix</label>
-                  <input type="text" id="prix" name="prix" required>
-    
-                  <label for="description">Description</label>
-                  <textarea id="description" name="description" required></textarea>
-    
-                  <button type="submit">Ajouter</button>
+                  <label for="produit">Produit</label>
+                  <select id="produit" name="produit" required>
+                      <option value="">Sélectionnez un produit</option>
+                      <option value="categorie1">Produit 1</option>
+                      <option value="categorie2">Produit 2</option>
+                      <option value="categorie3">Produit 3</option>
+                      <!-- Ajoutez d'autres options selon vos besoins -->
+                  </select>
+                  <label for="nombre">Nombre</label>
+                  <input type="number" id="nombre" name="nombre" required>
+
+                  <button type="#">Ajouter</button>
+
+              <table>
+                        <thead>
+                            <tr>
+                                <td>Id</td>
+                                <td>Nom</td>
+                                <td>Quantité</td>
+                                <td>Prix</td>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>Sac</td>
+                                <td>200</td>
+                                <td>3000</td>
+                            </tr>
+                        </tbody>
+                    </table>
+              <button type="submit">Valider</button>
             </form>
+
         </div>
     </div>
 {% endblock %}

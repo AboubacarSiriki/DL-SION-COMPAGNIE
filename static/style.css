@@ -586,11 +586,25 @@ nav .profile-details i{
 
 .popup-content form input,
 .popup-content form select,
+.popup-content table,
 .popup-content form textarea {
     width: 100%; /* Occupera toute la largeur */
     max-width: 400px; /* Largeur maximale */
     padding: 8px; /* Espacement interne */
     margin-bottom: 20px; /* Espacement entre chaque élément */
+}
+.popup-content table{
+  margin-top: 20px;
+  width: 100%; /* Occupera toute la largeur */
+  max-width: 550px; /* Largeur maximale */
+  padding: 8px; /* Espacement interne */
+  margin-bottom: 20px; /* Espacement entre chaque élément */
+
+}
+
+.popup-content table tr td {
+  padding: 12px 10px;
+  border: 1px solid #ddd;
 }
 
 /* Bouton pour fermer le popup */

@@ -200,24 +200,52 @@
             <span class="close" id="close-popup">&times;</span>
           <h2>Ajout d'une nouvelle vente</h2><br>
             <form>
-                 <label for="nom">Nom du produit</label>
-                  <input type="text" id="nom" name="nom" required>
-    
-                  <label for="categorie">Categorie</label>
-                  <input type="text" id="categorie" name="categorie" required>
-                        <!-- Ajoutez d'autres options selon vos besoins -->
-                    </select>
-                  <label for="prix">Prix</label>
-                  <input type="text" id="prix" name="prix" required>
-    
-                  <label for="description">Description</label>
-                  <textarea id="description" name="description" required></textarea>
-    
-                  <label for="image">Image</label>
-                  <input type="file" id="image" name="image" accept="image/*" required>
-    
-                  <button type="submit">Ajouter</button>
+                 <label for="client">Client</label>
+                  <select id="client" name="client" required>
+                      <option value="">Sélectionnez un client</option>
+                      <option value="categorie1">Client 1</option>
+                      <option value="categorie2">Client 2</option>
+                      <option value="categorie3">Client 3</option>
+                      <!-- Ajoutez d'autres options selon vos besoins -->
+                  </select>
+
+                  <label for="produit">Produit</label>
+                  <select id="produit" name="produit" required>
+                      <option value="">Sélectionnez un produit</option>
+                      <option value="categorie1">Produit 1</option>
+                      <option value="categorie2">Produit 2</option>
+                      <option value="categorie3">Produit 3</option>
+                      <!-- Ajoutez d'autres options selon vos besoins -->
+                  </select>
+                  <label for="nombre">Nombre</label>
+                  <input type="number" id="nombre" name="nombre" required>
+
+                  <button type="#">Ajouter</button>
+
+              <table>
+                        <thead>
+                            <tr>
+                                <td>Réf</td>
+                                <td>Designation</td>
+                                <td>Quantité</td>
+                                <td>PU TTC</td>
+                                <td>Montant TTC</td>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>Nolovo XP core I5</td>
+                                <td>2</td>
+                                <td>400 000</td>
+                                <td>400 000</td>
+                            </tr>
+                        </tbody>
+                    </table>
+              <button type="submit">Valider la vente</button>
             </form>
+
         </div>
     </div>
 {% endblock %}
