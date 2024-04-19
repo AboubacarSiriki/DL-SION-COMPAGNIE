@@ -117,8 +117,6 @@ CREATE TABLE IF NOT EXISTS `utilisateur` (
 -- Déchargement des données de la table `utilisateur`
 --
 
-INSERT INTO `utilisateur` (`id_utilisateur`, `email`, `mot_pass`) VALUES
-(1, 'soum', 'soum19972');
 
 -- --------------------------------------------------------
 

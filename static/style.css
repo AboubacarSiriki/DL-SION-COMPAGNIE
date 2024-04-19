@@ -578,6 +578,27 @@ nav .profile-details i{
 
 }
 
+.popup-content .form1 {
+    width: 100%; /* Pour occuper toute la largeur de .popup-content */
+    display: none; /* Utilisation de flexbox */
+    flex-direction: column; /* Les éléments sont disposés en colonne */
+    align-items: center; /* Centrer les éléments horizontalement */
+
+}
+.popup-content .form2 {
+    width: 100%; /* Pour occuper toute la largeur de .popup-content */
+    display: none; /* Utilisation de flexbox */
+    flex-direction: column; /* Les éléments sont disposés en colonne */
+    align-items: center; /* Centrer les éléments horizontalement */
+
+}
+
+.popup-content div{
+    width: 70%; /* Pour occuper toute la largeur de .popup-content */
+    display: flex; /* Utilisation de flexbox */
+    flex-direction: row; /* Les éléments sont disposés en colonne */
+    align-items: center; /* Centrer les éléments horizontalement */
+}
 .popup-content form label {
     width: 100%; /* Occupera toute la largeur */
     max-width: 400px; /* Largeur maximale */
@@ -623,6 +644,7 @@ nav .profile-details i{
     cursor: pointer;
 }
 
+
 .popup-content form button {
   font-size: 20px;
   font-weight: 400;
@@ -634,4 +656,19 @@ nav .profile-details i{
   cursor: pointer; /* Curseur de la souris */
   height: 50px;
   width: 50%;
+}
+
+.popup-content div button {
+    font-size: 20px;
+    font-weight: 400;
+    border-radius: 12px; /* Arrondi les bordures */
+    background-color: #3498db; /* Couleur de fond */
+    color: #ffffff; /* Couleur du texte */
+    padding: 10px 20px; /* Espacement interne */
+    border: none; /* Supprime la bordure */
+    cursor: pointer; /* Curseur de la souris */
+    height: 50px;
+    width: 50%;
+    margin-right: 3%; /* Ajoute de l'espace entre les boutons */
+    margin-left: 3%; /* Ajoute de l'espace entre les boutons */
 }

@@ -69,14 +69,15 @@
               </ul>
               <ul class="details">
                 <li class="topic">details</li>
-                <li><i class='bx bx-show eyes-icon' style='font-size: 30px; color:#0A2558;'></i></li>
-                <li><i class='bx bx-show eyes-icon' style='font-size: 30px; color:#0A2558;'></i></li>
-                <li><i class='bx bx-show eyes-icon' style='font-size: 30px; color:#0A2558;'></i></li>
-                <li><i class='bx bx-show eyes-icon' style='font-size: 30px; color:#0A2558;'></i></li>
-                <li><i class='bx bx-show eyes-icon' style='font-size: 30px; color:#0A2558;'></i></li>
-                <li><i class='bx bx-show eyes-icon' style='font-size: 30px; color:#0A2558;'></i></li>
-                <li><i class='bx bx-show eyes-icon' style='font-size: 30px; color:#0A2558;'></i></li>
-                <li><i class='bx bx-show eyes-icon' style='font-size: 30px; color:#0A2558;'></i></li>
+                <li><i class='bx bx-show eyes-icon' style='font-size: 22px; color:blue;'></i></li>
+                <li><i class='bx bx-show eyes-icon' style='font-size: 22px; color:blue;'></i></li>
+                <li><i class='bx bx-show eyes-icon' style='font-size: 22px; color:blue;'></i></li>
+                <li><i class='bx bx-show eyes-icon' style='font-size: 22px; color:blue;'></i></li>
+                <li><i class='bx bx-show eyes-icon' style='font-size: 22px; color:blue;'></i></li>
+                <li><i class='bx bx-show eyes-icon' style='font-size: 22px; color:blue;'></i></li>
+                <li><i class='bx bx-show eyes-icon' style='font-size: 22px; color:blue;'></i></li>
+                <li><i class='bx bx-show eyes-icon' style='font-size: 22px; color:blue;'></i></li>
+                  <li><i class='bx bx-show eyes-icon' style='font-size: 22px; color:blue;'></i></li>
               </ul>
               <ul class="details">
                 <li class="topic">Nom clients</li>
@@ -123,6 +124,10 @@
                 <div class="icon">
                   <i class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i>
                   <i class='bx bx-trash delete-icon' style='font-size: 30px; color: red;'></i>
+                </div>
+                  <div class="icon">
+                      <i class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i>
+                      <i class='bx bx-trash delete-icon' style='font-size: 30px; color: red;'></i>
                 </div>
               </ul>
             </div>
@@ -199,7 +204,11 @@
         <div class="popup-content">
             <span class="close" id="close-popup">&times;</span>
           <h2>Ajout d'une nouvelle vente</h2><br>
-            <form>
+            <div><button id="btn1">Client existant</button>
+                <button id="btn2">Nouveau client</button>
+            </div><br>
+            <form class="form1" id="form1">
+
                  <label for="client">Client</label>
                   <select id="client" name="client" required>
                       <option value="">Sélectionnez un client</option>
@@ -219,6 +228,60 @@
                   </select>
                   <label for="nombre">Nombre</label>
                   <input type="number" id="nombre" name="nombre" required>
+
+                  <button type="#">Ajouter</button>
+
+              <table>
+                        <thead>
+                            <tr>
+                                <td>Réf</td>
+                                <td>Designation</td>
+                                <td>Quantité</td>
+                                <td>PU TTC</td>
+                                <td>Montant TTC</td>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>Nolovo XP core I5</td>
+                                <td>2</td>
+                                <td>400 000</td>
+                                <td>400 000</td>
+                            </tr>
+                        </tbody>
+                    </table>
+              <button type="submit">Valider la vente</button>
+            </form>
+
+            <form class="form2" id="form2">
+
+                 <label for="nom">Nom et prénoms</label>
+                  <input type="text" id="nom" name="nom" required>
+
+                  <label for="tel">Téléphone</label>
+                  <input type="tel" id="tel" name="tel" required>
+
+
+                        <!-- Ajoutez d'autres options selon vos besoins -->
+                    </select>
+                  <label for="email">Email</label>
+                  <input type="email" id="email" name="email" required>
+
+                  <label for="adresse">Adresse</label>
+                  <input type="text" id="adresse" name="adresse" required>
+
+                  <label for="produit">Produit</label>
+                  <select id="nouvproduit" name="produit" required>
+                      <option value="">Sélectionnez un produit</option>
+                      <option value="categorie1">Produit 1</option>
+                      <option value="categorie2">Produit 2</option>
+                      <option value="categorie3">Produit 3</option>
+                      <!-- Ajoutez d'autres options selon vos besoins -->
+                  </select>
+                  <label for="nouvnombre">Nombre</label>
+                  <input type="number" id="nouvnombre" name="nombre" required>
 
                   <button type="#">Ajouter</button>
 

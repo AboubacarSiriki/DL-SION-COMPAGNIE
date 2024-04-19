@@ -72,5 +72,21 @@ window.onclick = function (event) {
 
      </script>
 
+   <script>
+
+    document.getElementById("btn1").addEventListener("click", function(){
+	document.querySelector(".form1").style.display = "flex";
+	document.querySelector(".form2").style.display = "none";
+})
+    </script>
+
+  <script>
+
+    document.getElementById("btn2").addEventListener("click", function(){
+	document.querySelector(".form2").style.display = "flex";
+	document.querySelector(".form1").style.display = "none";
+})
+    </script>
+
   </body>
 </html>
