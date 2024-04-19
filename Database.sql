@@ -1,5 +1,3 @@
-
-
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
 START TRANSACTION;
@@ -15,18 +13,18 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Structure de la table `achats`
+-- Structure de la table `commande`
 --
 
-DROP TABLE IF EXISTS `achats`;
-CREATE TABLE IF NOT EXISTS `achats` (
-  `id_achat` int(11) NOT NULL AUTO_INCREMENT,
+DROP TABLE IF EXISTS `commande`;
+CREATE TABLE IF NOT EXISTS `commande` (
+  `id_commande` int(11) NOT NULL AUTO_INCREMENT,
   `id_fournisseur` int(11) NOT NULL,
   `id_produit` int(11) NOT NULL,
   `quantite` int(11) NOT NULL,
   `prix` int(11) NOT NULL,
-  `date_achat` date NOT NULL,
-  PRIMARY KEY (`id_achat`)
+  `date_commande` date NOT NULL,
+  PRIMARY KEY (`id_commande`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -38,8 +36,7 @@ CREATE TABLE IF NOT EXISTS `achats` (
 DROP TABLE IF EXISTS `client`;
 CREATE TABLE IF NOT EXISTS `client` (
   `id_client` int(11) NOT NULL AUTO_INCREMENT,
-  `nom` varchar(250) NOT NULL,
-  `prenom` varchar(250) NOT NULL,
+  `nom et prénoms` varchar(250) NOT NULL,
   `adresse` varchar(250) NOT NULL,
   `telephone` int(11) NOT NULL,
   `email` varchar(250) NOT NULL,
@@ -60,6 +57,7 @@ CREATE TABLE IF NOT EXISTS `facture` (
   `numero_F` int(11) NOT NULL,
   `date_fact` int(11) NOT NULL,
   `montant` int(11) NOT NULL,
+  `reçu` LONGBLOB NOT NULL, -- Champ pour stocker le fichier PDF
   `mode_paiment` varchar(250) NOT NULL,
   PRIMARY KEY (`id_facture`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -91,11 +89,9 @@ DROP TABLE IF EXISTS `produit`;
 CREATE TABLE IF NOT EXISTS `produit` (
   `id_produit` int(11) NOT NULL AUTO_INCREMENT,
   `categorie` varchar(250) NOT NULL,
-  `nom_P` varchar(250) NOT NULL,
-  `description` text NOT NULL,
+  `nom_produit` varchar(250) NOT NULL,
+  `designation` text NOT NULL,
   `prix` int(11) NOT NULL,
-  `Date_E` date NOT NULL,
-  `Date_F` date NOT NULL,
   PRIMARY KEY (`id_produit`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -108,9 +104,28 @@ CREATE TABLE IF NOT EXISTS `produit` (
 DROP TABLE IF EXISTS `utilisateur`;
 CREATE TABLE IF NOT EXISTS `utilisateur` (
   `id_utilisateur` int(11) NOT NULL AUTO_INCREMENT,
+  `nom` varchar(250) NOT NULL,
+  `prenom` varchar(250) NOT NULL,
   `email` varchar(250) NOT NULL,
   `mot_pass` varchar(250) NOT NULL,
+  `telephone` int(11) NOT NULL,
+  `login` varchar(250) NOT NULL,
   PRIMARY KEY (`id_utilisateur`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+
+-- Structure de la table `administrateur`
+
+
+DROP TABLE IF EXISTS `administrateur`;
+CREATE TABLE IF NOT EXISTS `administrateur` (
+  `id_administrateur` int(11) NOT NULL AUTO_INCREMENT,
+  `nom` varchar(250) NOT NULL,
+  `prenom` varchar(250) NOT NULL,
+  `email` varchar(250) NOT NULL,
+  `mot_pass` varchar(250) NOT NULL,
+  `telephone` int(11) NOT NULL,
+  `login` varchar(250) NOT NULL,
+  PRIMARY KEY (`id_administrateur`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 
 --
@@ -147,9 +162,10 @@ ADD CONSTRAINT fk_achat_fournisseur FOREIGN KEY (id_fournisseur) REFERENCES four
 ALTER TABLE utilisateur
 ADD COLUMN image BLOB AFTER mot_pass;
 ALTER TABLE produit
-ADD COLUMN image BLOB AFTER Date_F;
+ADD COLUMN image BLOB AFTER prix;
 
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
