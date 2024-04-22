@@ -155,9 +155,9 @@ ALTER TABLE ventes
 ADD CONSTRAINT fk_vente_produit FOREIGN KEY (id_produit) REFERENCES produit(id_produit),
 ADD CONSTRAINT fk_vente_client FOREIGN KEY (id_client) REFERENCES client(id_client);
 
-ALTER TABLE achats
-ADD CONSTRAINT fk_achat_produit FOREIGN KEY (id_produit) REFERENCES produit(id_produit),
-ADD CONSTRAINT fk_achat_fournisseur FOREIGN KEY (id_fournisseur) REFERENCES fournisseur(id_fournisseur);
+ALTER TABLE commande
+ADD CONSTRAINT fk_commande_produit FOREIGN KEY (id_produit) REFERENCES produit(id_produit),
+ADD CONSTRAINT fk_commande_fournisseur FOREIGN KEY (id_fournisseur) REFERENCES fournisseur(id_fournisseur);
 
 ALTER TABLE utilisateur
 ADD COLUMN image BLOB AFTER mot_pass;
