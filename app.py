@@ -105,7 +105,7 @@ def fournisseurs():
         adresse = request.form['adresse']
 
         curso = conn.cursor()
-        curso.execute('INSERT INTO fournisseur (nom, adresse, telephone, email) VALUES (%s, %s, %s, %s)',
+        curso.execute('INSERT INTO fournisseur (nom_et_prenoms, adresse, telephone, email) VALUES (%s, %s, %s, %s)',
                       (nom_et_prenoms, adresse, telephone, email))
         conn.commit()
         flash('Fournisseur ajouté avec succès', 'success')

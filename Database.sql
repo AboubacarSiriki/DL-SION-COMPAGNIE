@@ -71,8 +71,7 @@ CREATE TABLE IF NOT EXISTS `facture` (
 DROP TABLE IF EXISTS `fournisseur`;
 CREATE TABLE IF NOT EXISTS `fournisseur` (
   `id_fournisseur` int(11) NOT NULL AUTO_INCREMENT,
-  `nom` varchar(250) NOT NULL,
-  `prenom` varchar(250) NOT NULL,
+  `nom_et_prenoms` varchar(250) NOT NULL,
   `adresse` varchar(250) NOT NULL,
   `telephone` int(11) NOT NULL,
   `email` varchar(250) NOT NULL,
