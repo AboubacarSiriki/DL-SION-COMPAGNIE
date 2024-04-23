@@ -1,0 +1,314 @@
+{% extends "base.html"%}
+{% block centre%}
+<div class="home-content">
+        <div class="overview-boxes">
+          <div class="box">
+            <div class="right-side">
+              <div class="box-topic">Total Produit</div>
+              <div class="number">60</div>
+              <div class="indicator">
+                <i class="bx bx-up-arrow-alt"></i>
+                <span class="text">Aujourd'hui</span>
+              </div>
+            </div>
+            <i class="bx bx-cart-alt cart"></i>
+          </div>
+          <div class="box">
+            <div class="right-side">
+              <div class="box-topic">Total vente</div>
+              <div class="number">50</div>
+              <div class="indicator">
+                <i class="bx bx-up-arrow-alt"></i>
+                <span class="text">Aujourd'hui</span>
+              </div>
+            </div>
+            <i class="bx bxs-cart-add cart two"></i>
+          </div>
+          <div class="box">
+            <div class="right-side">
+              <div class="box-topic">Cout total</div>
+              <div class="number">11</div>
+              <div class="indicator">
+                <i class="bx bx-down-arrow-alt down"></i>
+                <span class="text">Hier</span>
+              </div>
+            </div>
+            <i class="bx bxs-cart-download cart four"></i>
+          </div>
+        </div>
+
+        <div class="sales-boxes">
+          <div class="recent-sales box">
+            <div class="title">
+              <p>Liste Ventes</p><button id="open-popup">Ajouter une Vente</button>
+            </div>
+            <div class="sales-details">
+              <ul class="details">
+                <li class="topic">Date de vente</li>
+                <li><a href="#">02/01/2024</a></li>
+                <li><a href="#">05/01/2024</a></li>
+                <li><a href="#">---</a></li>
+                <li><a href="#">---</a></li>
+                <li><a href="#">---</a></li>
+                <li><a href="#">---</a></li>
+                <li><a href="#">---</a></li>
+                <li><a href="#">---</a></li>
+                <li><a href="#">---</a></li>
+              </ul>
+              <ul class="details">
+                <li class="topic">statut</li>
+                <li><a href="#"> terminée</a></li>
+                <li><a href="#">en cours</a></li>
+                <li><a href="#">annulé</a></li>
+                <li><a href="#">terminée</a></li>
+                <li><a href="#">en cours</a></li>
+                <li><a href="#">annulé</a></li>
+                <li><a href="#">terminée</a></li>
+                <li><a href="#"> en cours</a></li>
+                <li><a href="#">annulé</a></li>
+              </ul>
+              <ul class="details">
+                <li class="topic">details</li>
+                <li><i class='bx bx-show eyes-icon' style='font-size: 22px; color:blue;'></i></li>
+                <li><i class='bx bx-show eyes-icon' style='font-size: 22px; color:blue;'></i></li>
+                <li><i class='bx bx-show eyes-icon' style='font-size: 22px; color:blue;'></i></li>
+                <li><i class='bx bx-show eyes-icon' style='font-size: 22px; color:blue;'></i></li>
+                <li><i class='bx bx-show eyes-icon' style='font-size: 22px; color:blue;'></i></li>
+                <li><i class='bx bx-show eyes-icon' style='font-size: 22px; color:blue;'></i></li>
+                <li><i class='bx bx-show eyes-icon' style='font-size: 22px; color:blue;'></i></li>
+                <li><i class='bx bx-show eyes-icon' style='font-size: 22px; color:blue;'></i></li>
+                  <li><i class='bx bx-show eyes-icon' style='font-size: 22px; color:blue;'></i></li>
+              </ul>
+              <ul class="details">
+                <li class="topic">Nom clients</li>
+                <li><a href="#">kra</a></li>
+                <li><a href="#">kouassi</a></li>
+                <li><a href="#">soumahoro</a></li>
+                <li><a href="#">diarrassouba</a></li>
+                <li><a href="#">coulibaly</a></li>
+                <li><a href="#">ouadeba</a></li>
+                <li><a href="#">n'guessan</a></li>
+                <li><a href="#">houan</a></li>
+                <li><a href="#">tebily</a></li>
+              </ul>
+              <ul class="details">
+                <li class="topic">Action</li>
+                <div class="icon">
+                  <i class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i>
+                  <i class='bx bx-trash delete-icon' style='font-size: 30px; color: red;'></i>
+                </div>
+                <div class="icon">
+                  <i class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i>
+                  <i class='bx bx-trash delete-icon' style='font-size: 30px; color: red;'></i>
+                </div>
+                <div class="icon">
+                  <i class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i>
+                  <i class='bx bx-trash delete-icon' style='font-size: 30px; color: red;'></i>
+                </div>
+                <div class="icon">
+                  <i class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i>
+                  <i class='bx bx-trash delete-icon' style='font-size: 30px; color: red;'></i>
+                </div>
+               <div class="icon">
+                  <i class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i>
+                  <i class='bx bx-trash delete-icon' style='font-size: 30px; color: red;'></i>
+                </div>
+                <div class="icon">
+                  <i class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i>
+                  <i class='bx bx-trash delete-icon' style='font-size: 30px; color: red;'></i>
+                </div>
+                <div class="icon">
+                  <i class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i>
+                  <i class='bx bx-trash delete-icon' style='font-size: 30px; color: red;'></i>
+                </div>
+                <div class="icon">
+                  <i class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i>
+                  <i class='bx bx-trash delete-icon' style='font-size: 30px; color: red;'></i>
+                </div>
+                  <div class="icon">
+                      <i class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i>
+                      <i class='bx bx-trash delete-icon' style='font-size: 30px; color: red;'></i>
+                </div>
+              </ul>
+            </div>
+            <div class="button">
+              <a href="#">Voir plus</a>
+            </div>
+          </div>
+          <div class="top-sales box">
+            <div class="title">Meilleurs Ventes</div>
+            <ul class="top-sales-details">
+              <li>
+                <a href="#">
+                  <img src="{{ url_for('static', filename='image/sunglasses.jpg') }}" alt="" />
+                  <span class="product"> HP</span>
+                </a>
+                <span class="price">50.000F</span>
+              </li>
+              <li>
+                <a href="#">
+                  <img src="{{ url_for('static', filename='image/jeans.jpg') }}" alt="" />
+                  <span class="product">Imprimante </span>
+                </a>
+                <span class="price">300.000F</span>
+              </li>
+              <li>
+                <a href="#">
+                  <img src="{{ url_for('static', filename='image/nike-min.jpg') }}" alt="" />
+                  <span class="product">Tablette</span>
+                </a>
+                <span class="price">400.000F</span>
+              </li>
+              <li>
+                <a href="#">
+                  <img src="{{ url_for('static', filename='image/scarves.jpg') }}" alt="" />
+                  <span class="product">ordinateur Mac.</span>
+                </a>
+                <span class="price">800.000F</span>
+              </li>
+              <li>
+                <a href="#">
+                  <img src="{{ url_for('static', filename='image/blueBag.jpg') }}" alt="" />
+                  <span class="product">ordinateur bureau</span>
+                </a>
+                <span class="price">500.000F</span>
+              </li>
+              <li>
+                <a href="#">
+                  <img src="{{ url_for('static', filename='image/bag.jpg') }}" alt="" />
+                  <span class="product">clavier</span>
+                </a>
+                <span class="price">200.000F</span>
+              </li>
+
+              <li>
+                <a href="#">
+                  <img src="{{ url_for('static', filename='image/addidas.jpg') }}" alt="" />
+                  <span class="product">ordinateur Gamer</span>
+                </a>
+                <span class="price">390.000F</span>
+              </li>
+              <li>
+                <a href="#">
+                  <img src="{{ url_for('static', filename='image/shirt.jpg') }}" alt="" />
+                  <span class="product">ordinateur lenovo</span>
+                </a>
+                <span class="price">250.000F</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div id="popup" class="popup">
+        <div class="popup-content">
+            <span class="close" id="close-popup">&times;</span>
+          <h2>Ajout d'une nouvelle vente</h2><br>
+            <div><button id="btn1">Client existant</button>
+                <button id="btn2">Nouveau client</button>
+            </div><br>
+            <form class="form1" id="form1">
+
+                 <label for="client">Client</label>
+                  <select id="client" name="client" required>
+                      <option value="">Sélectionnez un client</option>
+                      <option value="categorie1">Client 1</option>
+                      <option value="categorie2">Client 2</option>
+                      <option value="categorie3">Client 3</option>
+                      <!-- Ajoutez d'autres options selon vos besoins -->
+                  </select>
+
+                  <label for="produit">Produit</label>
+                  <select id="produit" name="produit" required>
+                      <option value="">Sélectionnez un produit</option>
+                      <option value="categorie1">Produit 1</option>
+                      <option value="categorie2">Produit 2</option>
+                      <option value="categorie3">Produit 3</option>
+                      <!-- Ajoutez d'autres options selon vos besoins -->
+                  </select>
+                  <label for="nombre">Nombre</label>
+                  <input type="number" id="nombre" name="nombre" required>
+
+                  <button type="#">Ajouter</button>
+
+              <table>
+                        <thead>
+                            <tr>
+                                <td>Réf</td>
+                                <td>Designation</td>
+                                <td>Quantité</td>
+                                <td>PU TTC</td>
+                                <td>Montant TTC</td>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>Nolovo XP core I5</td>
+                                <td>2</td>
+                                <td>400 000</td>
+                                <td>400 000</td>
+                            </tr>
+                        </tbody>
+                    </table>
+              <button type="submit">Valider la vente</button>
+            </form>
+
+            <form class="form2" id="form2">
+
+                 <label for="nom">Nom et prénoms</label>
+                  <input type="text" id="nom" name="nom" required>
+
+                  <label for="tel">Téléphone</label>
+                  <input type="tel" id="tel" name="tel" required>
+
+
+                        <!-- Ajoutez d'autres options selon vos besoins -->
+                    </select>
+                  <label for="email">Email</label>
+                  <input type="email" id="email" name="email" required>
+
+                  <label for="adresse">Adresse</label>
+                  <input type="text" id="adresse" name="adresse" required>
+
+                  <label for="produit">Produit</label>
+                  <select id="nouvproduit" name="produit" required>
+                      <option value="">Sélectionnez un produit</option>
+                      <option value="categorie1">Produit 1</option>
+                      <option value="categorie2">Produit 2</option>
+                      <option value="categorie3">Produit 3</option>
+                      <!-- Ajoutez d'autres options selon vos besoins -->
+                  </select>
+                  <label for="nouvnombre">Nombre</label>
+                  <input type="number" id="nouvnombre" name="nombre" required>
+
+                  <button type="#">Ajouter</button>
+
+              <table>
+                        <thead>
+                            <tr>
+                                <td>Réf</td>
+                                <td>Designation</td>
+                                <td>Quantité</td>
+                                <td>PU TTC</td>
+                                <td>Montant TTC</td>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>Nolovo XP core I5</td>
+                                <td>2</td>
+                                <td>400 000</td>
+                                <td>400 000</td>
+                            </tr>
+                        </tbody>
+                    </table>
+              <button type="submit">Valider la vente</button>
+            </form>
+
+        </div>
+    </div>
+{% endblock %}

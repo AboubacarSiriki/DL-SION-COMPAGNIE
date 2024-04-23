@@ -13,7 +13,14 @@
         background-position: center;">
       <div class="content">
         <header>Connexion à mon gestionnaire</header>
-        <form action="{{url_for('base')}}" method="#">
+        <form action="/admin" method="POST">
+          {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
           <div class="field">
             <i class="fas fa-user"></i>
             <input type="text" required placeholder="Login" name="login">

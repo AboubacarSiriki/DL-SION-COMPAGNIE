@@ -13,13 +13,20 @@
         background-position: center;">
       <div class="content">
         <header>Récuperation de mot de passe</header>
-        <form action="{{url_for('login')}}" method="#">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <form action="/change_password" method="POST">
             <div class="pass">
                 <p class="pass">Entrez votre nouveau mot de passe</p>
           </div>
           <div class="field">
             <i class="fas fa-user"></i>
-            <input type="text" required placeholder="Nouveau mot de passe" name="pass">
+            <input type="text" required placeholder="Nouveau mot de passe" name="password">
           </div><br>
 
             <div class="pass">
@@ -27,7 +34,7 @@
           </div>
           <div class="field">
             <i class="fas fa-user"></i>
-            <input type="text" required placeholder="confirme mot de passe" name="confirmer">
+            <input type="text" required placeholder="confirme mot de passe" name="confirm_password">
           </div><br>
 
           <div class="field">

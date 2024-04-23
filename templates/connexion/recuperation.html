@@ -13,13 +13,13 @@
         background-position: center;">
       <div class="content">
         <header>Récuperation de mot de passe</header>
-        <form action="{{url_for('code')}}" method="#">
+        <form action="/forgot_password" method="POST">
             <div class="pass">
                 <p class="pass">Entrez votre adresse Email</p>
           </div>
           <div class="field">
             <i class="fas fa-user"></i>
-            <input type="email" required placeholder="Email" name="email">
+            <input type="email"  placeholder="Email" name="email">
           </div><br>
           <div class="field">
             <input type="submit" value="Confirmer">
