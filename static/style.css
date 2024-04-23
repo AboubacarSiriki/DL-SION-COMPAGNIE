@@ -688,7 +688,7 @@ nav .profile-details i{
     margin-left: 3%; /* Ajoute de l'espace entre les boutons */
 }
 
-.popup12 {
+.popup12{
     display: none;
     position: fixed;
     z-index: 1;
@@ -700,3 +700,10 @@ nav .profile-details i{
     background-color: rgba(0, 0, 0, 0.4);
     margin-button : 20px;
 }
+
+.bnt12 a{
+    text-decoration:none;
+    color: #fff;
+}
+
+

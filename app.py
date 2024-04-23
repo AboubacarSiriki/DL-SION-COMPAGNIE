@@ -22,6 +22,21 @@ def login():
     # Rendre le template index.html
     return render_template('connexion/login.html')
 
+@app.route('/code/')
+def code():
+    # Rendre le template index.html
+    return render_template('connexion/code.html')
+
+@app.route('/nouveau_mot/')
+def nouveau_mot():
+    # Rendre le template index.html
+    return render_template('connexion/nouveau_mot.html')
+
+@app.route('/recuperation/')
+def recuperation():
+    # Rendre le template index.html
+    return render_template('connexion/recuperation.html')
+
 @app.route('/base', methods=["post","get"])
 def base():
     # Rendre le template index.html
@@ -135,7 +150,6 @@ def stock():
 def commandes():
     # Rendre le template index.html
     return render_template('commandes.html')
-
 
 
 # Point d'entrée de l'application
