@@ -11,7 +11,7 @@
   </head>
   <body>
     {% include "nav_bar.html"%}
-    <section class="home-section">
+    <section class="home-section" style="background-image: url({{ url_for('static', filename='image/logo.jpg') }});;">
 
       {% include "header.html"%}
 
@@ -89,6 +89,12 @@ window.onclick = function (event) {
 
   <script>
     document.getElementById("voir").addEventListener("click", function(){
+	document.querySelector(".popup12").style.display = "block";
+})
+    </script>
+
+  <script>
+    document.getElementById("modif").addEventListener("click", function(){
 	document.querySelector(".popup12").style.display = "block";
 })
     </script>
