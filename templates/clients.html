@@ -77,8 +77,8 @@
                 <li class="topic">Action</li>
                 {% for row in resultat %}
                 <div class="icon">
-                  <i class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i>
-                  <i class='bx bx-trash delete-icon' style='font-size: 30px; color: red;'></i>
+                  <i id="modif" class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i>
+                  <i id="sup" class='bx bx-trash delete-icon' style='font-size: 30px; color: red;'></i>
                 </div>
                 {% endfor %}
               </ul>
@@ -175,6 +175,34 @@
                   <input type="text" id="adresse" name="adresse" required>
     
                   <button type="submit">Ajouter</button>
+            </form>
+        </div>
+    </div>
+
+<div id="popup12" class="popup12">
+        <div class="popup-content">
+            <span class="close" id="close-popup1">&times;</span>
+          <h2>Modification Client</h2><br>
+          <form method="post" action="{{url_for('clients')}}">
+
+            <label for="nommodif">Nom et prénoms</label>
+                  <input type="text" id="nommodif" name="nom" required>
+
+                  <label for="tel">Téléphone</label>
+                  <input type="tel" id="telmodif" name="tel" required>
+
+
+                        <!-- Ajoutez d'autres options selon vos besoins -->
+                    </select>
+                  <label for="email">Email</label>
+                  <input type="email" id="emailmodif" name="email" required>
+
+                  <label for="adresse">Adresse</label>
+                  <input type="text" id="adressemodif" name="adresse" required>
+
+                  <div><button class="btn12"><a href="{{url_for('ventes')}}">Retour</a></button>
+                <button id="btn11">Valider</button>
+            </div>
             </form>
         </div>
     </div>

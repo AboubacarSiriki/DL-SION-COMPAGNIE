@@ -326,6 +326,10 @@ def commandes():
     # Rendre le template index.html
     return render_template('commandes.html')
 
+@app.route('/modifier_client/', methods=["post", "get"])
+def modifier_client():
+    # Rendre le template index.html
+    return render_template('client.html')
 
 # Point d'entrée de l'application
 if __name__ == '__main__':

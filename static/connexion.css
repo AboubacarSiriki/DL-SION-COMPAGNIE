@@ -6,7 +6,7 @@
   user-select: none;
 }
 .bg-img{
-  background-image: url("{{ url_for('static', filename='image/bg.jpg') }}");
+  background-image: url("{{ url_for('static', filename='image/logo1.jpg') }}");
   height: 100vh;
   background-size: cover;
   background-position: center;
@@ -39,6 +39,19 @@
   margin: 0 0 35px 0;
   font-family: 'Montserrat',sans-serif;
 }
+
+.field {
+            position: relative;
+        }
+        .field i {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .field input {
+            padding-left: 30px; /* Laissez de l'espace pour l'icône */
+        }
 .field{
   position: relative;
   height: 45px;
@@ -158,15 +171,16 @@ i span{
   text-decoration: underline;
 }
 
-.field1{
+.field1 {
   height: 45px;
   width: 100%;
   display: flex;
-  background: red;
-  flex-direction:row;
-  justify-content:center;
-  align-items:center;
+  background: rgba(255, 0, 0, 0.5); /* Rouge transparent avec 50% d'opacité */
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
 }
+
 
 .field1 a{
 
@@ -181,3 +195,4 @@ i span{
     font-family: 'Montserrat',sans-serif;
     font-weight: 600;
 }
+
