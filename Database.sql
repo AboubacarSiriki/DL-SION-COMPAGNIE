@@ -101,16 +101,19 @@ CREATE TABLE IF NOT EXISTS `produit` (
 --
 
 DROP TABLE IF EXISTS `utilisateur`;
+
 CREATE TABLE IF NOT EXISTS `utilisateur` (
   `id_utilisateur` int(11) NOT NULL AUTO_INCREMENT,
   `nom` varchar(250) NOT NULL,
   `prenom` varchar(250) NOT NULL,
   `email` varchar(250) NOT NULL,
   `mot_pass` varchar(250) NOT NULL,
-  `telephone` int(11) NOT NULL,
+  `telephone` varchar(20) NOT NULL,  -- Utilisation de VARCHAR pour le numéro de téléphone
   `login` varchar(250) NOT NULL,
+  `poste` varchar(250) NOT NULL,  -- Ajout de la colonne pour le poste (vendeur, gestionnaire, etc.)
+  `photo` varchar(250) NOT NULL,  -- Ajout de la colonne pour le chemin de la photo
   PRIMARY KEY (`id_utilisateur`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
 
 -- Structure de la table `administrateur`
 

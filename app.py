@@ -1,4 +1,3 @@
-# <<<<<<< Updated upstream
 from flask import Flask, render_template, request, redirect, url_for,flash, session
 import pymysql, string, random
 from send_mail import envoicode
@@ -12,36 +11,18 @@ app.secret_key = 'message'
 
 # connexion à la base de donnée
 
-
 conn = pymysql.connect(
     host='localhost',
     user='root',
     password="",
     db='dlsionsarl_db',)
 
+# Initialiser l'extension Bcrypt pour le hachage des mots de passe
 bcrypt = Bcrypt(app)
-# =======
-# from flask import Flask, flash, redirect, render_template, request, session
-# import MySQLdb, string, random
-# from send_mail import envoicode
-# from flask_bcrypt import Bcrypt
-# # Créer une instance de l'application Flask
-# app = Flask(__name__)
-
-
-# # Configuration de la connexion à la base de données MySQL
-# db = MySQLdb.connect(host="localhost", user="root", passwd="", db="dlsionsarl_db")
-
-# # Clé secrète pour sécuriser les sessions et les cookies
-# app.config['SECRET_KEY'] = '65b0b774279de460f1cc5c92'
-
-# # Initialiser l'extension Bcrypt pour le hachage des mots de passe
-
 
 # hashed_password = bcrypt.generate_password_hash('admin')
 # print(hashed_password)
 # ===================================Admin espace ==============================
-# >>>>>>> Stashed changes
 
 # Définir une route et la fonction associée
 @app.route('/')
@@ -49,7 +30,6 @@ def login():
     # Rendre le template index.html
     return render_template('connexion/login.html')
 
-# <<<<<<< Updated upstream
 @app.route('/code/')
 def code():
     # Rendre le template index.html
@@ -65,11 +45,7 @@ def recuperation():
     # Rendre le template index.html
     return render_template('connexion/recuperation.html')
 
-# @app.route('/base', methods=["post","get"])
-# def base():
-#     # Rendre le template index.html
-#     return render_template('index.html')
-# =======
+# conneion de l'admin
 @app.route('/admin/', methods=["POST", "GET"])
 def adminIndex():
     if request.method == 'POST':
@@ -84,8 +60,6 @@ def adminIndex():
             cursor.execute(query, (username,))
             admin = cursor.fetchone()
             cursor.close()
-# >>>>>>> Stashed changes
-
             if admin and bcrypt.check_password_hash(admin[4], password):
                 session['admin_id'] = admin[0]
                 session['admin_name'] = admin[6]
@@ -117,7 +91,7 @@ def adminLogout():
         return redirect('/')
 
 
-# ================================Mot de passe oublié================================
+# ================================Admin Mot de passe oublié================================
 
 @app.route('/forgot_password', methods=["GET", "POST"])
 def forgot_password():
@@ -165,24 +139,6 @@ def forgot_password_code():
 
 
 @app.route('/change_password', methods=["GET", "POST"])
-# def change_password():
-#     email = session.get('email')
-#     if request.method == 'POST':
-#         password = request.form.get('password')
-#         confirm_password = request.form.get('confirm_password')
-#         if confirm_password == password:
-#             cursor = conn.cursor()
-#             hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
-#             query = "UPDATE administrateur SET password=%s WHERE email=%s"
-#             cursor.execute(query, (hashed_password, email))
-#             conn.commit()
-#             cursor.close()
-#             flash('Votre mot de passe a bien été modifié, connectez-vous')
-#             return redirect('/')
-#         else:
-#             flash('Veuillez saisir le même mot de passe dans les deux champs', 'danger')
-#     return render_template('connexion/nouveau_mot.html')
-
 def change_password():
     if request.method == 'POST':
         password = request.form.get('password')
@@ -210,12 +166,8 @@ def change_password():
         return redirect('/')
         
     return render_template('connexion/nouveau_mot.html')
- 
 
-# @app.route('/base', methods=["post","get"])
-# def base():
-#     # Rendre le template index.html
-#     return render_template('index.html')
+# ==========================Gestion des membres========================
 
 # @app.route('/index')
 # def index():
