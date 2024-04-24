@@ -195,4 +195,9 @@ i span{
     font-family: 'Montserrat',sans-serif;
     font-weight: 600;
 }
-
+.content form .alert{
+    color:red;
+    font-size: 18px;
+    font-family: 'Montserrat',sans-serif;
+    font-weight: 600;
+}
