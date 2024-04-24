@@ -86,7 +86,7 @@
   display: flex;
   justify-content: space-between;
   height: 80px;
-  background: #fff;
+  background: rgba(255, 255, 255, 0.9); /* RGBA avec une opacité de 0.9 (90%) */
   display: flex;
   align-items: center;
   position: fixed;
@@ -187,7 +187,7 @@ nav .profile-details i{
   align-items: center;
   justify-content: center;
   width: calc(100% / 4 - 15px);
-  background: #fff;
+  background: rgba(255, 255, 255, 0.9); /* RGBA avec une opacité de 0.9 (90%) */
   padding: 15px 14px;
   border-radius: 12px;
   box-shadow: 0 5px 10px rgba(0,0,0,0.1);
@@ -259,17 +259,18 @@ nav .profile-details i{
 
 
 /* left box */
-.home-content .sales-boxes .recent-sales{
+.home-content .sales-boxes .recent-sales {
   width: 70%;
-  background: #fff;
+  background: rgba(255, 255, 255, 0.9); /* RGBA avec une opacité de 0.9 (90%) */
   padding: 20px 30px;
   margin: 0 20px;
   border-radius: 12px;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
 }
+
 .home-content .sales-boxes .recent-sales1{
   width: 1000%;
-  background: #fff;
+  background: rgba(255, 255, 255, 0.9); /* RGBA avec une opacité de 0.9 (90%) */
   padding: 20px 30px;
   margin: 0 20px;
   border-radius: 12px;
@@ -389,7 +390,7 @@ nav .profile-details i{
 /* Right box */
 .home-content .sales-boxes .top-sales{
   width: 25%;
-  background: #fff;
+  background: rgba(255, 255, 255, 0.9); /* RGBA avec une opacité de 0.9 (90%) */
   padding: 20px 30px;
   margin: 0 20px 0 0;
   border-radius: 12px;
