@@ -37,10 +37,30 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 # # Exécutez la requête avec les valeurs
 # cursor.execute(sql, values)
 # conn.commit()
+=======
+
+hashed_password = bcrypt.generate_password_hash('kra1234')
+print(hashed_password)
+
+cursor = conn.cursor()
+# Exécutez la requête SQL en utilisant des paramètres pour éviter les injections SQL
+sql = "INSERT INTO administrateur (nom, prenom, email, mot_pass, telephone, login) VALUES (%s, %s, %s, %s, %s, %s)"
+values = ('Kra', 'Adephe', 'adelphekra@gmail.com', hashed_password, '586954455', 'kra1234')
+
+# Exécutez la requête avec les valeurs
+cursor.execute(sql, values)
+conn.commit()
+>>>>>>> Stashed changes
 # ===================================Admin espace ==============================
 
 # Définir une route et la fonction associée
+
 @app.route('/')
+def accueil():
+    # Rendre le template index.html
+    return render_template('accueil.html')
+
+@app.route('/login')
 def login():
     # Rendre le template index.html
     return render_template('connexion/login.html')
@@ -237,8 +257,6 @@ def equipe():
     cursor.close()
 
     return render_template('membres/equipe.html', utilisateurs=utilisateurs)
-
-
 
 
 @app.route('/userlogin', methods=['GET', 'POST'])
