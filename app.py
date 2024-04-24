@@ -1,7 +1,9 @@
+import os
 from flask import Flask, render_template, request, redirect, url_for,flash, session
 import pymysql, string, random
 from send_mail import envoicode
 from flask_bcrypt import Bcrypt
+from werkzeug.utils import secure_filename
 
 # Créer une instance de l'application Flask
 app = Flask(__name__)
@@ -20,6 +22,9 @@ conn = pymysql.connect(
 # Initialiser l'extension Bcrypt pour le hachage des mots de passe
 bcrypt = Bcrypt(app)
 
+
+UPLOAD_FOLDER = 'static/image/upload'  # Remplacez par le chemin de votre choix
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 # hashed_password = bcrypt.generate_password_hash('admin')
 # print(hashed_password)
 # ===================================Admin espace ==============================
@@ -168,6 +173,109 @@ def change_password():
     return render_template('connexion/nouveau_mot.html')
 
 # ==========================Gestion des membres========================
+@app.route('/admin/ajouter_membre', methods=['GET', 'POST'])
+def ajouter_membre():
+
+    utilisateur = None
+
+    if request.method == 'POST':
+        nom = request.form['nom']
+        prenom = request.form['prenom']
+        email = request.form['email']
+        mot_pass = request.form['password']
+        telephone = request.form['tel']
+        login = request.form['login']
+        poste = request.form['poste']
+        photo = request.files['image']  
+
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM utilisateur WHERE email = %s", (email,))
+        utilisateurs = cursor.fetchone()
+
+        if utilisateur:
+            flash('Cet email est déjà utilisé.', 'danger')
+            return redirect(url_for('ajouter_membre'))
+
+        if mot_pass != request.form['confmotpass']:
+            flash('Les mots de passe ne correspondent pas.', 'danger')
+            return redirect(url_for('ajouter_membre'))
+
+        mot_pass = bcrypt.generate_password_hash(mot_pass).decode('utf-8')
+
+        filename = secure_filename(photo.filename)
+        photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
+        cursor.execute("INSERT INTO utilisateur (nom, prenom, email, mot_pass, telephone, login, poste, photo) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)", 
+                       (nom, prenom, email, mot_pass, telephone, login, poste, filename))
+        conn.commit()
+
+        cursor.execute("SELECT * FROM utilisateur WHERE email = %s", (email,))
+        utilisateurs = cursor.fetchone()
+        cursor.close()
+        
+        flash('Nouveau membre ajouté avec succès.', 'success')
+        
+        return redirect('/admin/equipe/')
+
+    return redirect('/admin/equipe/')
+
+@app.route('/admin/equipe/')
+def equipe():
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM utilisateur")
+    utilisateurs = cursor.fetchall()
+    cursor.close()
+
+    return render_template('membres/equipe.html', utilisateurs=utilisateurs)
+
+
+
+
+@app.route('/userlogin', methods=['GET', 'POST'])
+def userLogin():
+    if request.method == 'POST':
+        email = request.form['email']
+        mot_pass = request.form['password']
+
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM utilisateur WHERE email = %s", (email,))
+        utilisateur = cursor.fetchone()
+
+        if utilisateur and bcrypt.check_password_hash(utilisateur[4], mot_pass):
+            # Si les informations sont correctes, l'utilisateur est connecté
+            session['logged_in'] = True
+            session['utilisateur_id'] = utilisateur[0]
+            session['email'] = email
+            session['nom'] = utilisateur[1]
+            session['poste'] = utilisateur[6]  # Poste de l'utilisateur
+            flash('Connexion réussie.', 'success')
+            return redirect(url_for('dashboard'))
+
+        else:
+            flash('Email ou mot de passe incorrect.', 'danger')
+
+    return render_template('connexion/userlogin.html')
+
+@app.route('/dashboard')
+def dashboard():
+    if 'logged_in' in session:
+        if session['poste'] == 'vendeur':
+            return redirect(url_for('dashboard_vendeur'))
+        elif session['poste'] == 'gestionnaire':
+            return redirect(url_for('dashboard_gestionnaire'))
+        else:
+            return redirect(url_for('accueil'))  # Redirection par défaut si le poste n'est pas spécifié
+    else:
+        return redirect(url_for('userlogin'))  # Redirection vers la page de connexion si l'utilisateur n'est pas connecté
+
+@app.route('/dashboard/vendeur')
+def dashboard_vendeur():
+    return render_template('memebres/dashboard_vendeur.html')
+
+@app.route('/dashboard/gestionnaire')
+def dashboard_gestionnaire():
+    return render_template('membres/dashboard_gestionnaire.html')
+
 
 # @app.route('/index')
 # def index():
@@ -228,15 +336,6 @@ def profil():
     # Rendre le template index.html
     return render_template('profil.html')
 
-@app.route('/equipe/')
-def equipe():
-    # Rendre le template index.html
-    return render_template('equipe.html')
-
-
-from flask import request, redirect, url_for, flash
-
-from flask import request, redirect, url_for, flash
 
 @app.route('/fournisseurs/', methods=["post", "get"])
 def fournisseurs():
