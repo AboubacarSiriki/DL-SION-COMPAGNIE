@@ -17,7 +17,7 @@ conn = pymysql.connect(
     host='localhost',
     user='root',
     password="",
-    db='dlsionsarl_db',)
+    db='dl_sion_compagnie',)
 
 # Initialiser l'extension Bcrypt pour le hachage des mots de passe
 bcrypt = Bcrypt(app)
@@ -25,8 +25,17 @@ bcrypt = Bcrypt(app)
 
 UPLOAD_FOLDER = 'static/image/upload'  # Remplacez par le chemin de votre choix
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-# hashed_password = bcrypt.generate_password_hash('admin')
+# hashed_password = bcrypt.generate_password_hash('kra1234')
 # print(hashed_password)
+
+# cursor = conn.cursor()
+# # Exécutez la requête SQL en utilisant des paramètres pour éviter les injections SQL
+# sql = "INSERT INTO administrateur (nom, prenom, email, mot_pass, telephone, login) VALUES (%s, %s, %s, %s, %s, %s)"
+# values = ('Kra', 'Adephe', 'adelphekra@gmail.com', hashed_password, '586954455', 'kra1234')
+
+# # Exécutez la requête avec les valeurs
+# cursor.execute(sql, values)
+# conn.commit()
 # ===================================Admin espace ==============================
 
 # Définir une route et la fonction associée
@@ -366,6 +375,11 @@ def fournisseurs():
 def ventes():
     # Rendre le template index.html
     return render_template('ventes.html')
+
+@app.route('/achat/')
+def achat():
+    # Rendre le template index.html
+    return render_template('admin/achat.html')
 
 @app.route('/stock/')
 def stock():
