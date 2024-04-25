@@ -13,11 +13,11 @@ app.secret_key = 'message'
 
 # connexion à la base de donnée
 
-# conn = pymysql.connect(
-#     host='localhost',
-#     user='root',
-#     password="",
-#     db='dlsionsarl_db',)
+conn = pymysql.connect(
+    host='localhost',
+    user='root',
+    password="",
+    db='dlsionsarl_db',)
 
 # Initialiser l'extension Bcrypt pour le hachage des mots de passe
 bcrypt = Bcrypt(app)
@@ -269,10 +269,16 @@ def userLogin():
 
     return render_template('connexion/userlogin.html')
 
+@app.route('/userlogout')
+def userLogout():
+    if 'logged_in' in session:
+        session.clear()  # Effacer toutes les informations de session
+        flash('Vous êtes déconnecté.', 'success')
+    return redirect(url_for('userLogin'))
 
 @app.route('/dashboard/vendeur')
 def dashboard_vendeur():
-    return render_template('memebres/dashboard_vendeur.html')
+    return render_template('membres/dashboard_vendeur.html')
 
 @app.route('/dashboard/gestionnaire')
 def dashboard_gestionnaire():
