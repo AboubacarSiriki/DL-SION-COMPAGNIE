@@ -13,11 +13,11 @@ app.secret_key = 'message'
 
 # connexion à la base de donnée
 
-conn = pymysql.connect(
-    host='localhost',
-    user='root',
-    password="",
-    db='dl_sion_compagnie',)
+# conn = pymysql.connect(
+#     host='localhost',
+#     user='root',
+#     password="",
+#     db='dlsionsarl_db',)
 
 # Initialiser l'extension Bcrypt pour le hachage des mots de passe
 bcrypt = Bcrypt(app)
@@ -66,7 +66,7 @@ def recuperation():
     # Rendre le template index.html
     return render_template('connexion/recuperation.html')
 
-# conneion de l'admin
+# connexion de l'admin
 @app.route('/admin/', methods=["POST", "GET"])
 def adminIndex():
     if request.method == 'POST':
@@ -74,7 +74,7 @@ def adminIndex():
         password = request.form.get('password')
         if not (username and password):
             flash('Please fill all the fields', 'danger')
-            return redirect('/')
+            return redirect('/admin/')
         else:
             cursor = conn.cursor()
             query = "SELECT * FROM administrateur WHERE login=%s"
@@ -88,9 +88,9 @@ def adminIndex():
                 return redirect('/admin/dashboard')
             else:
                 flash('Invalid Username or Password', 'danger')
-                return redirect('/')
+                return redirect(url_for('adminIndex'))
     else:
-        return redirect('/')
+        return render_template('admin/login.html')
 
 @app.route('/admin/dashboard', methods=["POST", "GET"])
 def base():
@@ -104,12 +104,11 @@ def base():
 # admin logout
 @app.route('/admin/logout')
 def adminLogout():
-    if not session.get('admin_id'):
-        return redirect('/admin/')
-    if session.get('admin_id'):
-        session['admin_id']=None
-        session['admin_name']=None
-        return redirect('/')
+    if 'admin_id' in session:
+        session.pop('admin_id')
+        session.pop('admin_name')
+        flash('You have been logged out', 'success')
+    return redirect('/admin/')
 
 
 # ================================Admin Mot de passe oublié================================
@@ -191,9 +190,7 @@ def change_password():
 # ==========================Gestion des membres========================
 @app.route('/admin/ajouter_membre', methods=['GET', 'POST'])
 def ajouter_membre():
-
     utilisateur = None
-
     if request.method == 'POST':
         nom = request.form['nom']
         prenom = request.form['prenom']
@@ -206,7 +203,7 @@ def ajouter_membre():
 
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM utilisateur WHERE email = %s", (email,))
-        utilisateurs = cursor.fetchone()
+        utilisateur = cursor.fetchone()
 
         if utilisateur:
             flash('Cet email est déjà utilisé.', 'danger')
@@ -226,7 +223,7 @@ def ajouter_membre():
         conn.commit()
 
         cursor.execute("SELECT * FROM utilisateur WHERE email = %s", (email,))
-        utilisateurs = cursor.fetchone()
+        utilisateur = cursor.fetchone()
         cursor.close()
         
         flash('Nouveau membre ajouté avec succès.', 'success')
@@ -248,8 +245,10 @@ def equipe():
 @app.route('/userlogin', methods=['GET', 'POST'])
 def userLogin():
     if request.method == 'POST':
-        email = request.form['email']
-        mot_pass = request.form['password']
+        email = request.form.get('email')
+        print ('Email: %s' % email)
+        mot_pass = request.form.get('password')
+        print ('Password: %s' % mot_pass)
 
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM utilisateur WHERE email = %s", (email,))
@@ -261,26 +260,15 @@ def userLogin():
             session['utilisateur_id'] = utilisateur[0]
             session['email'] = email
             session['nom'] = utilisateur[1]
-            session['poste'] = utilisateur[6]  # Poste de l'utilisateur
+            session['poste'] = utilisateur[7]  # Poste de l'utilisateur
             flash('Connexion réussie.', 'success')
-            return redirect(url_for('dashboard'))
+            return redirect(url_for('userDashboard'))
 
         else:
             flash('Email ou mot de passe incorrect.', 'danger')
 
     return render_template('connexion/userlogin.html')
 
-@app.route('/dashboard')
-def dashboard():
-    if 'logged_in' in session:
-        if session['poste'] == 'vendeur':
-            return redirect(url_for('dashboard_vendeur'))
-        elif session['poste'] == 'gestionnaire':
-            return redirect(url_for('dashboard_gestionnaire'))
-        else:
-            return redirect(url_for('accueil'))  # Redirection par défaut si le poste n'est pas spécifié
-    else:
-        return redirect(url_for('userlogin'))  # Redirection vers la page de connexion si l'utilisateur n'est pas connecté
 
 @app.route('/dashboard/vendeur')
 def dashboard_vendeur():
@@ -289,6 +277,21 @@ def dashboard_vendeur():
 @app.route('/dashboard/gestionnaire')
 def dashboard_gestionnaire():
     return render_template('membres/dashboard_gestionnaire.html')
+
+@app.route('/user/dashboard')
+def userDashboard():
+    if 'logged_in' in session:
+        if 'poste' in session:
+            if session['poste'] == 'vendeur':
+                return redirect(url_for('dashboard_vendeur'))
+            elif session['poste'] == 'gestionnaire':
+                return redirect(url_for('dashboard_gestionnaire'))
+        else:
+            return redirect(url_for('accueil'))  # Redirection par défaut si le poste n'est pas spécifié
+    else:
+        return redirect(url_for('userLogin'))
+
+  # Redirection vers la page de connexion si l'utilisateur n'est pas connecté
 
 
 # @app.route('/index')
