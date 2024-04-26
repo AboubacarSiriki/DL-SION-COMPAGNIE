@@ -4,6 +4,8 @@ import pymysql, string, random
 from send_mail import envoicode
 from flask_bcrypt import Bcrypt
 from werkzeug.utils import secure_filename
+from datetime import datetime
+from flask import jsonify
 
 # Créer une instance de l'application Flask
 app = Flask(__name__)
@@ -17,7 +19,7 @@ conn = pymysql.connect(
     host='localhost',
     user='root',
     password="",
-    db='dlsionsarl_db',)
+    db='dl_sion_compagnie',)
 
 # Initialiser l'extension Bcrypt pour le hachage des mots de passe
 bcrypt = Bcrypt(app)
@@ -218,8 +220,8 @@ def ajouter_membre():
         filename = secure_filename(photo.filename)
         photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
-        cursor.execute("INSERT INTO utilisateur (nom, prenom, email, mot_pass, telephone, login, poste, photo) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)", 
-                       (nom, prenom, email, mot_pass, telephone, login, poste, filename))
+        cursor.execute("INSERT INTO utilisateur (nom, prenom, email, mot_pass,poste,image, telephone, login) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+                       (nom, prenom, email, mot_pass, poste, filename, telephone, login))
         conn.commit()
 
         cursor.execute("SELECT * FROM utilisateur WHERE email = %s", (email,))
@@ -313,10 +315,11 @@ def Produit():
         description = request.form['description']
         prix = request.form['prix']
         image = request.form['image']
+        nombre= request.form['nombre']
 
         curso = conn.cursor()
-        curso.execute('INSERT INTO produit(categorie, nom_produit, designation, prix, image) VALUES (%s, %s, %s, %s, %s)',
-                      (categorie, nom, description, prix, image))
+        curso.execute('INSERT INTO produit(categorie, nom_produit, designation, prix,nombre, image) VALUES (%s, %s, %s ,%s, %s, %s)',
+                      (categorie, nom, description, prix ,nombre, image))
         conn.commit()
         flash('Produit ajouté avec succès', 'success')
         curso.close()
@@ -393,12 +396,91 @@ def ventes():
 @app.route('/achat/')
 def achat():
     # Rendre le template index.html
-    return render_template('admin/achat.html')
+    return render_template('achats.html')
 
-@app.route('/stock/')
+from flask import jsonify
+
+@app.route('/get_product_info/<int:produit_id>')
+def get_product_info(produit_id):
+    # Effectuez une requête à la base de données pour obtenir les informations du produit
+    cursor = conn.cursor()
+    cursor.execute("SELECT nom_produit, prix, categorie FROM produit WHERE id_produit = %s", (produit_id,))
+    produit_info = cursor.fetchone()
+    cursor.close()
+
+    # Vérifiez si le produit existe
+    if produit_info:
+        # Retournez les informations du produit sous forme de données JSON
+        response = {
+            'nom': produit_info[0],
+            'prix': produit_info[1],
+            'categorie': produit_info[2]
+        }
+        return jsonify(response)
+    else:
+        # Si le produit n'est pas trouvé, retournez un message d'erreur
+        return jsonify({'error': 'Produit non trouvé'}), 404
+
+@app.route('/save_stock', methods=['POST'])
+def save_stock():
+    data = request.json
+    produit_id = data['produitId']
+    nom = data['nom']
+    quantite = data['quantite']
+    prix = data['prix']
+    categorie = data['categorie']
+    date_aujourdhui = datetime.now().strftime('%Y-%m-%d')
+    # Enregistrez les données dans la base de données
+    cursor = conn.cursor()
+    cursor.execute(
+        'INSERT INTO stock (ID_Produit, Quantite, date) VALUES (%s, %s, %s)',
+        (produit_id, quantite, date_aujourdhui))
+    cursor.execute(
+        'UPDATE produit SET nombre = nombre + %s WHERE id_produit = %s',
+        (quantite, produit_id))
+    conn.commit()
+    cursor.close()
+
+    return 'Données enregistrées avec succès dans la base de données'
+@app.route('/stock/', methods=["POST", "GET"])
 def stock():
-    # Rendre le template index.html
-    return render_template('stock.html')
+    cursor = conn.cursor()
+    cursor.execute("SELECT id_produit, nom_produit,categorie,prix FROM produit")
+    produits = cursor.fetchall()
+    cursor.close()
+
+    if request.method == 'POST':
+        produit_id = request.form["produit"]
+        quantite = int(request.form["nombre"])  # Convertir en entier pour la manipulation
+        # Obtenir la date d'aujourd'hui
+        date_aujourdhui = datetime.now().strftime('%Y-%m-%d')
+
+        cursor = conn.cursor()
+
+        # Enregistrement de la vente dans la base de données avec la date d'aujourd'hui
+        cursor.execute(
+            'INSERT INTO stock (ID_Produit, Quantite, date) VALUES (%s, %s, %s)',
+            (produit_id, quantite, date_aujourdhui))
+
+        # Mise à jour du nombre de stock dans la table produit
+        cursor.execute(
+            'UPDATE produit SET nombre = nombre + %s WHERE id_produit = %s',
+            (quantite, produit_id))
+
+        conn.commit()
+        cursor.close()
+
+        flash('Stock ajouté avec succès', 'success')
+        return redirect(url_for('stock'))
+    else:
+        flash('Produit non trouvé', 'danger')
+
+    curso = conn.cursor()
+    curso.execute("SELECT * FROM produit")
+    resultat = curso.fetchall()
+    curso.close()
+
+    return render_template("stock.html", produits=produits,resultat=resultat)
 
 @app.route('/commandes/')
 def commandes():

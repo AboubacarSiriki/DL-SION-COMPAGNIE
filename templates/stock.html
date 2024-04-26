@@ -40,7 +40,7 @@
         <div class="sales-boxes">
           <div class="recent-sales box">
             <div class="title">
-              <p>Liste stocks</p><button  id="open-popup">Ajouter un stock</button>
+              <p>Liste des mises à jour stocks</p><button  id="open-popup">Faire une mise à jour</button>
             </div>
             <div class="sales-details">
               <ul class="details">
@@ -48,71 +48,22 @@
                 <li><a href="#">02/01/2024</a></li>
                 <li><a href="#">05/01/2024</a></li>
                 <li><a href="#">---</a></li>
-                <li><a href="#">---</a></li>
-                <li><a href="#">---</a></li>
-                <li><a href="#">---</a></li>
-                <li><a href="#">---</a></li>
-                <li><a href="#">---</a></li>
-                <li><a href="#">---</a></li>
+
               </ul>
               <ul class="details">
                 <li class="topic">Produit</li>
                 <li><a href="#">ordinateur</a></li>
                 <li><a href="#">ordinateur</a></li>
                 <li><a href="#">accessoire</a></li>
-                <li><a href="#">mini-otrdinateur</a></li>
-                <li><a href="#">ordinateur</a></li>
-                <li><a href="#">ordinateur</a></li>
-                <li><a href="#">accessoire</a></li>
-                <li><a href="#">ordinarteur</a></li>
-                <li><a href="#">ordinateur</a></li>
               </ul>
               <ul class="details">
                 <li class="topic">Quantité</li>
                 <li><a href="#"> 50</a></li>
                 <li><a href="#"> 20</a></li>
                 <li><a href="#">30</a></li>
-                <li><a href="#">40</a></li>
-                <li><a href="#">70</a></li>
-                <li><a href="#">100</a></li>
-                <li><a href="#">10</a></li>
-                <li><a href="#"> 55</a></li>
-                <li><a href="#"> 69</a></li>
-              </ul>
-              <ul class="details">
-                <li class="topic">Niveau</li>
-                <li><a href="#">max</a></li>
-                <li><a href="#">min</a></li>
-                <li><a href="#">max</a></li>
-                <li><a href="#">min</a></li>
-                <li><a href="#">max</a></li>
-                <li><a href="#">min</a></li>
-                <li><a href="#">max</a></li>
-                <li><a href="#">min</a></li>
-                <li><a href="#">max</a></li>
               </ul>
               <ul class="details">
                 <li class="topic">Action</li>
-                <div class="icon">
-                  <i class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i>
-                  <i class='bx bx-trash delete-icon' style='font-size: 30px; color: red;'></i>
-                </div>
-                <div class="icon">
-                  <i class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i>
-                  <i class='bx bx-trash delete-icon' style='font-size: 30px; color: red;'></i>
-                </div>
-                <div class="icon">
-                  <i class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i>
-                  <i class='bx bx-trash delete-icon' style='font-size: 30px; color: red;'></i>
-                </div>
-                <div class="icon">
-                  <i class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i>
-                  <i class='bx bx-trash delete-icon' style='font-size: 30px; color: red;'></i>
-                </div>
-               <div class="icon">
-                  <i class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i>
-                  <i class='bx bx-trash delete-icon' style='font-size: 30px; color: red;'></i>
-                </div>
                 <div class="icon">
                   <i class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i>
                   <i class='bx bx-trash delete-icon' style='font-size: 30px; color: red;'></i>
@@ -131,6 +82,7 @@
               <a href="#">Voir plus</a>
             </div>
           </div>
+
           <div class="top-sales box">
             <div class="title">Meilleurs Stocks</div>
             <ul class="top-sales-details">
@@ -155,87 +107,203 @@
                 </a>
                 <span class="price">400.000F</span>
               </li>
-              <li>
-                <a href="#">
-                  <img src="{{ url_for('static', filename='image/scarves.jpg') }}" alt="" />
-                  <span class="product">ordinateur Mac.</span>
-                </a>
-                <span class="price">800.000F</span>
-              </li>
-              <li>
-                <a href="#">
-                  <img src="{{ url_for('static', filename='image/blueBag.jpg') }}" alt="" />
-                  <span class="product">ordinateur bureau</span>
-                </a>
-                <span class="price">500.000F</span>
-              </li>
-              <li>
-                <a href="#">
-                  <img src="{{ url_for('static', filename='image/bag.jpg') }}" alt="" />
-                  <span class="product">clavier</span>
-                </a>
-                <span class="price">200.000F</span>
-              </li>
+            </ul>
+          </div>
+        </div><br>
 
+    <div class="sales-boxes">
+          <div class="recent-sales box">
+            <div class="title">
+              <p>Stocks</p>
+            </div>
+            <div class="sales-details">
+        <ul class="details">
+          <li class="topic">Réf</li>
+          {% for row in resultat %}
+          <li><a href="#">{{ row[0] }}</a></li>
+          {% endfor %}
+        </ul>
+        <ul class="details">
+          <li class="topic">Nom</li>
+          {% for row in resultat %}
+          <li><a href="#">{{ row[2] }}</a></li>
+          {% endfor %}
+        </ul>
+        <ul class="details">
+          <li class="topic">Catégorie</li>
+          {% for row in resultat %}
+          <li><a href="#">{{ row[1] }}</a></li>
+          {% endfor %}
+        </ul>
+        <ul class="details">
+          <li class="topic">Etat</li>
+          {% for row in resultat %}
+          <li><a href="#">Bon</a></li>
+          {% endfor %}
+        </ul>
+        <ul class="details">
+          <li class="topic">Stock</li>
+          {% for row in resultat %}
+          <li><a href="#">{{ row[5] }}</a></li>
+          {% endfor %}
+        </ul>
+        <ul class="details">
+          <li class="topic">Action</li>
+          {% for row in resultat %}
+          <div class="icon">
+            <i class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i>
+            <i class='bx bx-trash delete-icon' style='font-size: 30px; color: red;'></i>
+          </div>
+          {% endfor %}
+        </ul>
+      </div>
+            <div class="button">
+              <a href="#">Voir plus</a>
+            </div>
+          </div>
+
+          <div class="top-sales box">
+            <div class="title">Meilleurs Stocks</div>
+            <ul class="top-sales-details">
               <li>
                 <a href="#">
-                  <img src="{{ url_for('static', filename='image/addidas.jpg') }}" alt="" />
-                  <span class="product">ordinateur Gamer</span>
+                  <img src="{{ url_for('static', filename='image/sunglasses.jpg') }}" alt="" />
+                  <span class="product"> HP</span>
                 </a>
-                <span class="price">390.000F</span>
+                <span class="price">50.000F</span>
               </li>
               <li>
                 <a href="#">
-                  <img src="{{ url_for('static', filename='image/shirt.jpg') }}" alt="" />
-                  <span class="product">ordinateur lenovo</span>
+                  <img src="{{ url_for('static', filename='image/jeans.jpg') }}" alt="" />
+                  <span class="product">Imprimante </span>
                 </a>
-                <span class="price">250.000F</span>
+                <span class="price">300.000F</span>
+              </li>
+              <li>
+                <a href="#">
+                  <img src="{{ url_for('static', filename='image/nike-min.jpg') }}" alt="" />
+                  <span class="product">Tablette</span>
+                </a>
+                <span class="price">400.000F</span>
               </li>
             </ul>
           </div>
         </div>
-      </div>
+      </div><br>
 
       <div id="popup" class="popup">
         <div class="popup-content">
             <span class="close" id="close-popup">&times;</span>
-          <h2>Ajout de stock</h2><br>
-            <form>
-                  <label for="produit">Produit</label>
-                  <select id="produit" name="produit" required>
-                      <option value="">Sélectionnez un produit</option>
-                      <option value="categorie1">Produit 1</option>
-                      <option value="categorie2">Produit 2</option>
-                      <option value="categorie3">Produit 3</option>
-                      <!-- Ajoutez d'autres options selon vos besoins -->
-                  </select>
-                  <label for="nombre">Nombre</label>
-                  <input type="number" id="nombre" name="nombre" required>
+            <h2>Ajout de stock</h2><br>
+            <form id="stock-form" method="post" action="{{url_for('stock')}}" >
+                <label for="produit">Produit</label>
+                <select id="produit" name="produit" required>
+                    <option value="">Sélectionnez un produit</option>
+                    {% for produit in produits %}
+                        <option value="{{ produit[0] }}">{{ produit[1] }}</option>
+                    {% endfor %}
+                </select>
+                <label for="nombre">Nombre</label>
+                <input type="number" id="nombre" name="nombre" required>
+                <button id="add-button">Ajouter</button>
 
-                  <button type="#">Ajouter</button>
 
-              <table>
-                        <thead>
-                            <tr>
-                                <td>Id</td>
-                                <td>Nom</td>
-                                <td>Quantité</td>
-                                <td>Prix</td>
-                            </tr>
-                        </thead>
+            <table id="stock-table">
+                <thead>
+                    <tr>
+                        <td>Id</td>
+                        <td>Nom</td>
+                        <td>Quantité</td>
+                        <td>Prix</td>
+                        <td>Catégorie</td>
+                    </tr>
+                </thead>
+                <tbody>
 
-                        <tbody>
-                            <tr>
-                                <td>1</td>
-                                <td>Sac</td>
-                                <td>200</td>
-                                <td>3000</td>
-                            </tr>
-                        </tbody>
-                    </table>
-              <button type="submit">Valider</button>
+                </tbody>
+            </table>
+
+            <div><button class="btn12"><a href="{{url_for('stock')}}">Retour</a></button>
+                <button id="btn11" type="submit">Valider</button>
+            </div>
             </form>
-
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var addButton = document.querySelector('#add-button');
+            var stockTable = document.querySelector('#stock-table tbody');
+
+            addButton.addEventListener('click', function(event) {
+                event.preventDefault();
+
+                var produitId = document.querySelector('#produit').value;
+                var nombre = document.querySelector('#nombre').value;
+
+                fetch('/get_product_info/' + produitId)
+                    .then(response => response.json())
+                    .then(data => {
+                        var newRow = document.createElement('tr');
+                        newRow.innerHTML = '<td>' + produitId + '</td>' +
+                                            '<td>' + data.nom + '</td>' +
+                                            '<td>' + nombre + '</td>' +
+                                            '<td>' + data.prix + '</td>' +
+                                            '<td>' + data.categorie + '</td>';
+
+                        stockTable.appendChild(newRow);
+                    })
+                    .catch(error => {
+                        console.error('Erreur lors de la récupération des informations du produit :', error);
+                    });
+            });
+        });
+    </script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var submitButton = document.querySelector('#submit-button');
+    var stockTable = document.querySelector('#stock-table tbody');
+
+    submitButton.addEventListener('click', function(event) {
+        event.preventDefault();
+
+        // Parcourir toutes les lignes du tableau
+        var rows = stockTable.querySelectorAll('tr');
+        rows.forEach(function(row) {
+            // Récupérer les valeurs des cellules de la ligne
+            var produitId = row.querySelector('.produit-id').textContent;
+            var nom = row.querySelector('.nom').textContent;
+            var quantite = row.querySelector('.quantite').textContent;
+            var prix = row.querySelector('.prix').textContent;
+            var categorie = row.querySelector('.categorie').textContent;
+
+            // Créer un formulaire pour envoyer les données
+            var form = new FormData();
+            form.append('produitId', produitId);
+            form.append('nom', nom);
+            form.append('quantite', quantite);
+            form.append('prix', prix);
+            form.append('categorie', categorie);
+
+            // Enregistrer les valeurs dans la base de données via une requête AJAX
+            fetch('/stock', {
+                method: 'POST',
+                body: form
+            })
+            .then(response => {
+                if (response.ok) {
+                    console.log('Ligne enregistrée avec succès dans la base de données');
+                } else {
+                    console.error('Erreur lors de l\'enregistrement de la ligne dans la base de données');
+                }
+            })
+            .catch(error => {
+                console.error('Erreur lors de l\'enregistrement de la ligne dans la base de données :', error);
+            });
+        });
+    });
+});
+
+</script>
+
 {% endblock %}
