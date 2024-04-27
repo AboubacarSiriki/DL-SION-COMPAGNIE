@@ -28,17 +28,17 @@ bcrypt = Bcrypt(app)
 UPLOAD_FOLDER = 'static/image/upload'  # Remplacez par le chemin de votre choix
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# hashed_password = bcrypt.generate_password_hash('kra1234')
-# print(hashed_password)
+hashed_password = bcrypt.generate_password_hash('soum1234')
+print(hashed_password)
 
-# cursor = conn.cursor()
+cursor = conn.cursor()
 # # Exécutez la requête SQL en utilisant des paramètres pour éviter les injections SQL
-# sql = "INSERT INTO administrateur (nom, prenom, email, mot_pass, telephone, login) VALUES (%s, %s, %s, %s, %s, %s)"
-# values = ('Kra', 'Adephe', 'adelphekra@gmail.com', hashed_password, '586954455', 'kra1234')
+sql = "INSERT INTO administrateur (nom, prenom, telephone, email,login, mot_pass) VALUES (%s, %s, %s, %s, %s, %s)"
+values = ('Kra', 'Adephe', '56545678', 'sidiksoum344@gmail.com', 'soum1234', hashed_password)
 
 # # Exécutez la requête avec les valeurs
-# cursor.execute(sql, values)
-# conn.commit()
+cursor.execute(sql, values)
+conn.commit()
 # ===================================Admin espace ==============================
 
 # Définir une route et la fonction associée
@@ -83,9 +83,9 @@ def adminIndex():
             cursor.execute(query, (username,))
             admin = cursor.fetchone()
             cursor.close()
-            if admin and bcrypt.check_password_hash(admin[4], password):
+            if admin and bcrypt.check_password_hash(admin[6], password):
                 session['admin_id'] = admin[0]
-                session['admin_name'] = admin[6]
+                session['admin_name'] = admin[1]
                 flash('Login Successfully', 'success')
                 return redirect('/admin/dashboard')
             else:
@@ -220,12 +220,12 @@ def ajouter_membre():
         filename = secure_filename(photo.filename)
         photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
-        cursor.execute("INSERT INTO utilisateur (nom, prenom, email, mot_pass,poste,image, telephone, login) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
-                       (nom, prenom, email, mot_pass, poste, filename, telephone, login))
+        cursor.execute("INSERT INTO utilisateur (nom, prenom,poste,telephone, email, login, mot_pass,image) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+                       (nom, prenom, poste,telephone,email,login, mot_pass, filename))
         conn.commit()
 
         cursor.execute("SELECT * FROM utilisateur WHERE email = %s", (email,))
-        utilisateur = cursor.fetchone()
+        utilisateurs = cursor.fetchone()
         cursor.close()
         
         flash('Nouveau membre ajouté avec succès.', 'success')
@@ -262,7 +262,7 @@ def userLogin():
             session['utilisateur_id'] = utilisateur[0]
             session['email'] = email
             session['nom'] = utilisateur[1]
-            session['poste'] = utilisateur[7]  # Poste de l'utilisateur
+            session['poste'] = utilisateur[3]  # Poste de l'utilisateur
             flash('Connexion réussie.', 'success')
             return redirect(url_for('userDashboard'))
 
@@ -312,14 +312,14 @@ def Produit():
     if request.method == 'POST':
         nom = request.form['nom']
         categorie = request.form['categorie']
-        description = request.form['description']
+        designation = request.form['description']
         prix = request.form['prix']
         image = request.form['image']
-        nombre= request.form['nombre']
+        stock_min= request.form['nombre']
 
         curso = conn.cursor()
-        curso.execute('INSERT INTO produit(categorie, nom_produit, designation, prix,nombre, image) VALUES (%s, %s, %s ,%s, %s, %s)',
-                      (categorie, nom, description, prix ,nombre, image))
+        curso.execute('INSERT INTO produit(nom_produit,categorie, prix,stock_min,designation,image) VALUES (%s, %s, %s ,%s, %s, %s)',
+                      (nom,categorie, prix,stock_min,designation,image))
         conn.commit()
         flash('Produit ajouté avec succès', 'success')
         curso.close()
@@ -342,8 +342,8 @@ def clients():
         adresse = request.form['adresse']
 
         curso = conn.cursor()
-        curso.execute('INSERT INTO client (`nom et prénoms`, adresse, telephone, email) VALUES (%s, %s, %s, %s)',
-                      (nom, adresse, telephone, email))  # Correction de la requête SQL
+        curso.execute('INSERT INTO client (nom_prenoms,telephone,email,adresse) VALUES (%s, %s, %s, %s)',
+                      (nom,telephone,email,adresse))  # Correction de la requête SQL
         conn.commit()
         flash('Client ajouté avec succès', 'success')  # Correction du message flash
         curso.close()
@@ -366,14 +366,14 @@ def profil():
 @app.route('/fournisseurs/', methods=["post", "get"])
 def fournisseurs():
     if request.method == 'POST':
-        nom_et_prenoms = request.form['nom']
+        nom = request.form['nom']
         telephone = request.form['tel']
         email = request.form['email']
         adresse = request.form['adresse']
 
         curso = conn.cursor()
-        curso.execute('INSERT INTO fournisseur (nom_et_prenoms, adresse, telephone, email) VALUES (%s, %s, %s, %s)',
-                      (nom_et_prenoms, adresse, telephone, email))
+        curso.execute('INSERT INTO fournisseur (nom_prenoms,telephone,email,adresse) VALUES (%s, %s, %s, %s)',
+                      (nom,telephone,email,adresse))
         conn.commit()
         flash('Fournisseur ajouté avec succès', 'success')
         curso.close()
@@ -397,8 +397,6 @@ def ventes():
 def achat():
     # Rendre le template index.html
     return render_template('achats.html')
-
-from flask import jsonify
 
 @app.route('/get_product_info/<int:produit_id>')
 def get_product_info(produit_id):
@@ -464,7 +462,7 @@ def stock():
 
         # Mise à jour du nombre de stock dans la table produit
         cursor.execute(
-            'UPDATE produit SET nombre = nombre + %s WHERE id_produit = %s',
+            'UPDATE stock SET quantite = quantite + %s WHERE id_produit = %s',
             (quantite, produit_id))
 
         conn.commit()
@@ -476,7 +474,7 @@ def stock():
         flash('Produit non trouvé', 'danger')
 
     curso = conn.cursor()
-    curso.execute("SELECT * FROM produit")
+    curso.execute("select produit.nom_produit,produit.categorie,quantite,date FROM stock,produit WHERE stock.id_produit = produit.id_produit")
     resultat = curso.fetchall()
     curso.close()
 

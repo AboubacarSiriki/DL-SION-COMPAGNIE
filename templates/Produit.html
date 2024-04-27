@@ -52,25 +52,25 @@
         <ul class="details">
           <li class="topic">Nom</li>
           {% for row in resultat %}
-          <li><a href="#">{{ row[2] }}</a></li>
+          <li><a href="#">{{ row[1] }}</a></li>
           {% endfor %}
         </ul>
         <ul class="details">
           <li class="topic">Catégorie</li>
           {% for row in resultat %}
-          <li><a href="#">{{ row[1] }}</a></li>
+          <li><a href="#">{{ row[2] }}</a></li>
           {% endfor %}
         </ul>
         <ul class="details">
           <li class="topic">Prix</li>
           {% for row in resultat %}
-          <li><a href="#">{{ row[4] }}</a></li>
+          <li><a href="#">{{ row[3] }}</a></li>
           {% endfor %}
         </ul>
         <ul class="details">
-          <li class="topic">Nombre</li>
+          <li class="topic">Stock min</li>
           {% for row in resultat %}
-          <li><a href="#">{{ row[5] }}</a></li>
+          <li><a href="#">{{ row[4] }}</a></li>
           {% endfor %}
         </ul>
         <ul class="details">
@@ -169,7 +169,7 @@
       <label for="prix">Prix</label>
       <input type="number" id="prix" name="prix" required>
 
-      <label for="nombre">Nombre</label>
+      <label for="nombre">Stock min</label>
       <input type="number" id="nombre" name="nombre" required>
 
       <label for="description">Description</label>

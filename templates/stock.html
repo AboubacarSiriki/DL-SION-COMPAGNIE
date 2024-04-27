@@ -118,15 +118,9 @@
             </div>
             <div class="sales-details">
         <ul class="details">
-          <li class="topic">Réf</li>
-          {% for row in resultat %}
-          <li><a href="#">{{ row[0] }}</a></li>
-          {% endfor %}
-        </ul>
-        <ul class="details">
           <li class="topic">Nom</li>
           {% for row in resultat %}
-          <li><a href="#">{{ row[2] }}</a></li>
+          <li><a href="#">{{ row[0] }}</a></li>
           {% endfor %}
         </ul>
         <ul class="details">
@@ -144,7 +138,13 @@
         <ul class="details">
           <li class="topic">Stock</li>
           {% for row in resultat %}
-          <li><a href="#">{{ row[5] }}</a></li>
+          <li><a href="#">{{ row[2] }}</a></li>
+          {% endfor %}
+        </ul>
+                <ul class="details">
+          <li class="topic">Date</li>
+          {% for row in resultat %}
+          <li><a href="#">{{ row[3] }}</a></li>
           {% endfor %}
         </ul>
         <ul class="details">
