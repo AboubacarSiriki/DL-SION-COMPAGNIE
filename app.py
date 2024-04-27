@@ -256,7 +256,7 @@ def userLogin():
         cursor.execute("SELECT * FROM utilisateur WHERE email = %s", (email,))
         utilisateur = cursor.fetchone()
 
-        if utilisateur and bcrypt.check_password_hash(utilisateur[4], mot_pass):
+        if utilisateur and bcrypt.check_password_hash(utilisateur[7], mot_pass):
             # Si les informations sont correctes, l'utilisateur est connecté
             session['logged_in'] = True
             session['utilisateur_id'] = utilisateur[0]
