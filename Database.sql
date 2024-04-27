@@ -242,8 +242,8 @@ ALTER TABLE `vente`
 
 ALTER TABLE `facture`
   ADD CONSTRAINT `fk_facture_client` FOREIGN KEY (`id_client`) REFERENCES `client` (`id_client`),
-  ADD CONSTRAINT `fk_facture_produit` FOREIGN KEY (`id_produit`) REFERENCES `produit` (`id_produit`);
-  ADD CONSTRAINT `fk_facture_vente` FOREIGN KEY (`id_vente`) REFERENCES `vente` (`id_vente`);
+  ADD CONSTRAINT `fk_facture_produit` FOREIGN KEY (`id_produit`) REFERENCES `produit` (`id_produit`),
+  ADD CONSTRAINT `fk_facture_vente` FOREIGN KEY (`id_ventes`) REFERENCES `vente` (`id_vente`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
