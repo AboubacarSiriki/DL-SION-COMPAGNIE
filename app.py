@@ -86,7 +86,7 @@ def adminIndex():
             if admin and bcrypt.check_password_hash(admin[6], password):
                 session['admin_id'] = admin[0]
                 session['admin_name'] = admin[1]
-                flash('Login Successfully', 'success')
+                # flash('Login Successfully', 'success')
                 return redirect('/admin/dashboard')
             else:
                 flash('Invalid Username or Password', 'danger')
@@ -109,7 +109,8 @@ def adminLogout():
     if 'admin_id' in session:
         session.pop('admin_id')
         session.pop('admin_name')
-        flash('You have been logged out', 'success')
+        session.pop('_flashes', None)
+        # flash('You have been logged out', 'success')
     return redirect('/admin/')
 
 
@@ -228,7 +229,7 @@ def ajouter_membre():
         utilisateurs = cursor.fetchone()
         cursor.close()
         
-        flash('Nouveau membre ajouté avec succès.', 'success')
+        # flash('Nouveau membre ajouté avec succès.', 'success')
         
         return redirect('/admin/equipe/')
 
@@ -275,7 +276,7 @@ def userLogin():
 def userLogout():
     if 'logged_in' in session:
         session.clear()  # Effacer toutes les informations de session
-        flash('Vous êtes déconnecté.', 'success')
+        # flash('Vous êtes déconnecté.', 'success')
     return redirect(url_for('userLogin'))
 
 @app.route('/dashboard/vendeur')

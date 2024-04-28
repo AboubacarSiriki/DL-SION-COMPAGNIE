@@ -13,6 +13,13 @@
         background-position: center;">
       <div class="content">
         <header>Récuperation de mot de passe</header>
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+              {% for message in messages %}
+                  <div class="alert">{{ message }}</div>
+              {% endfor %}
+          {% endif %}
+        {% endwith %}
         <form action="/forgot_password" method="POST">
             <div class="pass">
                 <p class="pass">Entrez votre adresse Email</p>
