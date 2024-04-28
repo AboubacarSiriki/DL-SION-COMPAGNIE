@@ -13,6 +13,7 @@
         background-size: cover;
         background-position: center;">
       <div class="content">
+          <div class="hors"><a href="{{url_for('accueil')}}">Revenir sur la page d'accueil</a></div>
         <header>Connexion à mon gestionnaire</header>
         <form action="/userlogin" method="POST">
             {% with messages = get_flashed_messages() %}

@@ -253,6 +253,39 @@ i span{
     color:#fff;
     font-size:21px;
 }
+.hors {
+  background-color: #2a2185;
+  top: -80px;
+  left: -330px;
+  width: 50%;
+  height: 50px; /* Taille augmentée */
+  position: absolute;
+  border-radius: 25px; /* pour une forme arrondie parfaite */
+  animation: mouvement 2s infinite alternate; /* Effet de mouvement */
+
+  /* Centrer le contenu verticalement et horizontalement */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.hors a {
+  color: white; /* Couleur du texte */
+  text-decoration: none; /* Enlever la soulignement du lien */
+  font-size: 20px; /* Taille de la police augmentée */
+}
+
+/* Définir l'animation */
+@keyframes mouvement {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(20px); /* Ajustez selon vos besoins */
+  }
+}
+
+
 @media screen and (max-width: 768px) {
   .content1 header,
   .content1 h1{
@@ -276,4 +309,15 @@ i span{
     color:#fff;
     font-size:17px;
 }
+
+.hors {
+  background-color: #2a2185;
+  top: -50px;
+  left: -5px;
+  width: 50%;
+  height: 50px; /* Taille augmentée */
+  position: absolute;
+  border-radius: 25px; /* pour une forme arrondie parfaite */
+  animation: mouvement 2s infinite alternate; /* Effet de mouvement */
+  }
 }

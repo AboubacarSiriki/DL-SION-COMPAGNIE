@@ -16,7 +16,7 @@
 
       <!-- Ajouter une div distincte pour la liste déroulante -->
     <div class="dropdown-content" id="dropdown-menu">
-        <a href="{{ url_for('profil') }}" onclick="selectOption('Profile')">Profile</a>
+        <a href="{{ url_for('profil_gestionnaire') }}" onclick="selectOption('Profile')">Profile</a>
         <!-- <a href="{{ url_for('equipe') }}" onclick="selectOption('Equipe')">Equipe</a> -->
         <a href="{{url_for('userLogout')}}" onclick="selectOption('Deconnexion')">Deconnexion</a>
     </div>

@@ -218,6 +218,7 @@ CREATE TABLE IF NOT EXISTS `vente` (
 --
 
 -- Contraintes pour la table `commande`
+ALTER TABLE `produit` ADD `stock` INT NOT NULL AFTER `prix`;
 --
 ALTER TABLE `commande`
   ADD CONSTRAINT `fk_commande_client` FOREIGN KEY (`id_client`) REFERENCES `client` (`id_client`),

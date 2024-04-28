@@ -28,17 +28,17 @@ bcrypt = Bcrypt(app)
 UPLOAD_FOLDER = 'static/image/upload'  # Remplacez par le chemin de votre choix
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-hashed_password = bcrypt.generate_password_hash('soum1234')
-print(hashed_password)
+#hashed_password = bcrypt.generate_password_hash('soum1234')
+#print(hashed_password)
 
 cursor = conn.cursor()
 # # Exécutez la requête SQL en utilisant des paramètres pour éviter les injections SQL
-sql = "INSERT INTO administrateur (nom, prenom, telephone, email,login, mot_pass) VALUES (%s, %s, %s, %s, %s, %s)"
-values = ('Kra', 'Adephe', '56545678', 'sidiksoum344@gmail.com', 'soum1234', hashed_password)
+#sql = "INSERT INTO administrateur (nom, prenom, telephone, email,login, mot_pass) VALUES (%s, %s, %s, %s, %s, %s)"
+#values = ('Kra', 'Adephe', '56545678', 'sidiksoum344@gmail.com', 'soum1234', hashed_password)
 
 # # Exécutez la requête avec les valeurs
-cursor.execute(sql, values)
-conn.commit()
+#cursor.execute(sql, values)
+#conn.commit()
 # ===================================Admin espace ==============================
 
 # Définir une route et la fonction associée
@@ -317,10 +317,11 @@ def Produit():
         prix = request.form['prix']
         image = request.form['image']
         stock_min= request.form['nombre']
+        stock=0
 
         curso = conn.cursor()
-        curso.execute('INSERT INTO produit(nom_produit,categorie, prix,stock_min,designation,image) VALUES (%s, %s, %s ,%s, %s, %s)',
-                      (nom,categorie, prix,stock_min,designation,image))
+        curso.execute('INSERT INTO produit(nom_produit,categorie,prix,stock,stock_min,designation,image) VALUES (%s, %s, %s ,%s,%s, %s, %s)',
+                      (nom,categorie,prix,stock,stock_min,designation,image))
         conn.commit()
         flash('Produit ajouté avec succès', 'success')
         curso.close()
@@ -362,6 +363,16 @@ def clients():
 def profil():
     # Rendre le template index.html
     return render_template('profil.html')
+
+@app.route('/profil_vendeur/')
+def profil_vendeur():
+    # Rendre le template index.html
+    return render_template('profil_vendeur.html')
+
+@app.route('/profil_gestionnaire/')
+def profil_gestionnaire():
+    # Rendre le template index.html
+    return render_template('profil_gestionnaire.html')
 
 
 @app.route('/fournisseurs/', methods=["post", "get"])
@@ -461,9 +472,8 @@ def stock():
             'INSERT INTO stock (ID_Produit, Quantite, date) VALUES (%s, %s, %s)',
             (produit_id, quantite, date_aujourdhui))
 
-        # Mise à jour du nombre de stock dans la table produit
         cursor.execute(
-            'UPDATE stock SET quantite = quantite + %s WHERE id_produit = %s',
+            'UPDATE produit SET stock = stock + %s WHERE id_produit = %s',
             (quantite, produit_id))
 
         conn.commit()
@@ -479,7 +489,13 @@ def stock():
     resultat = curso.fetchall()
     curso.close()
 
-    return render_template("stock.html", produits=produits,resultat=resultat)
+    curso = conn.cursor()
+    curso.execute(
+        "select nom_produit,categorie,stock,stock_min FROM produit")
+    resultat1 = curso.fetchall()
+    curso.close()
+
+    return render_template("stock.html", produits=produits,resultat=resultat,resultat1=resultat1)
 
 @app.route('/commandes/')
 def commandes():
