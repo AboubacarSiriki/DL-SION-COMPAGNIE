@@ -405,10 +405,61 @@ def ventes():
     # Rendre le template index.html
     return render_template('ventes.html')
 
-@app.route('/achat/')
-def achat():
-    # Rendre le template index.html
-    return render_template('achats.html')
+
+@app.route('/achats/', methods=["POST", "GET"])
+def achats():
+    cursor = conn.cursor()
+    cursor.execute("SELECT id_produit, nom_produit, categorie, prix FROM produit")
+    produits = cursor.fetchall()
+    cursor.close()
+
+    cursor = conn.cursor()
+    cursor.execute("SELECT id_fournisseur, nom_prenoms FROM fournisseur")
+    fournisseurs = cursor.fetchall()
+    cursor.close()
+
+    if request.method == 'POST':
+        produit_id = request.form["produit"]
+        quantite = int(request.form["nombre"])  # Convertir en entier pour la manipulation
+        fournisseur_id = request.form["fournisseur"]
+        statut = request.form["statut"]
+
+        # Récupérer le prix du produit à partir de la liste des produits
+        prix_produit = None
+        for produit in produits:
+            if produit[0] == produit_id:
+                prix_produit = produit[3]  # Index 3 correspond au prix dans la requête SQL
+                break
+        montant = quantite * prix_produit
+
+        if prix_produit is None:
+            flash('Produit non trouvé', 'danger')
+            return redirect(url_for('achats'))
+        # Calculer le montant en multipliant la quantité par le prix du produit
+        date_aujourdhui = datetime.now().strftime('%Y-%m-%d')
+
+        cursor = conn.cursor()
+
+        # Enregistrement de l'achat dans la base de données avec la date d'aujourd'hui
+        cursor.execute(
+            'INSERT INTO entree (ID_fournisseur, id_produit, Quantite, prix, date_entree, statut) VALUES (%s, %s, %s, %s, %s, %s)',
+            (fournisseur_id, produit_id, quantite, montant, date_aujourdhui, statut))
+        conn.commit()
+        cursor.close()
+        flash('Achat ajouté avec succès', 'success')
+        return redirect(url_for('achats'))
+    else:
+        flash('Produit non trouvé', 'danger')
+
+    curso = conn.cursor()
+    curso.execute(
+        "select date_entree,statut,fournisseur.nom_prenoms from entree,fournisseur where entree.id_fournisseur = fournisseur.id_fournisseur ")
+    resultat = curso.fetchall()
+    curso.close()
+    return render_template("achats.html", produits=produits, fournisseurs=fournisseurs,resultat=resultat)
+
+
+
 
 @app.route('/get_product_info/<int:produit_id>')
 def get_product_info(produit_id):
@@ -431,27 +482,6 @@ def get_product_info(produit_id):
         # Si le produit n'est pas trouvé, retournez un message d'erreur
         return jsonify({'error': 'Produit non trouvé'}), 404
 
-@app.route('/save_stock', methods=['POST'])
-def save_stock():
-    data = request.json
-    produit_id = data['produitId']
-    nom = data['nom']
-    quantite = data['quantite']
-    prix = data['prix']
-    categorie = data['categorie']
-    date_aujourdhui = datetime.now().strftime('%Y-%m-%d')
-    # Enregistrez les données dans la base de données
-    cursor = conn.cursor()
-    cursor.execute(
-        'INSERT INTO stock (ID_Produit, Quantite, date) VALUES (%s, %s, %s)',
-        (produit_id, quantite, date_aujourdhui))
-    cursor.execute(
-        'UPDATE produit SET nombre = nombre + %s WHERE id_produit = %s',
-        (quantite, produit_id))
-    conn.commit()
-    cursor.close()
-
-    return 'Données enregistrées avec succès dans la base de données'
 @app.route('/stock/', methods=["POST", "GET"])
 def stock():
     cursor = conn.cursor()
@@ -475,7 +505,6 @@ def stock():
         cursor.execute(
             'UPDATE produit SET stock = stock + %s WHERE id_produit = %s',
             (quantite, produit_id))
-
         conn.commit()
         cursor.close()
 
@@ -483,7 +512,6 @@ def stock():
         return redirect(url_for('stock'))
     else:
         flash('Produit non trouvé', 'danger')
-
     curso = conn.cursor()
     curso.execute("select produit.nom_produit,produit.categorie,quantite,date FROM stock,produit WHERE stock.id_produit = produit.id_produit")
     resultat = curso.fetchall()
