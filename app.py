@@ -424,18 +424,7 @@ def achats():
         fournisseur_id = request.form["fournisseur"]
         statut = request.form["statut"]
 
-        # Récupérer le prix du produit à partir de la liste des produits
-        prix_produit = None
-        for produit in produits:
-            if produit[0] == produit_id:
-                prix_produit = produit[3]  # Index 3 correspond au prix dans la requête SQL
-                break
-        montant = quantite * prix_produit
-
-        if prix_produit is None:
-            flash('Produit non trouvé', 'danger')
-            return redirect(url_for('achats'))
-        # Calculer le montant en multipliant la quantité par le prix du produit
+        montant = 0
         date_aujourdhui = datetime.now().strftime('%Y-%m-%d')
 
         cursor = conn.cursor()
@@ -450,6 +439,12 @@ def achats():
         return redirect(url_for('achats'))
     else:
         flash('Produit non trouvé', 'danger')
+
+    cursor = conn.cursor()
+    cursor.execute(
+        'UPDATE entree JOIN produit ON entree.id_produit = produit.id_produit SET entree.prix = produit.prix * entree.quantite')
+    conn.commit()
+    cursor.close()
 
     curso = conn.cursor()
     curso.execute(
