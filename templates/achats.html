@@ -50,11 +50,20 @@
                   {% endfor %}
               </ul>
               <ul class="details">
-                <li class="topic">statut</li>
+                <li class="topic">Statut</li>
                 {% for row in resultat %}
-                  <li><a href="#">{{ row[1] }}</a></li>
-                  {% endfor %}
-              </ul>
+                <li class="status-item">
+                    <span>{{ row[1] }}</span>
+                    <div class="options">
+                        <select class="status-select">
+                            <option value="livre">Livré</option>
+                            <option value="annuler">Annuler</option>
+                        </select>
+                        <button class="update-status">Valider</button>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
               <ul class="details">
                 <li class="topic">details</li>
                   {% for row in resultat%}
@@ -108,14 +117,6 @@
                     {% endfor %}
                       <!-- Ajoutez d'autres options selon vos besoins -->
                   </select>
-                <label for="statut">Statut</label>
-                  <select id="statut" name="statut" required>
-                        <option >selectionner un statut</option>
-                        <option >En cours</option>
-                        <option >Livré</option>
-                        <option >Annuler</option>
-                      <!-- Ajoutez d'autres options selon vos besoins -->
-                  </select>
                   <label for="nombre">Nombre</label>
                   <input type="number" id="nombre" name="nombre" required>
 
@@ -128,7 +129,7 @@
                         <td>Nom</td>
                         <td>Quantité</td>
                         <td>Prix</td>
-                        <td>Catégorie</td>
+                        <td>Désignation</td>
                     </tr>
                 </thead>
                 <tbody>
@@ -205,80 +206,86 @@
         </div>
 </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var addButton = document.querySelector('#add-button');
-            var stockTable = document.querySelector('#stock-table tbody');
+   <script>
+   document.addEventListener('DOMContentLoaded', function() {
+  var addButton = document.querySelector('#add-button');
+  var stockTable = document.querySelector('#stock-table tbody');
+  var submitButton = document.querySelector('button[type="submit"]'); // Get the submit button
 
-            addButton.addEventListener('click', function(event) {
-                event.preventDefault();
+  addButton.addEventListener('click', function(event) {
+    event.preventDefault();
 
-                var produitId = document.querySelector('#produit').value;
-                var nombre = document.querySelector('#nombre').value;
+    var produitId = document.querySelector('#produit').value;
+    var nombre = document.querySelector('#nombre').value;
+    var fournisseurId = document.querySelector('#fournisseur').value; // Assuming supplier ID selector
 
-                fetch('/get_product_info/' + produitId)
-                    .then(response => response.json())
-                    .then(data => {
-                        var newRow = document.createElement('tr');
-                        newRow.innerHTML = '<td>' + produitId + '</td>' +
-                                            '<td>' + data.nom + '</td>' +
-                                            '<td>' + nombre + '</td>' +
-                                            '<td>' + data.prix + '</td>' +
-                                            '<td>' + data.categorie + '</td>';
+    fetch('/get_product_info/' + produitId)
+      .then(response => response.json())
+      .then(data => {
+        var newRow = document.createElement('tr');
+        newRow.innerHTML = '<td>' + produitId + '</td>' +
+                            '<td>' + data.nom + '</td>' +
+                            '<td>' + nombre + '</td>' +
+                            '<td>' + data.prix + '</td>' +
+                            '<td>' + data.designation + '</td>' +
+                            '<td>' + fournisseurId + '</td>'; // Add supplier ID cell
 
-                        stockTable.appendChild(newRow);
-                    })
-                    .catch(error => {
-                        console.error('Erreur lors de la récupération des informations du produit :', error);
-                    });
-            });
-        });
-    </script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    var submitButton = document.querySelector('#submit-button');
-    var stockTable = document.querySelector('#stock-table tbody');
+        stockTable.appendChild(newRow);
+      })
+      .catch(error => {
+        console.error('Erreur lors de la récupération des informations du produit :', error);
+      });
+  });
 
-    submitButton.addEventListener('click', function(event) {
-        event.preventDefault();
+  submitButton.addEventListener('click', function(event) {
+    event.preventDefault(); // Prevent default form submission
 
-        // Parcourir toutes les lignes du tableau
-        var rows = stockTable.querySelectorAll('tr');
-        rows.forEach(function(row) {
-            // Récupérer les valeurs des cellules de la ligne
-            var produitId = row.querySelector('.produit-id').textContent;
-            var nom = row.querySelector('.nom').textContent;
-            var quantite = row.querySelector('.quantite').textContent;
-            var prix = row.querySelector('.prix').textContent;
-            var categorie = row.querySelector('.categorie').textContent;
+    // Get all rows from the stock table
+    var rows = stockTable.querySelectorAll('tr');
 
-            // Créer un formulaire pour envoyer les données
-            var form = new FormData();
-            form.append('produitId', produitId);
-            form.append('nom', nom);
-            form.append('quantite', quantite);
-            form.append('prix', prix);
-            form.append('categorie', categorie);
+    // Prepare an array to store order data
+    var orderData = [];
 
-            // Enregistrer les valeurs dans la base de données via une requête AJAX
-            fetch('/achats', {
-                method: 'POST',
-                body: form
-            })
-            .then(response => {
-                if (response.ok) {
-                    console.log('Ligne enregistrée avec succès dans la base de données');
-                } else {
-                    console.error('Erreur lors de l\'enregistrement de la ligne dans la base de données');
-                }
-            })
-            .catch(error => {
-                console.error('Erreur lors de l\'enregistrement de la ligne dans la base de données :', error);
-            });
-        });
-    });
+    // Iterate over each row and extract data
+    for (var i = 0; i < rows.length; i++) { // Skip the first header row
+      var rowData = {
+        produit_id: parseInt(rows[i].cells[0].textContent),
+        nombre: parseInt(rows[i].cells[2].textContent),
+        prix_unitaire: parseFloat(rows[i].cells[3].textContent),
+        fournisseur_id: parseInt(rows[i].cells[5].textContent), // Supplier ID from cell 5
+      };
+
+      orderData.push(rowData);
+    }
+
+    // Send the order data to the server using fetch
+    fetch('/submit_order', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(orderData) // Convert order data to JSON
+    })
+      .then(response => response.json())
+      .then(data => {
+        // Handle successful submission response
+        console.log('Commande soumise avec succès:', data);
+
+        // Clear the stock table
+        stockTable.innerHTML = '';
+
+        // Display a success message to the user
+        alert('Commande soumise avec succès!');
+      })
+      .catch(error => {
+        // Handle submission error
+        console.error('Erreur lors de la soumission de la commande:', error);
+
+        // Display an error message to the user
+        alert('Erreur lors de la soumission de la commande.');
+      });
+  });
 });
-
 </script>
 
 {% endblock %}

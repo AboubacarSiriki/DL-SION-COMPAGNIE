@@ -405,7 +405,36 @@ def ventes():
     # Rendre le template index.html
     return render_template('ventes.html')
 
+@app.route('/submit_order', methods=['POST'])
+def submit_order():
+    # Récupérer les données de la commande à partir du corps de la requête
+    order_data = request.get_json()
 
+    # Valider les données de la commande (vérifier les valeurs manquantes ou invalides)
+
+    # Traiter les données de la commande
+    for item in order_data:
+        product_id = item['produit_id']
+        quantity = item['nombre']
+        unit_price = item['prix_unitaire']
+        fournisseur_id = item['fournisseur_id']
+        # Insérer l'élément de commande dans la base de données
+        cursor = conn.cursor()
+        cursor.execute(
+            """INSERT INTO entree (ID_fournisseur, id_produit, Quantite, prix, date_entree, statut) VALUES (%s, %s, %s, %s, %s, %s)""",
+            (fournisseur_id, product_id, quantity, unit_price, datetime.now().strftime('%Y-%m-%d'), 'En cours')  # Remplacer 1 par l'ID du fournisseur réel
+        )
+        conn.commit()
+        cursor.close()
+
+        # Calculer le prix total (si nécessaire)
+
+    # Préparer la réponse
+    response_data = {
+        'message': 'Commande soumise avec succès'
+    }
+
+    return jsonify(response_data), 200
 @app.route('/achats/', methods=["POST", "GET"])
 def achats():
     cursor = conn.cursor()
@@ -422,7 +451,6 @@ def achats():
         produit_id = request.form["produit"]
         quantite = int(request.form["nombre"])  # Convertir en entier pour la manipulation
         fournisseur_id = request.form["fournisseur"]
-        statut = request.form["statut"]
 
         montant = 0
         date_aujourdhui = datetime.now().strftime('%Y-%m-%d')
@@ -432,7 +460,7 @@ def achats():
         # Enregistrement de l'achat dans la base de données avec la date d'aujourd'hui
         cursor.execute(
             'INSERT INTO entree (ID_fournisseur, id_produit, Quantite, prix, date_entree, statut) VALUES (%s, %s, %s, %s, %s, %s)',
-            (fournisseur_id, produit_id, quantite, montant, date_aujourdhui, statut))
+            (fournisseur_id, produit_id, quantite, montant, date_aujourdhui, "En cours"))
         conn.commit()
         cursor.close()
         flash('Achat ajouté avec succès', 'success')
@@ -454,13 +482,11 @@ def achats():
     return render_template("achats.html", produits=produits, fournisseurs=fournisseurs,resultat=resultat)
 
 
-
-
 @app.route('/get_product_info/<int:produit_id>')
 def get_product_info(produit_id):
     # Effectuez une requête à la base de données pour obtenir les informations du produit
     cursor = conn.cursor()
-    cursor.execute("SELECT nom_produit, prix, categorie FROM produit WHERE id_produit = %s", (produit_id,))
+    cursor.execute("SELECT nom_produit, prix,designation FROM produit WHERE id_produit = %s", (produit_id,))
     produit_info = cursor.fetchone()
     cursor.close()
 
@@ -470,12 +496,31 @@ def get_product_info(produit_id):
         response = {
             'nom': produit_info[0],
             'prix': produit_info[1],
-            'categorie': produit_info[2]
+            'designation': produit_info[2]
         }
         return jsonify(response)
     else:
         # Si le produit n'est pas trouvé, retournez un message d'erreur
         return jsonify({'error': 'Produit non trouvé'}), 404
+
+@app.route('/get_fournisseur/<int:fournisseur_id>')
+def get_fournisseur(fournisseur_id):
+    # Effectuez une requête à la base de données pour obtenir les informations du produit
+    cursor = conn.cursor()
+    cursor.execute("SELECT nom_produit FROM fournisseur WHERE id_fournisseur = %s", (fournisseur_id,))
+    fournisseur_infos = cursor.fetchone()
+    cursor.close()
+
+    # Vérifiez si le produit existe
+    if fournisseur_infos:
+        # Retournez les informations du produit sous forme de données JSON
+        response = {
+            'nom': fournisseur_infos[0],
+        }
+        return jsonify(response)
+    else:
+        # Si le produit n'est pas trouvé, retournez un message d'erreur
+        return jsonify({'error': 'Fournisseur non trouvé'}), 404
 
 @app.route('/stock/', methods=["POST", "GET"])
 def stock():
