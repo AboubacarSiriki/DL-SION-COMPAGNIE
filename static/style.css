@@ -260,6 +260,15 @@ nav .profile-details i{
 
 /* left box */
 .home-content .sales-boxes .recent-sales {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.9); /* RGBA avec une opacité de 0.9 (90%) */
+  padding: 20px 30px;
+  margin: 0 20px;
+  border-radius: 12px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+}
+
+.home-content .sales-boxes .recent-sales1 {
   width: 70%;
   background: rgba(255, 255, 255, 0.9); /* RGBA avec une opacité de 0.9 (90%) */
   padding: 20px 30px;
@@ -269,7 +278,7 @@ nav .profile-details i{
 }
 
 .home-content .sales-boxes .recent-sales1{
-  width: 1000%;
+  width: 100%;
   background: rgba(255, 255, 255, 0.9); /* RGBA avec une opacité de 0.9 (90%) */
   padding: 20px 30px;
   margin: 0 20px;
@@ -699,11 +708,146 @@ nav .profile-details i{
     background-color: rgba(0, 0, 0, 0.4);
     margin-button : 20px;
 }
+.popup-content1 {
+    background-color: #fff;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 700px;
+    display: flex; /* Ajout de flexbox */
+    flex-direction: column; /* Les éléments sont disposés en colonne */
+    align-items: center; /* Centrer horizontalement les éléments */
+}
+
+.popup-content1 div button {
+    font-size: 20px;
+    font-weight: 400;
+    border-radius: 12px; /* Arrondi les bordures */
+    background-color: #3498db; /* Couleur de fond */
+    color: #ffffff; /* Couleur du texte */
+    padding: 10px 20px; /* Espacement interne */
+    border: none; /* Supprime la bordure */
+    cursor: pointer; /* Curseur de la souris */
+    height: 50px;
+    width: 50%;
+    margin-right: 3%; /* Ajoute de l'espace entre les boutons */
+    margin-left: 3%; /* Ajoute de l'espace entre les boutons */
+    margin-top:25px;
+}
 
 
-.popup-content div .bnt12 a{
+.bnt12 a{
     text-decoration:none;
     color: #fff;
 }
 
+.popup-content1 div{
+    width: 70%; /* Pour occuper toute la largeur de .popup-content */
+    display: flex; /* Utilisation de flexbox */
+    flex-direction: row; /* Les éléments sont disposés en colonne */
+    align-items: center; /* Centrer les éléments horizontalement */
+}
+.popup-content1 form label {
+    width: 100%; /* Occupera toute la largeur */
+    max-width: 400px; /* Largeur maximale */
+    margin-bottom: 10px; /* Espacement entre chaque élément */
+}
+
+.popup-content1 form input,
+.popup-content1 form select,
+.popup-content1 table,
+.popup-content form textarea {
+    width: 100%; /* Occupera toute la largeur */
+    max-width: 470px; /* Largeur maximale */
+    padding: 8px; /* Espacement interne */
+    margin-bottom: 20px; /* Espacement entre chaque élément */
+}
+.popup-content1 table{
+  margin-top: 0px;
+  width: 100%; /* Occupera toute la largeur */
+  max-width: 550px; /* Largeur maximale */
+  padding: 8px; /* Espacement interne */
+  margin-bottom: 0px; /* Espacement entre chaque élément */
+
+}
+
+.popup-content1 table tr td {
+  padding: 17px 10px;
+  border: 1px solid orange;
+}
+.popup-content1 .signe{
+  width: 100%; /* Occupera toute la largeur */
+  max-width: 550px; /* Largeur maximale */
+  padding: 8px; /* Espacement interne */
+  height : 120px;
+  display:flex;
+  flex-direction:row
+  justify-content:center
+  align-items:center;
+
+}
+.popup-content1 .signe .signature {
+  width: 48%;
+  height: 100%;
+  border: 1px solid orange;
+  margin: 0 10px; /* Ajoute de l'espace sur les côtés gauche et droit */
+}
+.popup-content1 .signe .clients {
+  width: 48%;
+  height: 100%;
+  margin: 0 10px; /* Ajoute de l'espace sur les côtés gauche et droit */
+  display:flex;
+  flex-direction:column;
+  justify-content:space-evenly;
+}
+.popup-content1 .signe .clients p {
+  color:orange;
+}
+
+.black-text {
+   color: orange;
+  font-weight: bold; /* Si vous voulez rendre le texte gras */
+  font-size: 1.2em; /* Augmente légèrement la taille du texte */
+}
+
+.orange-text {
+  color: black;
+  font-weight: bold; /* Si vous voulez rendre le texte gras */
+  font-size: 1.3em; /* Augmente légèrement la taille du texte */
+}
+
+.popup-content1 .signe1{
+  width: 100%; /* Occupera toute la largeur */
+  max-width: 550px; /* Largeur maximale */
+  padding: 0px; /* Espacement interne */
+  height : 60px;
+  display:flex;
+  flex-direction:row
+  justify-content:center
+  align-items:center;
+  margin-bottom:5px;
+
+
+}
+.popup-content1 .signe1 .signature1 {
+  width: 70%;
+  height: 100%;
+  border: 1px solid orange;
+  margin: 0 3px; /* Ajoute de l'espace sur les côtés gauche et droit */
+  display:flex;
+  justify-content:end;
+  align-items:center;
+  padding:4px;
+}
+.popup-content1 .signe1 .total {
+  width: 30%;
+  height: 100%;
+  margin: 0 3px; /* Ajoute de l'espace sur les côtés gauche et droit */
+  display:flex;
+  border: 1px solid orange;
+  flex-direction:column;
+  justify-content:space-evenly;
+}
 

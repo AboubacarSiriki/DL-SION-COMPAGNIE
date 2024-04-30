@@ -81,32 +81,6 @@
               <a href="#">Voir plus</a>
             </div>
           </div>
-          <div class="top-sales box">
-            <div class="title">Meilleurs Ventes</div>
-            <ul class="top-sales-details">
-              <li>
-                <a href="#">
-                  <img src="{{ url_for('static', filename='image/sunglasses.jpg') }}" alt="" />
-                  <span class="product"> HP</span>
-                </a>
-                <span class="price">50.000F</span>
-              </li>
-              <li>
-                <a href="#">
-                  <img src="{{ url_for('static', filename='image/jeans.jpg') }}" alt="" />
-                  <span class="product">Imprimante </span>
-                </a>
-                <span class="price">300.000F</span>
-              </li>
-              <li>
-                <a href="#">
-                  <img src="{{ url_for('static', filename='image/nike-min.jpg') }}" alt="" />
-                  <span class="product">Tablette</span>
-                </a>
-                <span class="price">400.000F</span>
-              </li>
-            </ul>
-          </div>
         </div>
       </div>
 
@@ -171,9 +145,16 @@
     </div>
 
 <div id="popup12" class="popup12">
-        <div class="popup-content">
+        <div class="popup-content1">
             <span class="close" id="close-popup1">&times;</span>
-          <h2>Facture normalisée</h2>
+          <p style="color: orange;">Cachet des mentions obligatoires <span class="black-text">FACTURE N°23007Z075</span><span class="orange-text">\0740935</span></p>
+            <div class="signe">
+                <div class="signature"></div>
+                <div class="clients"><p>Date : .................................................</p>
+                    <p>Client : ...................................................</p>
+                    <p>Adresse : .............................................</p>
+                </div>
+            </div>
             <form>
               <table>
                         <thead>
@@ -194,8 +175,29 @@
                                 <td>400 000</td>
                                 <td>400 000</td>
                             </tr>
+                             <tr>
+                                <td>2</td>
+                                <td>Nolovo XP core I5</td>
+                                <td>2</td>
+                                <td>400 000</td>
+                                <td>400 000</td>
+                            </tr>
+                             <tr>
+                                <td>3</td>
+                                <td>Nolovo XP core I5</td>
+                                <td>2</td>
+                                <td>400 000</td>
+                                <td>400 000</td>
+                            </tr>
                         </tbody>
                     </table>
+                <div class="signe1">
+                <div class="signature1">Montant total TTC</div>
+                <div class="total"></div>
+            </div>
+                <p style="color:orange;">Arreté de la presente facture à la somme de .........................................................</p>
+                 <p style="color:orange;">.....................................................................................................................................................................</p><br>
+                 <p style="color:orange; text-align:center;">Facturation de la TVA non autorisée</p>
             </form>
             <div><button class="btn12"><a href="{{url_for('achats')}}">Retour</a></button>
                 <button id="btn11">Imprimer</button>
