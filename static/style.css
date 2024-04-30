@@ -851,3 +851,29 @@ nav .profile-details i{
   justify-content:space-evenly;
 }
 
+/* Style de la liste déroulante */
+    .select {
+        appearance: none; /* Supprimer la flèche par défaut */
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 4px;
+        cursor: pointer;
+        display: none;
+    }
+
+    /* Style des options de la liste déroulante */
+    .select option {
+        cursor: pointer;
+    }
+
+    /* Style de la liste déroulante lors du survol */
+    .select:hover {
+        border-color: #999;
+    }
+    /* Afficher la liste déroulante lorsque la classe active est présente */
+.select.active {
+    display: block;
+}

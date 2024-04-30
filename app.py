@@ -476,10 +476,31 @@ def achats():
 
     curso = conn.cursor()
     curso.execute(
-        "select date_entree,statut,fournisseur.nom_prenoms from entree,fournisseur where entree.id_fournisseur = fournisseur.id_fournisseur ")
+        "select id_entree,date_entree,statut,fournisseur.nom_prenoms,produit.nom_produit from entree,fournisseur,produit where entree.id_fournisseur = fournisseur.id_fournisseur and entree.id_produit=produit.id_produit ")
     resultat = curso.fetchall()
     curso.close()
     return render_template("achats.html", produits=produits, fournisseurs=fournisseurs,resultat=resultat)
+
+
+from flask import request
+
+@app.route('/update_status/<entry_id>', methods=['POST'])
+def update_status(entry_id):
+    if request.method == 'POST':
+        # Récupérer le nouveau statut envoyé depuis le formulaire
+        new_status = request.form.get('status')
+
+        # Mettre à jour le statut dans la base de données
+        cursor = conn.cursor()
+        cursor.execute("UPDATE entree SET statut = %s WHERE id_entree = %s", (new_status, entry_id))
+        conn.commit()
+        cursor.close()
+
+        # Rediriger vers la page d'achats après la mise à jour du statut
+        return redirect(url_for('achats'))
+    else:
+        # Si la méthode de la requête n'est pas POST, retourner une erreur 405 (Méthode non autorisée)
+        return jsonify({'error': 'Method Not Allowed'}), 405
 
 
 @app.route('/get_product_info/<int:produit_id>')
