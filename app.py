@@ -481,9 +481,6 @@ def achats():
     curso.close()
     return render_template("achats.html", produits=produits, fournisseurs=fournisseurs,resultat=resultat)
 
-
-from flask import request
-
 @app.route('/update_status/<entry_id>', methods=['POST'])
 def update_status(entry_id):
     if request.method == 'POST':

@@ -897,3 +897,9 @@ nav .profile-details i{
 .dropdown-content a:hover {
     background-color: #f1f1f1;
 }
+
+@media print {
+    .btn12, #btn11 {
+        display: none;
+    }
+}

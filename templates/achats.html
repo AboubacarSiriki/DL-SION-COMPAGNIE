@@ -172,7 +172,7 @@
                 </div>
             </div>
             <form>
-              <table>
+              <table ID="stock-table1">
                         <thead>
                             <tr>
                                 <td>Réf</td>
@@ -184,28 +184,44 @@
                         </thead>
 
                         <tbody>
-                            <tr>
-                                <td>1</td>
-                                <td>Nolovo XP core I5</td>
-                                <td>2</td>
-                                <td>400 000</td>
-                                <td>400 000</td>
-                            </tr>
-                             <tr>
-                                <td>2</td>
-                                <td>Nolovo XP core I5</td>
-                                <td>2</td>
-                                <td>400 000</td>
-                                <td>400 000</td>
-                            </tr>
-                             <tr>
-                                <td>3</td>
-                                <td>Nolovo XP core I5</td>
-                                <td>2</td>
-                                <td>400 000</td>
-                                <td>400 000</td>
-                            </tr>
                         </tbody>
+                     <thead>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </thead>
                     </table>
                 <div class="signe1">
                 <div class="signature1">Montant total TTC</div>
@@ -225,7 +241,9 @@
    document.addEventListener('DOMContentLoaded', function() {
   var addButton = document.querySelector('#add-button');
   var stockTable = document.querySelector('#stock-table tbody');
+  var stockTable1 = document.querySelector('#stock-table1 tbody');
   var submitButton = document.querySelector('button[type="submit"]'); // Get the submit button
+  var rowNum = 1;
 
   addButton.addEventListener('click', function(event) {
     event.preventDefault();
@@ -245,12 +263,39 @@
                             '<td>' + data.designation + '</td>' +
                             '<td>' + fournisseurId + '</td>'; // Add supplier ID cell
 
+        var newRow1 = document.createElement('tr');
+        newRow1.innerHTML = '<td>' + rowNum + '</td>' +
+                            '<td>' + data.designation + '</td>' +
+                            '<td>' + nombre + '</td>' +
+                            '<td>' + data.prix + '</td>' +
+                            '<td>' + (nombre * data.prix) + '</td>'; // Add supplier ID cell
+
         stockTable.appendChild(newRow);
+        stockTable1.appendChild(newRow1);
+
+        rowNum++;
+
+        updateTotal();
       })
       .catch(error => {
         console.error('Erreur lors de la récupération des informations du produit :', error);
       });
   });
+
+  // Fonction pour mettre à jour le total
+function updateTotal() {
+    var total = 0;
+    var rows = stockTable1.querySelectorAll('tr');
+
+    // Calculer le total à partir des lignes du tableau 1
+    for (var i = 0; i < rows.length; i++) {
+        var cellValue = rows[i].querySelectorAll('td')[4].textContent;
+        total += parseInt(cellValue);
+    }
+
+    // Mettre à jour le contenu de la balise div avec la classe "total"
+    document.querySelector('.total').textContent = total;
+}
 
   submitButton.addEventListener('click', function(event) {
     event.preventDefault(); // Prevent default form submission
@@ -299,9 +344,28 @@
         // Display an error message to the user
         alert('Erreur lors de la soumission de la commande.');
       });
+
+      document.querySelector(".popup12").style.display = "block";
   });
 });
 </script>
+
+<script>
+document.getElementById("btn11").addEventListener("click", function() {
+    // Sélectionnez la section contenant le tableau de la facture à imprimer
+    var sectionToPrint = document.getElementById("popup12").cloneNode(true);
+
+    // Masquez les éléments non souhaités lors de l'impression
+    sectionToPrint.querySelector('.btn12').style.display = 'none'; // Masquer le bouton "Retour"
+    sectionToPrint.querySelector('#btn11').style.display = 'none'; // Masquer le bouton "Imprimer"
+
+    // Créez une fenêtre d'impression et imprimez la section
+    var printWindow = window.open('', '_blank');
+    printWindow.document.body.appendChild(sectionToPrint);
+    printWindow.print();
+});
+</script>
+
 <script>
     // Fonction pour afficher ou masquer la liste déroulante
 function toggleDropdown(link, color) {
@@ -347,7 +411,5 @@ function hideDropdownAndSubmit(form) {
     form.submit(); // Soumettre le formulaire
 }
 </script>
-
-
 
 {% endblock %}
