@@ -422,7 +422,7 @@ def submit_order():
         cursor = conn.cursor()
         cursor.execute(
             """INSERT INTO entree (ID_fournisseur, id_produit, Quantite, prix, date_entree, statut) VALUES (%s, %s, %s, %s, %s, %s)""",
-            (fournisseur_id, product_id, quantity, unit_price, datetime.now().strftime('%Y-%m-%d'), 'En cours')  # Remplacer 1 par l'ID du fournisseur réel
+            (fournisseur_id, product_id, quantity, unit_price,datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'En cours')  # Remplacer 1 par l'ID du fournisseur réel
         )
         conn.commit()
         cursor.close()
@@ -453,7 +453,7 @@ def achats():
         fournisseur_id = request.form["fournisseur"]
 
         montant = 0
-        date_aujourdhui = datetime.now().strftime('%Y-%m-%d')
+        date_aujourdhui = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
         cursor = conn.cursor()
 
@@ -551,7 +551,7 @@ def stock():
         produit_id = request.form["produit"]
         quantite = int(request.form["nombre"])  # Convertir en entier pour la manipulation
         # Obtenir la date d'aujourd'hui
-        date_aujourdhui = datetime.now().strftime('%Y-%m-%d')
+        date_aujourdhui = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
         cursor = conn.cursor()
 

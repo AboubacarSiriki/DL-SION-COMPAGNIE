@@ -232,7 +232,7 @@
                  <p style="color:orange; text-align:center;">Facturation de la TVA non autorisée</p>
             </form>
             <div><button class="btn12"><a href="{{url_for('achats')}}">Retour</a></button>
-                <button id="btn11">Imprimer</button>
+                <button id="btn11" onclick="printSection('popup12')">Imprimer</button>
             </div><br>
         </div>
 </div>
@@ -351,19 +351,16 @@ function updateTotal() {
 </script>
 
 <script>
-document.getElementById("btn11").addEventListener("click", function() {
-    // Sélectionnez la section contenant le tableau de la facture à imprimer
-    var sectionToPrint = document.getElementById("popup12").cloneNode(true);
+function printSection(sectionId) {
+    var printContents = document.getElementById(sectionId).innerHTML;
+    var originalContents = document.body.innerHTML;
 
-    // Masquez les éléments non souhaités lors de l'impression
-    sectionToPrint.querySelector('.btn12').style.display = 'none'; // Masquer le bouton "Retour"
-    sectionToPrint.querySelector('#btn11').style.display = 'none'; // Masquer le bouton "Imprimer"
+    document.body.innerHTML = printContents;
 
-    // Créez une fenêtre d'impression et imprimez la section
-    var printWindow = window.open('', '_blank');
-    printWindow.document.body.appendChild(sectionToPrint);
-    printWindow.print();
-});
+    window.print();
+
+    document.body.innerHTML = originalContents;
+}
 </script>
 
 <script>

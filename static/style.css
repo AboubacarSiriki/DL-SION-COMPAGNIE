@@ -712,7 +712,7 @@ nav .profile-details i{
     background-color: #fff;
     margin: 15% auto;
     padding: 20px;
-    border: 1px solid #888;
+    border: 1px solid orange;
     border-radius: 8px;
     width: 80%;
     max-width: 700px;
@@ -809,13 +809,13 @@ nav .profile-details i{
 .black-text {
    color: orange;
   font-weight: bold; /* Si vous voulez rendre le texte gras */
-  font-size: 1.2em; /* Augmente légèrement la taille du texte */
+  font-size: 0.9em; /* Augmente légèrement la taille du texte */
 }
 
 .orange-text {
   color: black;
   font-weight: bold; /* Si vous voulez rendre le texte gras */
-  font-size: 1.3em; /* Augmente légèrement la taille du texte */
+  font-size: 1em; /* Augmente légèrement la taille du texte */
 }
 
 .popup-content1 .signe1{
@@ -901,5 +901,8 @@ nav .profile-details i{
 @media print {
     .btn12, #btn11 {
         display: none;
+    }
+    .popup12, .popup12 * {
+        display: block !important; /* S'assurer que tous les éléments de la section à imprimer sont visibles */
     }
 }
