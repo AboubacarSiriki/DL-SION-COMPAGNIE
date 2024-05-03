@@ -88,10 +88,44 @@ window.onclick = function (event) {
     </script>
 
   <script>
-    document.getElementById("voir").addEventListener("click", function(){
-	document.querySelector(".popup12").style.display = "block";
-})
-    </script>
+    // Sélectionnez tous les boutons "Voir"
+    var voirButtons = document.querySelectorAll(".voir-btn");
+
+    // Ajoutez un écouteur d'événements à chaque bouton "Voir"
+    voirButtons.forEach(function(button) {
+        button.addEventListener("click", function() {
+            var rowId = button.getAttribute("data-id");
+            var popup = document.querySelector(".popup121");
+
+            // Faire une requête AJAX pour récupérer les données associées à cette ligne
+            fetch('/get_row_data/' + rowId)
+                .then(response => response.json())
+                .then(data => {
+                    // Afficher les données dans le popup
+                    // Exemple : mettre les données dans les cellules du tableau dans le popup
+                    var tbody = popup.querySelector('tbody');
+                    tbody.innerHTML = ''; // Effacer le contenu précédent
+
+                    data.forEach(function(item) {
+                        var tr = document.createElement('tr');
+                        tr.innerHTML = '<td>' + item.designation + '</td>' +
+                                       '<td>' + item.quantite + '</td>' +
+                                       '<td>' + item.prix_produit + '</td>' +
+                                       '<td>' + item.prix_entree + '</td>' +
+                                       '<td>' + item.date_entree + '</td>';
+                        tbody.appendChild(tr);
+                    });
+
+                    // Afficher le popup
+                    popup.style.display = "block";
+                })
+                .catch(error => {
+                    console.error('Erreur lors de la récupération des données de la ligne:', error);
+                });
+        });
+    });
+</script>
+
 
   <script>
     document.getElementById("modif").addEventListener("click", function(){

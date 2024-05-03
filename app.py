@@ -456,7 +456,6 @@ def achats():
         date_aujourdhui = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
         cursor = conn.cursor()
-
         # Enregistrement de l'achat dans la base de données avec la date d'aujourd'hui
         cursor.execute(
             'INSERT INTO entree (ID_fournisseur, id_produit, Quantite, prix, date_entree, statut) VALUES (%s, %s, %s, %s, %s, %s)',
@@ -479,7 +478,30 @@ def achats():
         "select id_entree,date_entree,statut,fournisseur.nom_prenoms,produit.nom_produit from entree,fournisseur,produit where entree.id_fournisseur = fournisseur.id_fournisseur and entree.id_produit=produit.id_produit ")
     resultat = curso.fetchall()
     curso.close()
+
     return render_template("achats.html", produits=produits, fournisseurs=fournisseurs,resultat=resultat)
+
+# Définir la route pour récupérer les données de la ligne
+@app.route('/get_row_data/<int:row_id>', methods=['GET'])
+def get_row_data(row_id):
+    # Exécuter la requête SQL pour récupérer la date associée à l'ID de la ligne
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT date_entree FROM entree WHERE id_entree = %s", (row_id,))
+    date_entree = cursor.fetchone()[0]  # Récupérer la date de la première colonne
+
+    # Ensuite, utilisez cette date pour récupérer les données associées
+    cursor.execute(
+        "SELECT produit.designation, entree.quantite, produit.prix, entree.prix, entree.date_entree,id_entree FROM entree JOIN produit ON entree.id_produit = produit.id_produit WHERE entree.date_entree = %s", (date_entree,))
+    resultat1 = cursor.fetchall()
+    cursor.close()
+
+    # Formater les données et les renvoyer en tant que réponse JSON
+    data = [{'designation': row[5], 'quantite': row[0], 'prix_produit': row[1], 'prix_entree': row[2], 'date_entree': row[3]} for row in resultat1]
+
+    return jsonify(data)
+
+
 
 @app.route('/update_status/<entry_id>', methods=['POST'])
 def update_status(entry_id):

@@ -81,9 +81,9 @@
               </ul>
               <ul class="details">
                 <li class="topic">details</li>
-                  {% for row in resultat%}
-                   <li><button class="gauche" id="voir"><a href="#"><i class='bx bx-show eyes-icon' style='font-size: 22px; color:white;'></i></a></button></li>
-                   {% endfor %}
+                  {% for row in resultat %}
+                    <li><button class="gauche voir-btn" data-id="{{ row[0] }}"><a href="#"><i class='bx bx-show eyes-icon' style='font-size: 22px; color:white;'></i></a></button></li>
+                  {% endfor %}
               </ul>
               <ul class="details">
                 <li class="topic">Fournisseur</li>
@@ -108,6 +108,86 @@
         </div>
       </div>
 
+
+<div id="popup121" class="popup121">
+        <div class="popup-content1">
+            <span class="close" id="close-popup11">&times;</span>
+          <p style="color: orange;">Cachet des mentions obligatoires <span class="black-text">FACTURE N°23007Z075</span><span class="orange-text">\0740935</span></p>
+            <div class="signe">
+                <div class="signature"></div>
+                <div class="clients"><p>Date : .................................................</p>
+                    <p>Client : ...................................................</p>
+                    <p>Adresse : .............................................</p>
+                </div>
+            </div>
+            <form>
+              <table>
+                        <thead>
+                            <tr>
+                                <td>Réf</td>
+                                <td>Designation</td>
+                                <td>Quantité</td>
+                                <td>PU TTC</td>
+                                <td>Montant TTC</td>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                        </tbody>
+                     <thead>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </thead>
+                    </table>
+                <div class="signe1">
+                <div class="signature1">Montant total TTC</div>
+                <div class="total1"></div>
+            </div>
+                <p style="color:orange;">Arreté de la presente facture à la somme de .........................................................</p>
+                 <p style="color:orange;">.....................................................................................................................................................................</p><br>
+                 <p style="color:orange; text-align:center;">Facturation de la TVA non autorisée</p>
+            </form>
+            <div><button class="btn12"><a href="{{url_for('achats')}}">Retour</a></button>
+                <button id="btn111" onclick="printSection('popup121')">Imprimer</button>
+            </div><br>
+        </div>
+</div>
+
+
       <div id="popup" class="popup">
         <div class="popup-content">
             <span class="close" id="close-popup">&times;</span>
@@ -117,7 +197,7 @@
 
                  <label for="fournisseur">Fournisseur</label>
                   <select id="fournisseur" name="fournisseur" required>
-                      <option value="">Sélectionnez un fournisseur</option>
+                      <option value="" disabled selected>Sélectionnez un fournisseur</option>
                       {% for fournisseur in fournisseurs %}
                         <option value="{{fournisseur[0] }}">{{ fournisseur[1] }}</option>
                     {% endfor %}
@@ -126,7 +206,7 @@
 
                   <label for="produit">Produit</label>
                   <select id="produit" name="produit" required>
-                      <option value="">Sélectionnez un produit</option>
+                      <option value="" disabled selected>Sélectionnez un produit</option>
                       {% for produit in produits %}
                         <option value="{{ produit[0] }}">{{ produit[1] }}</option>
                     {% endfor %}
@@ -394,19 +474,51 @@ function getColor(status) {
     }
 }
 </script>
-<script>
-// Fonction pour afficher ou masquer la liste déroulante
-function toggleDropdown(link) {
-    var select = link.nextElementSibling.querySelector('.select');
-    select.classList.toggle('active');
-}
 
-// Fonction pour masquer la liste déroulante et soumettre le formulaire
-function hideDropdownAndSubmit(form) {
-    var select = form.querySelector('.select');
-    select.classList.remove('active'); // Masquer la liste déroulante
-    form.submit(); // Soumettre le formulaire
-}
+
+<script>
+    // Sélectionnez tous les boutons "Voir"
+    var voirButtons = document.querySelectorAll(".voir-btn");
+
+    // Ajoutez un écouteur d'événements à chaque bouton "Voir"
+    voirButtons.forEach(function(button) {
+        button.addEventListener("click", function() {
+            var rowId = button.getAttribute("data-id");
+            var popup = document.querySelector(".popup121");
+            var rowNum = 1;
+
+            // Faire une requête AJAX pour récupérer les données associées à cette ligne
+            fetch('/get_row_data/' + rowId)
+                .then(response => response.json())
+                .then(data => {
+                    // Afficher les données dans le popup
+                    // Exemple : mettre les données dans les cellules du tableau dans le popup
+                    var tbody = popup.querySelector('tbody');
+                    tbody.innerHTML = ''; // Effacer le contenu précédent
+
+                    data.forEach(function(item) {
+                        var tr = document.createElement('tr');
+                        tr.innerHTML = '<td>' + rowNum + '</td>' +
+                                       '<td>' + item.date_entree + '</td>'
+                                       '<td>' + item.designation + '</td>' +
+                                       '<td>' + item.quantite + '</td>' +
+                                       '<td>' + item.prix_produit + '</td>' +
+                                       '<td>' + item.prix_entree + '</td>' +;
+                        tbody.appendChild(tr);
+
+                        rowNum++;
+                    });
+
+                    // Afficher le popup
+                    popup.style.display = "block";
+                })
+                .catch(error => {
+                    console.error('Erreur lors de la récupération des données de la ligne:', error);
+                });
+        });
+    });
 </script>
+
+
 
 {% endblock %}

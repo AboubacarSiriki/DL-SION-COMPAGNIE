@@ -75,6 +75,12 @@
           {% endfor %}
         </ul>
         <ul class="details">
+          <li class="topic">Stock</li>
+          {% for row in resultat %}
+          <li><a href="#">{{ row[4] }}</a></li>
+          {% endfor %}
+        </ul>
+        <ul class="details">
           <li class="topic">Stock min</li>
           {% for row in resultat %}
           <li><a href="#">{{ row[5] }}</a></li>
