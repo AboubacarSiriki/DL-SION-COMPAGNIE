@@ -206,7 +206,7 @@ CREATE TABLE IF NOT EXISTS `vente` (
   `quantite` int(11) NOT NULL,
   `montant` int(11) NOT NULL,
   `date_vente` date NOT NULL,
-  PRIMARY KEY (`id_vente`)
+  PRIMARY KEY (`id_vente`)  
 ) ENGINE=InnoDB;
 
 --

@@ -400,10 +400,65 @@ def fournisseurs():
         return render_template("fournisseurs.html", resultat=resultat)
 
 
-@app.route('/ventes/')
+@app.route('/ventes/', methods=["POST", "GET"])
 def ventes():
-    # Rendre le template index.html
-    return render_template('ventes.html')
+    cursor = conn.cursor()
+    cursor.execute("SELECT id_produit, nom_produit, categorie, prix FROM produit")
+    produits = cursor.fetchall()
+    cursor.close()
+
+    cursor = conn.cursor()
+    cursor.execute("SELECT id_client, nom_prenoms FROM client")
+    clients = cursor.fetchall()
+    cursor.close()
+
+    if request.method == 'POST':
+        client_id = request.form.get("client")
+        produit_id = request.form.get("produit")
+        quantite = request.form.get("nombre")
+
+        if not client_id:  # Si aucun client_id n'est fourni, créez un nouveau client
+            nom = request.form.get("nom")
+            tel = request.form.get("tel")
+            email = request.form.get("email")
+            adresse = request.form.get("adresse")
+            with conn.cursor() as cursor:
+                cursor.execute(
+                    'INSERT INTO client (nom_prenoms, telephone, email, adresse) VALUES (%s, %s, %s, %s)',
+                    (nom, tel, email, adresse))
+                conn.commit()
+                client_id = cursor.lastrowid
+
+        if produit_id and quantite:
+            quantite = int(quantite)  # Convertir en entier pour la manipulation
+            with conn.cursor() as cursor:
+                cursor.execute("SELECT prix FROM produit WHERE id_produit = %s", (produit_id,))
+                prix_unitaire = cursor.fetchone()
+                if prix_unitaire:
+                    prix_unitaire = prix_unitaire[0]
+                    montant = prix_unitaire * quantite
+                    date_aujourdhui = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                    cursor.execute(
+                        'INSERT INTO vente (id_client, id_produit, quantite, montant, date_vente) VALUES (%s, %s, %s, %s, %s)',
+                        (client_id, produit_id, quantite, montant, date_aujourdhui))
+                    conn.commit()
+                    cursor.execute(
+                        'UPDATE produit SET stock = stock - %s WHERE id_produit = %s',
+                        (quantite, produit_id))
+                    conn.commit()
+                    flash('Vente ajoutée avec succès', 'success')
+                else:
+                    flash('Prix du produit non trouvé', 'danger')
+        else:
+            flash('Informations de vente manquantes', 'danger')
+        cursor.close()
+        return redirect(url_for('ventes'))
+
+    return render_template("ventes.html", produits=produits, clients=clients)
+
+
+
+
 
 @app.route('/submit_order', methods=['POST'])
 def submit_order():
