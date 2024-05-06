@@ -182,7 +182,7 @@
                  <p style="color:orange;">.....................................................................................................................................................................</p><br>
                  <p style="color:orange; text-align:center;">Facturation de la TVA non autorisée</p>
             </form>
-            <div><button class="btn12"><a href="{{url_for('achats')}}">Retour</a></button>
+            <div><button class="btn12"><a href="{{url_for('commandes')}}">Retour</a></button>
                 <button id="btn111" onclick="printSection('popup121')">Imprimer</button>
             </div><br>
         </div>
@@ -514,12 +514,12 @@ function printSection(sectionId) {
 
                     data.forEach(function(item) {
                         var tr = document.createElement('tr');
-                        tr.innerHTML = '<td>' + rowNum + '</td>' +
-                                       '<td>' + item.date_commande + '</td>'
+                        tr.innerHTML = '<td>' + item.date_commande + '</td>' +
                                        '<td>' + item.designation + '</td>' +
                                        '<td>' + item.quantite + '</td>' +
                                        '<td>' + item.prix_vente + '</td>' +
-                                       '<td>' + item.montant + '</td>' +;
+                                       '<td>' + item.montant + '</td>';
+
                         tbody.appendChild(tr);
 
                         rowNum++;

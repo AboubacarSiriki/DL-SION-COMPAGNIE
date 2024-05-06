@@ -777,7 +777,7 @@ def donnee_commande(ligne_id):
     cursor.close()
 
     # Formater les données et les renvoyer en tant que réponse JSON
-    data = [{'designation': row[5], 'quantite': row[0], 'prix_vente': row[1], 'montant': row[2], 'date_commande': row[3]} for row in resultat1]
+    data = [{'designation': row[0], 'quantite': row[1], 'prix_vente': row[2], 'montant': row[3], 'date_commande': row[5]} for row in resultat1]
 
     return jsonify(data)
 
