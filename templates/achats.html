@@ -62,7 +62,7 @@
                 {% for row in resultat %}
                 <li>
                     <a href="#" onclick="toggleDropdown(this, '{{ row[2] }}')">{{ row[2] }}</a>
-                    <form action="/update_status/{{ row[0] }}" method="POST" class="select-wrapper">
+                    <form action="/status_achat/{{ row[0] }}" method="POST" class="select-wrapper">
                         <select class="select" name="status" onchange="hideDropdownAndSubmit(this.form, '{{ row[2] }}')">
                             <option disabled selected>Choisissez un statut</option>
                             <option value="En cours">En cours</option>
@@ -200,7 +200,7 @@
                       <option value="" disabled selected>Sélectionnez un fournisseur</option>
                       {% for fournisseur in fournisseurs %}
                         <option value="{{fournisseur[0] }}">{{ fournisseur[1] }}</option>
-                    {% endfor %}
+                      {% endfor %}
                       <!-- Ajoutez d'autres options selon vos besoins -->
                   </select>
 
@@ -209,7 +209,7 @@
                       <option value="" disabled selected>Sélectionnez un produit</option>
                       {% for produit in produits %}
                         <option value="{{ produit[0] }}">{{ produit[1] }}</option>
-                    {% endfor %}
+                      {% endfor %}
                       <!-- Ajoutez d'autres options selon vos besoins -->
                   </select>
                   <label for="nombre">Nombre</label>
@@ -252,7 +252,7 @@
                 </div>
             </div>
             <form>
-              <table ID="stock-table1">
+              <table id="stock-table1">
                         <thead>
                             <tr>
                                 <td>Réf</td>
@@ -518,7 +518,5 @@ function getColor(status) {
         });
     });
 </script>
-
-
 
 {% endblock %}
