@@ -209,6 +209,7 @@ CREATE TABLE IF NOT EXISTS `vente` (
   PRIMARY KEY (`id_vente`)  
 ) ENGINE=InnoDB;
 
+ALTER TABLE `vente` ADD `prix_vente` INT NOT NULL AFTER `montant`;
 --
 -- Contraintes pour les tables déchargées
 --
