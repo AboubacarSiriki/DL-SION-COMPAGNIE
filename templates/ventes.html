@@ -183,9 +183,9 @@
       <label for="prix_vente">Entrez le prix unitaire de vente</label>
       <input type="prix_vente" id="n_prix_vente" name="prix_vente" required>
 
-      <button type="button" onclick="return ajouterVente()">Ajouter</button>
+      <button type="button" id="add-button1">Ajouter</button>
 
-      <table id="ventes-table">
+      <table id="ventes-table1">
         <thead>
           <tr>
             <td>Réf</td>
@@ -196,15 +196,7 @@
           </tr>
         </thead>
         <tbody>
-          {% for vente in resultat %}
-          <tr>
-            <td>{{ vente.id_vente }}</td>
-            <td>{{ vente.nom_produit }}</td>
-            <td>{{ vente.quantite }}</td>
-            <td>{{ vente.prix_unitaire }}</td>
-            <td>{{ vente.montant }}</td>
-          </tr>
-          {% endfor %}
+
         </tbody>
       </table>
       <button type="submit">Valider la vente</button>
@@ -271,6 +263,42 @@ addButton.addEventListener('click', function(event) {
     var produitId = document.querySelector('#produit').value;
     var nombre = document.querySelector('#nombre').value;
     var prixVente = document.querySelector('#prix_vente').value;
+    var montantTTC = parseInt(nombre, 10) * parseFloat(prixVente);
+
+    if (produitId && nombre && prixVente) {
+        fetch('/get_product_info/' + produitId)
+            .then(response => response.json())
+            .then(data => {
+                var newRow = document.createElement('tr');
+                newRow.innerHTML = '<td>' + produitId + '</td>' +
+                                    '<td>' + data.designation + '</td>' +
+                                    '<td>' + nombre + '</td>' +
+                                    '<td>' + data.prix + '</td>' +
+                                    '<td>' + montantTTC + '</td>';
+
+                ventTable.appendChild(newRow);
+            })
+            .catch(error => {
+                console.error('Erreur lors de la récupération des informations du produit :', error);
+            });
+    } else {
+        console.error('Veuillez remplir tous les champs du formulaire.');
+    }
+});
+});
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+var addButton = document.querySelector('#add-button1');
+var ventTable = document.querySelector('#ventes-table1 tbody');
+
+addButton.addEventListener('click', function(event) {
+    event.preventDefault();
+
+    var produitId = document.querySelector('#n_produit').value;
+    var nombre = document.querySelector('#n_nombre').value;
+    var prixVente = document.querySelector('#n_prix_vente').value;
     var montantTTC = parseInt(nombre, 10) * parseFloat(prixVente);
 
     if (produitId && nombre && prixVente) {
