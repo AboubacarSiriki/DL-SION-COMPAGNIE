@@ -96,7 +96,7 @@
           <li class="topic">Action</li>
           {% for row in resultat %}
           <div class="icon">
-            <i class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i>
+            <i class='bx bx-edit edit-icon' id="modif" style='font-size: 30px; color: blue;'></i>
             <i class='bx bx-trash delete-icon' style='font-size: 30px; color: red;'></i>
           </div>
           {% endfor %}
@@ -138,5 +138,38 @@
       <button type="submit">Ajouter</button>
     </form>
   </div>
+
+  <div id="popup1" class="popup1">
+  <div class="popup-content">
+    <span class="close" id="close-popup1">&times;</span>
+    <h2>Ajout d'un nouveau produit</h2><br>
+
+    <form method="post" action="#">
+
+      <label for="nommodif">Nom du produit</label>
+      <input type="text" id="nommodif" name="nommodif" required>
+
+      <label for="categoriemodif">Categorie</label>
+      <input type="text" id="categoriemodif" name="categoriemodif" required>
+      <!-- Ajoutez d'autres options selon vos besoins -->
+      </select>
+      <label for="prixmodif">Prix d'achat</label>
+      <input type="number" id="prixmodif" name="prixmodif" required>
+
+      <label for="nombremodif">Ajouter un stock minimum</label>
+      <input type="number" id="nombremodif" name="nombremodif" required>
+
+      <label for="descriptionmodif">Description</label>
+      <textarea id="descriptionmodif" name="descriptionmodif" required></textarea>
+
+      <label for="imagemodif">Image</label>
+      <input type="file" id="imagemodif" name="imagemodif" accept="image/*" required>
+
+      <button type="submit">Ajouter</button>
+    </form>
+  </div>
 </div>
+
+</div>
+
 {% endblock %}

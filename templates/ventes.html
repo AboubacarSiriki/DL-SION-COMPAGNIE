@@ -51,47 +51,56 @@
       </div>
       <div class="sales-details">
         <ul class="details">
-          <li class="topic">Date de vente</li>
-          <li><a href="#">02/01/2024</a></li>
-          <li><a href="#">05/01/2024</a></li>
-          <li><a href="#">---</a></li>
+          <li class="topic">Date de la vente</li>
+          {% for row in resultat %}
+             <li><a href="#">{{ row[1] }}</a></li>
+          {% endfor %}
+        </ul>
 
+        <ul class="details">
+          <li class="topic">Statut</li>
+          {% for row in resultat %}
+          <li>
+            <a href="#" onclick="toggleDropdown(this, '{{ row[2] }}')">{{ row[2] }}</a>
+            <form action="/status_vente/{{ row[0] }}" method="POST" class="select-wrapper">
+              <select class="select" name="status" onchange="hideDropdownAndSubmit(this.form, '{{ row[2] }}')">
+                <option disabled selected>Choisissez un statut</option>
+                <option value="Vendu">Vendu</option>
+                <option value="Retourné">Retourné</option>
+                <option value="Annuler">Annuler</option>
+              </select>
+            </form>
+          </li>
+          {% endfor %}
         </ul>
         <ul class="details">
-          <li class="topic">statut</li>
-          <li><a href="#"> terminée</a></li>
-          <li><a href="#">en cours</a></li>
-          <li><a href="#">annulé</a></li>
+          <li class="topic">Produit</li>
+          {% for row in resultat %}
+          <li><a href="#">{{ row[4] }}</a></li>
+          {% endfor %}
         </ul>
+
         <ul class="details">
           <li class="topic">details</li>
-          <li><button class="gauche" id="voir"><a href="#"><i class='bx bx-show eyes-icon'
-                  style='font-size: 22px; color:white;'></i></a></button></li>
-          <li><button class="gauche"><a href=""><i class='bx bx-show eyes-icon'
-                  style='font-size: 22px; color:white;'></i></a></button></li>
-          <li><button class="gauche"><a href=""><i class='bx bx-show eyes-icon'
-                  style='font-size: 22px; color:white;'></i></a></button></li>
+          {% for row in resultat %}
+          <li><button class="gauche voir-btn1" data-id="{{ row[0] }}"><a href="#"><i class='bx bx-show eyes-icon' style='font-size: 22px; color:white;'></i></a></button></li>
+          {% endfor %}
         </ul>
+
         <ul class="details">
           <li class="topic">Nom clients</li>
-          <li><a href="#">kra</a></li>
-          <li><a href="#">kouassi</a></li>
-          <li><a href="#">soumahoro</a></li>
+          {% for row in resultat %}
+          <li><a href="#">{{ row[3] }}</a></li>
+          {% endfor %}
         </ul>
         <ul class="details">
           <li class="topic">Action</li>
+          {% for row in resultat %}
           <div class="icon">
             <i class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i>
             <i class='bx bx-trash delete-icon' style='font-size: 30px; color: red;'></i>
           </div>
-          <div class="icon">
-            <i class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i>
-            <i class='bx bx-trash delete-icon' style='font-size: 30px; color: red;'></i>
-          </div>
-          <div class="icon">
-            <i class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i>
-            <i class='bx bx-trash delete-icon' style='font-size: 30px; color: red;'></i>
-          </div>
+          {% endfor %}
         </ul>
       </div>
       <div class="button">
@@ -99,6 +108,84 @@
       </div>
     </div>
   </div>
+</div>
+
+<div id="popup121" class="popup121">
+        <div class="popup-content1">
+            <span class="close" id="close-popup11">&times;</span>
+          <p style="color: orange;">Cachet des mentions obligatoires <span class="black-text">FACTURE N°23007Z075</span><span class="orange-text">\0740935</span></p>
+            <div class="signe">
+                <div class="signature"></div>
+                <div class="clients"><p>Date : .................................................</p>
+                    <p>Client : ...................................................</p>
+                    <p>Adresse : .............................................</p>
+                </div>
+            </div>
+            <form>
+              <table>
+                        <thead>
+                            <tr>
+                                <td>Réf</td>
+                                <td>Designation</td>
+                                <td>Quantité</td>
+                                <td>PU TTC</td>
+                                <td>Montant TTC</td>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                        </tbody>
+                     <thead>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </thead>
+                    </table>
+                <div class="signe1">
+                <div class="signature1">Montant total TTC</div>
+                <div class="total1"></div>
+            </div>
+                <p style="color:orange;">Arreté de la presente facture à la somme de .........................................................</p>
+                 <p style="color:orange;">.....................................................................................................................................................................</p><br>
+                 <p style="color:orange; text-align:center;">Facturation de la TVA non autorisée</p>
+            </form>
+            <div><button class="btn12"><a href="{{url_for('commandes')}}">Retour</a></button>
+                <button id="btn111" onclick="printSection('popup121')">Imprimer</button>
+            </div><br>
+        </div>
 </div>
 
 <div id="popup" class="popup">
@@ -112,6 +199,7 @@
 
       <label for="client">Client</label>
       <select id="client" name="client" required>
+        <option value="" disabled selected>Sélectionnez le client</option>
         {% for client in clients %}
         <option value="{{ client[0] }}">{{ client[1] }}</option>
         {% endfor %}
@@ -120,7 +208,7 @@
 
       <label for="produit">Produit</label>
       <select id="produit" name="produit" required>
-        <option value="">Sélectionnez un produit</option>
+        <option value="" disabled selected>Sélectionnez un produit</option>
         {% for produit in produits %}
         <option value="{{ produit[0] }}">{{ produit[1] }}</option>
         {% endfor %}
@@ -129,7 +217,7 @@
       <label for="nombre">Nombre</label>
       <input type="number" id="nombre" name="nombre" required>
       <label for="prix_vente">Entrez le prix unitaire de vente</label>
-      <input type="prix_vente" id="prix_vente" name="prix_vente" required>
+      <input type="number" id="prix_vente" name="prix_vente" required>
 
       <button type="button" id="add-button">Ajouter</button>
 
@@ -172,16 +260,16 @@
 
       <label for="produit">Produit</label>
       <select id="n_produit" name="produit" required>
-        <option value="">Sélectionnez un produit</option>
+        <option value="" disabled selected>Sélectionnez un produit</option>
         {% for produit in produits %}
         <option value="{{ produit[0] }}">{{ produit[1] }}</option>
         {% endfor %}
       </select>
 
-      <label for="nouvnombre">Nombre</label>
+      <label for="n_nombre">Nombre</label>
       <input type="number" id="n_nombre" name="nombre" required>
       <label for="prix_vente">Entrez le prix unitaire de vente</label>
-      <input type="prix_vente" id="n_prix_vente" name="prix_vente" required>
+      <input type="number" id="n_prix_vente" name="prix_vente" required>
 
       <button type="button" id="add-button1">Ajouter</button>
 
@@ -206,86 +294,209 @@
 </div>
 
 <div id="popup12" class="popup12">
-  <div class="popup-content1">
-    <span class="close" id="close-popup1">&times;</span>
-    <p style="color: orange;">Cachet des mentions obligatoires <span class="black-text">FACTURE N°23007Z075</span><span
-        class="orange-text">\0740935</span></p>
-    <div class="signe">
-      <div class="signature"></div>
-      <div class="clients">
-        <p>Date : .................................................</p>
-        <p>Client : ...................................................</p>
-        <p>Adresse : .............................................</p>
-      </div>
-    </div>
-    <form>
-      <table>
-        <thead>
-          <tr>
-            <td>Réf</td>
-            <td>Designation</td>
-            <td>Quantité</td>
-            <td>PU TTC</td>
-            <td>Montant TTC</td>
-          </tr>
-        </thead>
+        <div class="popup-content1">
+            <span class="close" id="close-popup1">&times;</span>
+          <p style="color: orange;">Cachet des mentions obligatoires <span class="black-text">FACTURE N°23007Z075</span><span class="orange-text">\0740935</span></p>
+            <div class="signe">
+                <div class="signature"></div>
+                <div class="clients"><p>Date : .................................................</p>
+                    <p>Client : ...................................................</p>
+                    <p>Adresse : .............................................</p>
+                </div>
+            </div>
+            <form>
+              <table id="stock-table1">
+                        <thead>
+                            <tr>
+                                <td>Réf</td>
+                                <td>Designation</td>
+                                <td>Quantité</td>
+                                <td>PU TTC</td>
+                                <td>Montant TTC</td>
+                            </tr>
+                        </thead>
 
-        <tbody>
-
-        </tbody>
-      </table>
-      <div class="signe1">
-        <div class="signature1">Montant total TTC</div>
-        <div class="total"></div>
-      </div>
-      <p style="color:orange;">Arreté de la presente facture à la somme de
-        .........................................................</p>
-      <p style="color:orange;">
-        .....................................................................................................................................................................
-      </p><br>
-      <p style="color:orange; text-align:center;">Facturation de la TVA non autorisée</p>
-    </form>
-    <div><button class="btn12"><a href="{{url_for('ventes')}}">Retour</a></button>
-      <button id="btn11">Imprimer</button>
-    </div><br>
-  </div>
+                        <tbody>
+                        </tbody>
+                     <thead>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </thead>
+                    </table>
+                <div class="signe1">
+                <div class="signature1">Montant total TTC</div>
+                <div class="total"></div>
+            </div>
+                <p style="color:orange;">Arreté de la presente facture à la somme de .........................................................</p>
+                 <p style="color:orange;">.....................................................................................................................................................................</p><br>
+                 <p style="color:orange; text-align:center;">Facturation de la TVA non autorisée</p>
+            </form>
+            <div><button class="btn12"><a href="{{url_for('ventes')}}">Retour</a></button>
+                <button id="btn11" onclick="printSection('popup12')">Imprimer</button>
+            </div><br>
+        </div>
 </div>
 
+   <script>
+   document.addEventListener('DOMContentLoaded', function() {
+  var addButton = document.querySelector('#add-button');
+  var ventTable = document.querySelector('#ventes-table tbody');
+  var stockTable1 = document.querySelector('#stock-table1 tbody');
+  var submitButton = document.querySelector('button[type="submit"]'); // Get the submit button
+  var rowNum = 1;
 
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-var addButton = document.querySelector('#add-button');
-var ventTable = document.querySelector('#ventes-table tbody');
-
-addButton.addEventListener('click', function(event) {
+  addButton.addEventListener('click', function(event) {
     event.preventDefault();
 
     var produitId = document.querySelector('#produit').value;
     var nombre = document.querySelector('#nombre').value;
+    var id_client = document.querySelector('#client').value; // Assuming supplier ID selector
     var prixVente = document.querySelector('#prix_vente').value;
     var montantTTC = parseInt(nombre, 10) * parseFloat(prixVente);
 
-    if (produitId && nombre && prixVente) {
-        fetch('/get_product_info/' + produitId)
-            .then(response => response.json())
-            .then(data => {
-                var newRow = document.createElement('tr');
-                newRow.innerHTML = '<td>' + produitId + '</td>' +
-                                    '<td>' + data.designation + '</td>' +
-                                    '<td>' + nombre + '</td>' +
-                                    '<td>' + data.prix + '</td>' +
-                                    '<td>' + montantTTC + '</td>';
+    fetch('/get_product_info/' + produitId)
+      .then(response => response.json())
+      .then(data => {
+        var newRow = document.createElement('tr');
+        newRow.innerHTML = '<td>' + produitId + '</td>' +
+                            '<td>' + data.designation + '</td>' +
+                            '<td>' + nombre + '</td>' +
+                            '<td>' + data.prix + '</td>' +
+                            '<td>' + montantTTC + '</td>' +
+                            '<td>' + id_client + '</td>'; // Add supplier ID cell
 
-                ventTable.appendChild(newRow);
-            })
-            .catch(error => {
-                console.error('Erreur lors de la récupération des informations du produit :', error);
-            });
-    } else {
-        console.error('Veuillez remplir tous les champs du formulaire.');
+        var newRow1 = document.createElement('tr');
+        newRow1.innerHTML = '<td>' + rowNum + '</td>' +
+                            '<td>' + data.designation + '</td>' +
+                            '<td>' + nombre + '</td>' +
+                            '<td>' + data.prix + '</td>' +
+                            '<td>' + montantTTC + '</td>';
+
+        ventTable.appendChild(newRow);
+        stockTable1.appendChild(newRow1);
+
+        rowNum++;
+
+        updateTotal();
+      })
+      .catch(error => {
+        console.error('Erreur lors de la récupération des informations du produit :', error);
+      });
+  });
+
+  // Fonction pour mettre à jour le total
+function updateTotal() {
+    var total = 0;
+    var rows = stockTable1.querySelectorAll('tr');
+
+    // Calculer le total à partir des lignes du tableau 1
+    for (var i = 0; i < rows.length; i++) {
+        var cellValue = rows[i].querySelectorAll('td')[4].textContent;
+        total += parseInt(cellValue);
     }
+
+    // Mettre à jour le contenu de la balise div avec la classe "total"
+    document.querySelector('.total').textContent = total;
+}
+
+  submitButton.addEventListener('click', function(event) {
+    event.preventDefault(); // Prevent default form submission
+
+    // Get all rows from the stock table
+    var rows = stockTable.querySelectorAll('tr');
+
+    // Prepare an array to store order data
+    var orderData = [];
+
+    // Iterate over each row and extract data
+    for (var i = 0; i < rows.length; i++) { // Skip the first header row
+      var rowData = {
+        produit_id: parseInt(rows[i].cells[0].textContent),
+        nombre: parseInt(rows[i].cells[2].textContent),
+        prix_vente: parseFloat(rows[i].cells[3].textContent),
+        montant: parseFloat(rows[i].cells[4].textContent),
+        id_client: parseInt(rows[i].cells[5].textContent), // Supplier ID from cell 5
+      };
+
+      orderData.push(rowData);
+    }
+
+    // Send the order data to the server using fetch
+    fetch('/submit_vente', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(orderData) // Convert order data to JSON
+    })
+      .then(response => response.json())
+      .then(data => {
+        // Handle successful submission response
+        console.log('Commande soumise avec succès:', data);
+
+        // Clear the vente table
+        stockTable.innerHTML = '';
+
+        // Display a success message to the user
+        alert('Commande soumise avec succès!');
+      })
+      .catch(error => {
+        // Handle submission error
+        console.error('Erreur lors de la soumission de la commande:', error);
+
+        // Display an error message to the user
+        alert('Erreur lors de la soumission de la commande.');
+      });
+
+      document.querySelector(".popup12").style.display = "block";
+  });
 });
-});
+</script>
+
+<script>
+function printSection(sectionId) {
+    var printContents = document.getElementById(sectionId).innerHTML;
+    var originalContents = document.body.innerHTML;
+
+    document.body.innerHTML = printContents;
+
+    window.print();
+
+    document.body.innerHTML = originalContents;
+}
 </script>
 
 <script>
@@ -323,4 +534,37 @@ addButton.addEventListener('click', function(event) {
 });
 });
 </script>
+
+<script>
+    // Fonction pour afficher ou masquer la liste déroulante
+function toggleDropdown(link, color) {
+    var select = link.nextElementSibling.querySelector('.select');
+    select.classList.toggle('active');
+    link.style.color = getColor(color); // Mettre à jour la couleur du texte
+
+}
+
+// Fonction pour masquer la liste déroulante et soumettre le formulaire
+function hideDropdownAndSubmit(form, color) {
+    var select = form.querySelector('.select');
+    select.classList.remove('active'); // Masquer la liste déroulante
+    form.submit(); // Soumettre le formulaire
+    link.style.color = getColor(color); // Mettre à jour la couleur du texte
+}
+
+// Fonction pour obtenir la couleur en fonction du statut sélectionné
+function getColor(status) {
+    switch (status) {
+        case 'Vendu':
+            return 'green'; // Vert
+        case 'Retourné':
+            return 'blue'; // Bleu
+        case 'Annuler':
+            return 'red'; // Rouge
+        default:
+            return 'black'; // Noir par défaut
+    }
+}
+</script>
+
 {% endblock %}

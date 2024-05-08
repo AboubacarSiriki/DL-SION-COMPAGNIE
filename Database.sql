@@ -210,6 +210,7 @@ CREATE TABLE IF NOT EXISTS `vente` (
 ) ENGINE=InnoDB;
 
 ALTER TABLE `vente` ADD `prix_vente` INT NOT NULL AFTER `montant`;
+ALTER TABLE `vente` ADD `statut` VARCHAR(250) NOT NULL AFTER `date_vente`;
 --
 -- Contraintes pour les tables déchargées
 --

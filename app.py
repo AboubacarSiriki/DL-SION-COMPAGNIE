@@ -434,8 +434,8 @@ def ventes():
             date_aujourdhui = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             with conn.cursor() as cursor:
                 cursor.execute(
-                    'INSERT INTO vente (id_client, id_produit, quantite, montant, prix_vente, date_vente) VALUES (%s, %s, %s, %s, %s, %s)',
-                    (client_id, produit_id, quantite, montant, prix_vente, date_aujourdhui))
+                    'INSERT INTO vente (id_client, id_produit, quantite, montant, prix_vente, date_vente,statut) VALUES (%s, %s, %s, %s, %s, %s,%s)',
+                    (client_id, produit_id, quantite, montant, prix_vente, date_aujourdhui,"Vendu"))
                 conn.commit()
                 cursor.execute(
                     'UPDATE produit SET stock = stock - %s WHERE id_produit = %s',
@@ -445,9 +445,62 @@ def ventes():
         else:
             flash('Informations de vente manquantes ou incorrectes', 'danger')
 
-    return render_template("ventes.html", produits=produits, clients=clients)
+    curso = conn.cursor()
+    curso.execute(
+        "select id_vente,date_vente,statut,client.nom_prenoms,produit.nom_produit from vente,client,produit where vente.id_client = client.id_client and vente.id_produit=produit.id_produit ")
+    resultat = curso.fetchall()
+    curso.close()
+    return render_template("ventes.html", produits=produits, clients=clients,resultat=resultat)
 
+@app.route('/status_vente/<entry_id>', methods=['POST'])
+def status_vente(entry_id):
+    if request.method == 'POST':
+        # Récupérer le nouveau statut envoyé depuis le formulaire
+        new_status = request.form.get('status')
 
+        # Mettre à jour le statut dans la base de données
+        cursor = conn.cursor()
+        cursor.execute("UPDATE vente SET statut = %s WHERE id_vente = %s", (new_status, entry_id))
+        conn.commit()
+        cursor.close()
+
+        # Rediriger vers la page d'achats après la mise à jour du statut
+        return redirect(url_for('ventes'))
+    else:
+        # Si la méthode de la requête n'est pas POST, retourner une erreur 405 (Méthode non autorisée)
+        return jsonify({'error': 'Method Not Allowed'}), 405
+
+@app.route('/submit_vente', methods=['POST'])
+def submit_vente():
+    # Récupérer les données de la commande à partir du corps de la requête
+    order_data = request.get_json()
+
+    # Valider les données de la commande (vérifier les valeurs manquantes ou invalides)
+
+    # Traiter les données de la commande
+    for item in order_data:
+        product_id = item['produit_id']
+        quantity = item['nombre']
+        prix_vente = item['prix_vente']
+        id_client = item['client_id']
+        montant = item['montant']
+        # Insérer l'élément de commande dans la base de données
+        cursor = conn.cursor()
+        cursor.execute(
+            """INSERT INTO vente (id_client, id_produit, Quantite, prix_vente,Montant, date_vente, statut) VALUES (%s, %s, %s, %s, %s, %s, %s)""",
+            (id_client, product_id, quantity, prix_vente,montant,datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'Vendue')
+        )
+        conn.commit()
+        cursor.close()
+
+        # Calculer le prix total (si nécessaire)
+
+    # Préparer la réponse
+    response_data = {
+        'message': 'Vente effectuée avec succès'
+    }
+
+    return jsonify(response_data), 200
 
 @app.route('/submit_order', methods=['POST'])
 def submit_order():
@@ -525,7 +578,8 @@ def achats():
 
     return render_template("achats.html", produits=produits, fournisseurs=fournisseurs,resultat=resultat)
 
-# Définir la route pour récupérer les données de la ligne
+
+
 @app.route('/get_row_data/<int:row_id>', methods=['GET'])
 def get_row_data(row_id):
     # Exécuter la requête SQL pour récupérer la date associée à l'ID de la ligne
@@ -588,7 +642,7 @@ def get_product_info(produit_id):
 def get_fournisseur(fournisseur_id):
     # Effectuez une requête à la base de données pour obtenir les informations du produit
     cursor = conn.cursor()
-    cursor.execute("SELECT nom_produit FROM fournisseur WHERE id_fournisseur = %s", (fournisseur_id,))
+    cursor.execute("SELECT nom_prenoms FROM fournisseur WHERE id_fournisseur = %s", (fournisseur_id,))
     fournisseur_infos = cursor.fetchone()
     cursor.close()
 
@@ -603,11 +657,11 @@ def get_fournisseur(fournisseur_id):
         # Si le produit n'est pas trouvé, retournez un message d'erreur
         return jsonify({'error': 'Fournisseur non trouvé'}), 404
 
-@app.route('/get_client/<int:fournisseur_id>')
+@app.route('/get_client/<int:client_id>')
 def get_client(client_id):
     # Effectuez une requête à la base de données pour obtenir les informations du produit
     cursor = conn.cursor()
-    cursor.execute("SELECT nom_produit FROM fournisseur WHERE id_fournisseur = %s", (client_id,))
+    cursor.execute("SELECT nom_prenoms FROM client WHERE id_client = %s", (client_id,))
     client_infos = cursor.fetchone()
     cursor.close()
 
@@ -620,7 +674,7 @@ def get_client(client_id):
         return jsonify(response)
     else:
         # Si le produit n'est pas trouvé, retournez un message d'erreur
-        return jsonify({'error': 'Fournisseur non trouvé'}), 404
+        return jsonify({'error': 'Client non trouvé'}), 404
 
 @app.route('/stock/', methods=["POST", "GET"])
 def stock():
