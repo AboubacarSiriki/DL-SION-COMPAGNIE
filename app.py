@@ -482,14 +482,21 @@ def submit_vente():
         product_id = item['produit_id']
         quantity = item['nombre']
         prix_vente = item['prix_vente']
-        id_client = item['client_id']
+        id_client = item['id_client']
         montant = item['montant']
         # Insérer l'élément de commande dans la base de données
         cursor = conn.cursor()
         cursor.execute(
-            """INSERT INTO vente (id_client, id_produit, Quantite, prix_vente,Montant, date_vente, statut) VALUES (%s, %s, %s, %s, %s, %s, %s)""",
-            (id_client, product_id, quantity, prix_vente,montant,datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'Vendue')
+            """INSERT INTO vente (id_client, id_produit, Quantite, prix_vente, Montant, date_vente, statut) VALUES (%s, %s, %s, %s, %s, %s, %s)""",
+            (id_client, product_id, quantity, prix_vente, montant, datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'Vendu')
         )
+        conn.commit()
+        cursor.close()
+
+        cursor = conn.cursor()
+        cursor.execute(
+            'UPDATE produit SET stock = stock - %s WHERE id_produit = %s',
+            (quantity, product_id))
         conn.commit()
         cursor.close()
 
@@ -501,6 +508,7 @@ def submit_vente():
     }
 
     return jsonify(response_data), 200
+
 
 @app.route('/submit_order', methods=['POST'])
 def submit_order():
@@ -532,6 +540,26 @@ def submit_order():
     }
 
     return jsonify(response_data), 200
+
+@app.route('/donnee_vente/<int:ligne_id>', methods=['GET'])
+def donnee_vente(ligne_id):
+    # Exécuter la requête SQL pour récupérer la date associée à l'ID de la ligne
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT date_vente FROM vente WHERE id_vente = %s", (ligne_id,))
+    date_vente = cursor.fetchone()[0]  # Récupérer la date de la première colonne
+
+    # Ensuite, utilisez cette date pour récupérer les données associées
+    cursor.execute(
+        "SELECT produit.designation, vente.quantite, vente.prix_vente, vente.montant, vente.date_vente,id_vente FROM vente JOIN produit ON vente.id_produit = produit.id_produit WHERE vente.date_vente = %s", (date_vente,))
+    resultat1 = cursor.fetchall()
+    cursor.close()
+
+    # Formater les données et les renvoyer en tant que réponse JSON
+    data = [{'designation': row[0], 'quantite': row[1], 'prix_vente': row[2], 'montant': row[3], 'date_commande': row[5]} for row in resultat1]
+
+    return jsonify(data)
+
 @app.route('/achats/', methods=["POST", "GET"])
 def achats():
     cursor = conn.cursor()
@@ -665,7 +693,7 @@ def get_client(client_id):
     client_infos = cursor.fetchone()
     cursor.close()
 
-    # Vérifiez si le produit existe
+    # Vérifiez si le client existe
     if client_infos:
         # Retournez les informations du fournisseur sous forme de données JSON
         response = {

@@ -182,7 +182,7 @@
                  <p style="color:orange;">.....................................................................................................................................................................</p><br>
                  <p style="color:orange; text-align:center;">Facturation de la TVA non autorisée</p>
             </form>
-            <div><button class="btn12"><a href="{{url_for('commandes')}}">Retour</a></button>
+            <div><button class="btn12"><a href="{{url_for('ventes')}}">Retour</a></button>
                 <button id="btn111" onclick="printSection('popup121')">Imprimer</button>
             </div><br>
         </div>
@@ -195,7 +195,7 @@
     <div><button id="btn1">Client existant</button>
       <button id="btn2">Nouveau client</button>
     </div><br>
-    <form class="form1" id="form1" method="post" action="/ventes/">
+    <form class="form1" id="form1 stock-form" method="post" action="{{url_for('ventes')}}" >
 
       <label for="client">Client</label>
       <select id="client" name="client" required>
@@ -394,7 +394,7 @@
         newRow.innerHTML = '<td>' + produitId + '</td>' +
                             '<td>' + data.designation + '</td>' +
                             '<td>' + nombre + '</td>' +
-                            '<td>' + data.prix + '</td>' +
+                            '<td>' + prixVente + '</td>' +
                             '<td>' + montantTTC + '</td>' +
                             '<td>' + id_client + '</td>'; // Add supplier ID cell
 
@@ -402,7 +402,7 @@
         newRow1.innerHTML = '<td>' + rowNum + '</td>' +
                             '<td>' + data.designation + '</td>' +
                             '<td>' + nombre + '</td>' +
-                            '<td>' + data.prix + '</td>' +
+                            '<td>' + prixVente + '</td>' +
                             '<td>' + montantTTC + '</td>';
 
         ventTable.appendChild(newRow);
@@ -436,7 +436,7 @@ function updateTotal() {
     event.preventDefault(); // Prevent default form submission
 
     // Get all rows from the stock table
-    var rows = stockTable.querySelectorAll('tr');
+    var rows = ventTable.querySelectorAll('tr');
 
     // Prepare an array to store order data
     var orderData = [];
@@ -468,17 +468,17 @@ function updateTotal() {
         console.log('Commande soumise avec succès:', data);
 
         // Clear the vente table
-        stockTable.innerHTML = '';
+        ventTable.innerHTML = '';
 
         // Display a success message to the user
-        alert('Commande soumise avec succès!');
+        alert('Vente soumise avec succès!');
       })
       .catch(error => {
         // Handle submission error
-        console.error('Erreur lors de la soumission de la commande:', error);
+        console.error('Erreur lors de la soumission de la vente:', error);
 
         // Display an error message to the user
-        alert('Erreur lors de la soumission de la commande.');
+        alert('Erreur lors de la soumission de la vente.');
       });
 
       document.querySelector(".popup12").style.display = "block";
@@ -501,10 +501,13 @@ function printSection(sectionId) {
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-var addButton = document.querySelector('#add-button1');
-var ventTable = document.querySelector('#ventes-table1 tbody');
+  var addButton = document.querySelector('#add-button1');
+  var ventTable = document.querySelector('#ventes-table1 tbody');
+  var stockTable1 = document.querySelector('#stock-table1 tbody');
+  var submitButton = document.querySelector('button[type="submit"]'); // Get the submit button
+  var rowNum = 1;
 
-addButton.addEventListener('click', function(event) {
+  addButton.addEventListener('click', function(event) {
     event.preventDefault();
 
     var produitId = document.querySelector('#n_produit').value;
@@ -512,26 +515,102 @@ addButton.addEventListener('click', function(event) {
     var prixVente = document.querySelector('#n_prix_vente').value;
     var montantTTC = parseInt(nombre, 10) * parseFloat(prixVente);
 
-    if (produitId && nombre && prixVente) {
-        fetch('/get_product_info/' + produitId)
-            .then(response => response.json())
-            .then(data => {
-                var newRow = document.createElement('tr');
-                newRow.innerHTML = '<td>' + produitId + '</td>' +
-                                    '<td>' + data.designation + '</td>' +
-                                    '<td>' + nombre + '</td>' +
-                                    '<td>' + data.prix + '</td>' +
-                                    '<td>' + montantTTC + '</td>';
+    fetch('/get_product_info/' + produitId)
+      .then(response => response.json())
+      .then(data => {
+        var newRow = document.createElement('tr');
+        newRow.innerHTML = '<td>' + produitId + '</td>' +
+                            '<td>' + data.designation + '</td>' +
+                            '<td>' + nombre + '</td>' +
+                            '<td>' + prixVente + '</td>' +
+                            '<td>' + montantTTC + '</td>' +
+                            '<td>' + data.id_client + '</td>'; // Add supplier ID cell
 
-                ventTable.appendChild(newRow);
-            })
-            .catch(error => {
-                console.error('Erreur lors de la récupération des informations du produit :', error);
-            });
-    } else {
-        console.error('Veuillez remplir tous les champs du formulaire.');
+        var newRow1 = document.createElement('tr');
+        newRow1.innerHTML = '<td>' + rowNum + '</td>' +
+                            '<td>' + data.designation + '</td>' +
+                            '<td>' + nombre + '</td>' +
+                            '<td>' + prixVente + '</td>' +
+                            '<td>' + montantTTC + '</td>';
+
+        ventTable.appendChild(newRow);
+        stockTable1.appendChild(newRow1);
+
+        rowNum++;
+
+        updateTotal();
+      })
+      .catch(error => {
+        console.error('Erreur lors de la récupération des informations du produit :', error);
+      });
+  });
+
+  // Fonction pour mettre à jour le total
+function updateTotal() {
+    var total = 0;
+    var rows = stockTable1.querySelectorAll('tr');
+
+    // Calculer le total à partir des lignes du tableau 1
+    for (var i = 0; i < rows.length; i++) {
+        var cellValue = rows[i].querySelectorAll('td')[4].textContent;
+        total += parseInt(cellValue);
     }
-});
+
+    // Mettre à jour le contenu de la balise div avec la classe "total"
+    document.querySelector('.total').textContent = total;
+}
+
+  submitButton.addEventListener('click', function(event) {
+    event.preventDefault(); // Prevent default form submission
+
+    // Get all rows from the stock table
+    var rows = ventTable.querySelectorAll('tr');
+
+    // Prepare an array to store order data
+    var orderData = [];
+
+    // Iterate over each row and extract data
+    for (var i = 0; i < rows.length; i++) { // Skip the first header row
+      var rowData = {
+        produit_id: parseInt(rows[i].cells[0].textContent),
+        nombre: parseInt(rows[i].cells[2].textContent),
+        prix_vente: parseFloat(rows[i].cells[3].textContent),
+        montant: parseFloat(rows[i].cells[4].textContent),
+        id_client: parseInt(rows[i].cells[5].textContent), // Supplier ID from cell 5
+      };
+
+      orderData.push(rowData);
+    }
+
+    // Send the order data to the server using fetch
+    fetch('/submit_vente', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(orderData) // Convert order data to JSON
+    })
+      .then(response => response.json())
+      .then(data => {
+        // Handle successful submission response
+        console.log('Commande soumise avec succès:', data);
+
+        // Clear the vente table
+        ventTable.innerHTML = '';
+
+        // Display a success message to the user
+        alert('Vente soumise avec succès!');
+      })
+      .catch(error => {
+        // Handle submission error
+        console.error('Erreur lors de la soumission de la vente:', error);
+
+        // Display an error message to the user
+        alert('Erreur lors de la soumission de la vente.');
+      });
+
+      document.querySelector(".popup12").style.display = "block";
+  });
 });
 </script>
 
@@ -565,6 +644,49 @@ function getColor(status) {
             return 'black'; // Noir par défaut
     }
 }
+</script>
+
+<script>
+    // Sélectionnez tous les boutons "Voir"
+    var voirButtons = document.querySelectorAll(".voir-btn1");
+
+    // Ajoutez un écouteur d'événements à chaque bouton "Voir"
+    voirButtons.forEach(function(button) {
+        button.addEventListener("click", function() {
+            var rowId = button.getAttribute("data-id");
+            var popup = document.querySelector(".popup121");
+            var rowNum = 1;
+
+            // Faire une requête AJAX pour récupérer les données associées à cette ligne
+            fetch('/donnee_vente/' + rowId)
+                .then(response => response.json())
+                .then(data => {
+                    // Afficher les données dans le popup
+                    // Exemple : mettre les données dans les cellules du tableau dans le popup
+                    var tbody = popup.querySelector('tbody');
+                    tbody.innerHTML = ''; // Effacer le contenu précédent
+
+                    data.forEach(function(item) {
+                        var tr = document.createElement('tr');
+                        tr.innerHTML = '<td>' + item.date_commande + '</td>' +
+                                       '<td>' + item.designation + '</td>' +
+                                       '<td>' + item.quantite + '</td>' +
+                                       '<td>' + item.prix_vente + '</td>' +
+                                       '<td>' + item.montant + '</td>';
+
+                        tbody.appendChild(tr);
+
+                        rowNum++;
+                    });
+
+                    // Afficher le popup
+                    popup.style.display = "block";
+                })
+                .catch(error => {
+                    console.error('Erreur lors de la récupération des données de la ligne:', error);
+                });
+        });
+    });
 </script>
 
 {% endblock %}
