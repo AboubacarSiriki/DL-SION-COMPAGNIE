@@ -7,16 +7,12 @@
       <div class="title">Profil</div>
       <p>Tableau de bord / Profil</p><br>
       <div class="sales-details1">
-        <div class="profil" style="background-image: url({{url_for('static', filename='image/upload/illam.jpg') }});"></div>
+        <div class="profil" style="background-image: url({{url_for('static', filename='image/upload/pc_dell.jpg') }});"></div>
         <div class="infos">
-          {% for infos in admin_info %}
-          <h3>{{infos[1]}}</h3><br>
-          {% endfor %}
+          <h3>{{infos_admin[1]}}</h3><br>
           <p>Responsable</p><br>
-          <p> Florida, United State</p><br>
-          {% for infos in admin_info %}
-          <p>Tel : {{infos[3]}}, Email : {{infos[4]}}, DL SION COMPAGNY, ABIDJAN</p>
-          {% endfor %}
+          <p> Cote D'Ivoire, Cocody</p><br>
+          <p>Tel : {{infos_admin[3]}}, Email : {{infos_admin[4]}}, DL SION COMPAGNY, ABIDJAN</p>
         </div>
         <div class="message">
           <button>Message</button>
@@ -54,7 +50,8 @@
        <label for="image">Photo</label>
       <input type="file" id="image" name="image" accept="image/*" required>
 
-      <div><button class="btn12"><a href="{{url_for('profil')}}">Annuler</a></button>
+      <div><button class="btn12"><a href="{{url_for('profil')}}" style="text-decoration:none;
+    color: #fff;">Annuler</a></button>
                 <button  type="submit">Confirmer</button>
             </div><br>
     </form>
@@ -75,7 +72,8 @@
       <label for="confmotpass">Confirmez le mot de pass</label>
       <input type="password" id="confmotpass" name="confmotpass" required>
 
-      <div><button class="btn12"><a href="{{url_for('profil')}}">Annuler</a></button>
+      <div><button class="btn12"><a href="{{url_for('profil')}}" style="text-decoration:none;
+    color: #fff;">Annuler</a></button>
                 <button  type="submit">Confirmer</button>
             </div><br>
     </form>

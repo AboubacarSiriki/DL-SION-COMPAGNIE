@@ -438,8 +438,12 @@ def clients():
 
 @app.route('/profil/')
 def profil():
-    # Rendre le template index.html
-    return render_template('profil.html')
+    curso = conn.cursor()
+    curso.execute("SELECT * FROM administrateur")
+    infos_admin = curso.fetchone()
+    curso.close()
+
+    return render_template('profil.html',infos_admin=infos_admin)
 
 @app.route('/profil_vendeur/')
 def profil_vendeur():
