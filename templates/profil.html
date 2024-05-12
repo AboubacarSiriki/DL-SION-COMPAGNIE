@@ -7,12 +7,16 @@
       <div class="title">Profil</div>
       <p>Tableau de bord / Profil</p><br>
       <div class="sales-details1">
-        <div class="profil" style="background-image: url({{url_for('static', filename='image/profile.jpg') }});"></div>
+        <div class="profil" style="background-image: url({{url_for('static', filename='image/upload/illam.jpg') }});"></div>
         <div class="infos">
-          <h3>David YAO</h3><br>
+          {% for infos in admin_info %}
+          <h3>{{infos[1]}}</h3><br>
+          {% endfor %}
           <p>Responsable</p><br>
           <p> Florida, United State</p><br>
-          <p>Tel : 777777777, Email : dlsioncompagnie@.com, DL SION COMPAGNY, ABIDJAN</p>
+          {% for infos in admin_info %}
+          <p>Tel : {{infos[3]}}, Email : {{infos[4]}}, DL SION COMPAGNY, ABIDJAN</p>
+          {% endfor %}
         </div>
         <div class="message">
           <button>Message</button>
@@ -33,7 +37,7 @@
   <div class="popup-content">
     <span class="close" id="close-popup">&times;</span>
     <h2>Modifications des information du responsable</h2><br>
-    <form>
+    <form method="post" action="{{ url_for('modifier_profil') }}" enctype="multipart/form-data">
 
       <label for="nom">Nom</label>
       <input type="text" id="nom" name="nom" required>
@@ -61,7 +65,7 @@
   <div class="popup-content">
     <span class="close" id="close-popup1">&times;</span>
     <h2>Modification de mes access</h2><br>
-    <form>
+    <form method="post" action="{{ url_for('modifier_access') }}">
       <label for="login">Login</label>
       <input type="text" id="login" name="login" required>
 

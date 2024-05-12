@@ -25,13 +25,15 @@ conn = pymysql.connect(
 bcrypt = Bcrypt(app)
 
 
-UPLOAD_FOLDER = 'static/image/upload'  # Remplacez par le chemin de votre choix
+UPLOAD_FOLDER = 'static/image/upload'  
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+cursor = conn.cursor()
 
 #hashed_password = bcrypt.generate_password_hash('soum1234')
 #print(hashed_password)
 
-cursor = conn.cursor()
+
 # # Exécutez la requête SQL en utilisant des paramètres pour éviter les injections SQL
 #sql = "INSERT INTO administrateur (nom, prenom, telephone, email,login, mot_pass) VALUES (%s, %s, %s, %s, %s, %s)"
 #values = ('Kra', 'Adephe', '56545678', 'sidiksoum344@gmail.com', 'soum1234', hashed_password)
@@ -99,8 +101,8 @@ def base():
     if 'admin_id' in session:  # Vérifie si l'administrateur est connecté
         return render_template('admin/dashboard.html')
     else:
-        flash('Please login first', 'danger')  # Message flash indiquant que l'utilisateur doit d'abord se connecter
-        return redirect('/admin')  # Redirige vers la page de connexion
+        flash('Please login first', 'danger') 
+        return redirect('/admin')
 
 
 # admin logout
@@ -189,6 +191,81 @@ def change_password():
         return redirect('/')
         
     return render_template('connexion/nouveau_mot.html')
+# ==========================Admin update=======================================
+
+@app.route('/admin/modifier_profil', methods=['GET', 'POST'])
+def modifier_profil():
+    if 'admin_id' not in session:
+        flash('Veuillez vous connecter d\'abord.', 'danger')
+        return redirect(url_for('adminIndex'))
+
+    admin_id = session['admin_id']
+    cursor = conn.cursor()
+
+    if request.method == 'POST':
+        nom = request.form['nom']
+        prenom = request.form['prenom']
+        tel = request.form['tel']
+        email = request.form['email']
+        image = request.files['image']
+
+        # Sécurisez le nom du fichier
+        filename = secure_filename(image.filename)
+        image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        image.save(image_path)
+
+        # Mettez à jour les informations dans la base de données
+        cursor.execute('UPDATE administrateur SET nom = %s, prenom = %s, telephone = %s, email = %s, image = %s WHERE id_admin = %s',
+                       (nom, prenom, tel, email, filename, admin_id))
+        conn.commit()
+
+        flash('Profil mis à jour avec succès.', 'success')
+        return redirect(url_for('base'))
+
+    # Récupérez les informations actuelles de l'administrateur pour les afficher dans le formulaire
+    cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
+    admin_info = cursor.fetchone()
+    cursor.close()
+
+    return render_template('profil.html', admin_info=admin_info)
+
+@app.route('/admin/modifier_access', methods=['GET', 'POST'])
+def modifier_access():
+    if 'admin_id' not in session:
+        flash('Veuillez vous connecter d\'abord.', 'danger')
+        return redirect(url_for('adminIndex'))
+
+    admin_id = session['admin_id']
+    cursor = conn.cursor()
+
+    if request.method == 'POST':
+        login = request.form['login']
+        password = request.form['password']
+        confmotpass = request.form['confmotpass']
+
+        # Vérifiez que les mots de passe correspondent
+        if password != confmotpass:
+            flash('Les mots de passe ne correspondent pas.', 'danger')
+            return redirect(url_for('modifier_access'))
+
+        # Hash du mot de passe pour la sécurité
+        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+
+        # Mettez à jour le login et le mot de passe dans la base de données
+        cursor.execute('UPDATE administrateur SET login = %s, mot_pass = %s WHERE id_admin = %s',
+                       (login, hashed_password, admin_id))
+        conn.commit()
+
+        flash('Les informations de connexion ont été mises à jour avec succès.', 'success')
+        return redirect(url_for('base'))
+
+    # Récupérez les informations actuelles de l'administrateur pour les afficher dans le formulaire
+    cursor.execute('SELECT login FROM administrateur WHERE id_admin = %s', (admin_id,))
+    admin_login = cursor.fetchone()[0]
+    cursor.close()
+
+    return render_template('profil.html', admin_login=admin_login)
+
 
 # ==========================Gestion des membres========================
 @app.route('/admin/ajouter_membre', methods=['GET', 'POST'])
