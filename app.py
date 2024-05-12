@@ -323,8 +323,8 @@ def Produit():
         curso.execute('INSERT INTO produit(nom_produit,categorie,prix,stock,stock_min,designation,image) VALUES (%s, %s, %s ,%s,%s, %s, %s)',
                       (nom,categorie,prix,stock,stock_min,designation,image))
         conn.commit()
-        flash('Produit ajouté avec succès', 'success')
         curso.close()
+        flash('Produit ajouté avec succès', 'success')
         return redirect(url_for("Produit"))  # Redirection vers la même page Produit après ajout
     else:
         # Récupération des éléments de la table produit
@@ -347,8 +347,8 @@ def clients():
         curso.execute('INSERT INTO client (nom_prenoms,telephone,email,adresse) VALUES (%s, %s, %s, %s)',
                       (nom,telephone,email,adresse))  # Correction de la requête SQL
         conn.commit()
-        flash('Client ajouté avec succès', 'success')  # Correction du message flash
         curso.close()
+        flash('Client ajouté avec succès', 'success')
         return redirect(url_for("clients"))  # Redirection vers la même page clients après ajout
     else:
         # Récupération des éléments de la table client
@@ -387,8 +387,8 @@ def fournisseurs():
         curso.execute('INSERT INTO fournisseur (nom_prenoms,telephone,email,adresse) VALUES (%s, %s, %s, %s)',
                       (nom,telephone,email,adresse))
         conn.commit()
-        flash('Fournisseur ajouté avec succès', 'success')
         curso.close()
+        flash('Fournisseur ajouté avec succès', 'success')
         return redirect(url_for("fournisseurs"))
     else:
         # Récupération des éléments de la table fournisseur
@@ -441,6 +441,7 @@ def ventes():
                     'UPDATE produit SET stock = stock - %s WHERE id_produit = %s',
                     (quantite, produit_id))
                 conn.commit()
+                cursor.close()
                 flash('Vente ajoutée avec succès', 'success')
         else:
             flash('Informations de vente manquantes ou incorrectes', 'danger')
@@ -747,6 +748,38 @@ def stock():
 
     return render_template("stock.html", produits=produits,resultat=resultat,resultat1=resultat1)
 
+@app.route('/submit_stock', methods=['POST'])
+def submit_stock():
+    # Récupérer les données de la commande à partir du corps de la requête
+    order_data = request.get_json()
+
+    # Valider les données de la commande (vérifier les valeurs manquantes ou invalides)
+
+    # Traiter les données de la commande
+    for item in order_data:
+        produit_id = item['produit_id']
+        quantite = item['nombre']
+        date_aujourdhui = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+        cursor = conn.cursor()
+
+        # Enregistrement de la vente dans la base de données avec la date d'aujourd'hui
+        cursor.execute(
+            'INSERT INTO stock (ID_Produit, Quantite, date) VALUES (%s, %s, %s)',
+            (produit_id, quantite, date_aujourdhui))
+
+        cursor.execute(
+            'UPDATE produit SET stock = stock + %s WHERE id_produit = %s',
+            (quantite, produit_id))
+        conn.commit()
+        cursor.close()
+
+    # Préparer la réponse
+    response_data = {
+    }
+
+    return jsonify(response_data), 200
+
 @app.route('/commandes/', methods=["POST", "GET"])
 def commandes():
     cursor = conn.cursor()
@@ -831,7 +864,6 @@ def submit_commande():
 
     # Préparer la réponse
     response_data = {
-        'message': 'Commande soumise avec succès'
     }
 
     return jsonify(response_data), 200

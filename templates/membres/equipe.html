@@ -1,27 +1,6 @@
 {% extends "base.html"%}
 {% block centre%}
 <div class="home-content">
-
-  <div class="sales-boxes">
-    <div class="recent-sales1 box">
-      <div class="title">Profil</div>
-      <p>Tableau de bord / Profil</p><br>
-      <div class="sales-details1">
-        <div class="profil" style="background-image: url({{ url_for('static', filename='image/profile.jpg') }});"></div>
-        <div class="infos">
-          <h3>David YAO</h3>
-          <p>Responsable</p>
-          <p> Florida, United State</p>
-          <p>Tel : 777777777, Email : dlsioncompagnie@.com, DL SION COMPAGNY, ABIDJAN</p>
-        </div>
-        <div class="message">
-          <button>Message</button>
-          <button id="modifier">Modifier</button>
-        </div>
-      </div><br>
-    </div>
-  </div><br>
-
   <div class="sales-boxes">
     <div class="recent-sales1 box">
       <div class="title">
@@ -131,6 +110,47 @@
     </form>
   </div>
 </div>
+
+<div id="popup1" class="popup1">
+  <div class="popup-content">
+    <span class="close" id="close-popup1">&times;</span>
+    <h2>Modification de mes access</h2><br>
+    <form>
+      <label for="login">Login</label>
+      <input type="text" id="login1" name="login" required>
+
+      <label for="motpass">Mot de pass</label>
+      <input type="password" id="motpass1" name="password" required>
+
+      <label for="confmotpass">Confirmez le mot de pass</label>
+      <input type="password" id="confmotpass1" name="confmotpass" required>
+
+      <div><button class="btn12"><a href="{{url_for('equipe')}}">Annuler</a></button>
+                <button  type="submit">Confirmer</button>
+            </div><br>
+    </form>
+  </div>
+</div>
+
+<script>
+       // Ouvrir le popup lorsqu'on clique sur le bouton "Ajouter un Produit"
+document.getElementById("open-popup1").addEventListener("click", function () {
+    document.getElementById("popup1").style.display = "block";
+});
+
+// Fermer le popup lorsqu'on clique sur le bouton de fermeture
+document.getElementById("close-popup1").addEventListener("click", function () {
+    document.getElementById("popup1").style.display = "none";
+});
+
+// Fermer le popup lorsque l'utilisateur clique en dehors du contenu du popup
+window.onclick = function (event) {
+    var popup = document.getElementById("popup1");
+    if (event.target == popup) {
+        popup1.style.display = "none";
+    }
+}
+     </script>
 
 
 {% endblock %}

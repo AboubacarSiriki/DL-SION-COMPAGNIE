@@ -284,20 +284,22 @@ nav .profile-details i{
   margin: 0 20px;
   border-radius: 12px;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+  height:500px;
 }
 .home-content .sales-boxes .sales-details1{
   display: flex;
   align-items: center;
   justify-content: space-between;
-  flex-direction:row
+  flex-direction:row;
+  height:200px;
 }
 .home-content .sales-boxes .sales-details1 div{
   weight: 10%;
-  height: 100px;
+  height: 90%;
 }
 .home-content .sales-boxes .sales-details2 div{
   weight: 10%;
-  height: 50px;
+  height: 90%;
 }
 .home-content .sales-boxes .sales-details2 .message button {
   font-size: 15px;
@@ -349,14 +351,14 @@ nav .profile-details i{
 }
 
 .profil {
-    width: 100px; /* Largeur de la div */
-    height: 100px; /* Hauteur de la div */
-    border-radius: 50%; /* Forme circulaire */
+    width: 150px; /* Largeur de la div */
+    height: 100%; /* Hauteur de la div */
+    border-radius: 5%; /* Forme circulaire */
     overflow: hidden; /* Masque tout contenu dépassant de la div */
     background-image: url('{{ url_for('static', filename='image/profile.jpg') }}'); /* Chemin vers votre image */
     background-size: cover; /* Ajuste la taille de l'image */
     background-position: center; /* Centre l'image */
-    border: 2px solid #000;
+    border: 2px solid #fff;
 }
 
 

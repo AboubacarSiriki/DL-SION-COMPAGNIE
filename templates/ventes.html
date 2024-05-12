@@ -245,7 +245,7 @@
       <button type="submit" id="submit-button">Valider la vente</button>
     </form>
 
-    <form class="form2" id="form2" method="post" action="/ventes/">
+    <form class="form2" id="form2 stock-form" method="post" action="{{url_for('ventes')}}">
       <label for="nom">Nom et prénoms</label>
       <input type="text" id="nom" name="nom" required>
 
