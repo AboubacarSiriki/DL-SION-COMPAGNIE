@@ -505,6 +505,52 @@ def submit_vente():
 
     # Préparer la réponse
     response_data = {
+    }
+
+    return jsonify(response_data), 200
+
+@app.route('/submit_vente_client', methods=['POST'])
+def submit_vente_client():
+    # Récupérer les données de la commande à partir du corps de la requête
+    order_data = request.get_json()
+
+    nom = request.form.get("nom")
+    tel = request.form.get("tel")
+    email = request.form.get("email")
+    adresse = request.form.get("adresse")
+    with conn.cursor() as cursor:
+        cursor.execute(
+            'INSERT INTO client (nom_prenoms, telephone, email, adresse) VALUES (%s, %s, %s, %s)',
+            (nom, tel, email, adresse))
+        conn.commit()
+        client_id = cursor.lastrowid
+
+    for item in order_data:
+        product_id = item['produit_id']
+        quantity = item['nombre']
+        prix_vente = item['prix_vente']
+        id_client = item['id_client']
+        montant = item['montant']
+        # Insérer l'élément de commande dans la base de données
+        cursor = conn.cursor()
+        cursor.execute(
+            """INSERT INTO vente (id_client, id_produit, Quantite, prix_vente, Montant, date_vente, statut) VALUES (%s, %s, %s, %s, %s, %s, %s)""",
+            (client_id, product_id, quantity, prix_vente, montant, datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'Vendu')
+        )
+        conn.commit()
+        cursor.close()
+
+        cursor = conn.cursor()
+        cursor.execute(
+            'UPDATE produit SET stock = stock - %s WHERE id_produit = %s',
+            (quantity, product_id))
+        conn.commit()
+        cursor.close()
+
+        # Calculer le prix total (si nécessaire)
+
+    # Préparer la réponse
+    response_data = {
         'message': 'Vente effectuée avec succès'
     }
 
