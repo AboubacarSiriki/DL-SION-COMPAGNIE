@@ -287,15 +287,27 @@ nav .profile-details i{
   height:500px;
 }
 .home-content .sales-boxes .sales-details1{
+  width:100%;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
   flex-direction:row;
   height:200px;
+  justify-content:space-between
 }
-.home-content .sales-boxes .sales-details1 div{
-  weight: 10%;
-  height: 90%;
+
+.home-content .sales-boxes .sales-details1 .infos{
+  width: 65%;
+  height: 100%;
+  display:flex;
+  flex-direction:row;
+  justify-content:space-around;
+}
+.home-content .sales-boxes .sales-details1 .message{
+  width: 25%;
+  height: 100%;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-around;
+  align-items:center;
 }
 .home-content .sales-boxes .sales-details2 div{
   weight: 10%;
@@ -303,7 +315,7 @@ nav .profile-details i{
 }
 .home-content .sales-boxes .sales-details2 .message button {
   font-size: 15px;
-  font-weight: 400;
+  font-weight: 410;
   border-radius: 12px; /* Arrondi les bordures */
   background-color: #3498db; /* Couleur de fond */
   color: #ffffff; /* Couleur du texte */
@@ -314,7 +326,7 @@ nav .profile-details i{
 }
 .home-content .sales-boxes .sales-details1 .message button {
   font-size: 15px;
-  font-weight: 400;
+  font-weight: 410;
   border-radius: 12px; /* Arrondi les bordures */
   background-color: #3498db; /* Couleur de fond */
   color: #ffffff; /* Couleur du texte */
@@ -351,7 +363,7 @@ nav .profile-details i{
 }
 
 .profil {
-    width: 150px; /* Largeur de la div */
+    width: 15%; /* Largeur de la div */
     height: 100%; /* Hauteur de la div */
     border-radius: 5%; /* Forme circulaire */
     overflow: hidden; /* Masque tout contenu dépassant de la div */

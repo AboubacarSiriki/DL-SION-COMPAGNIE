@@ -34,9 +34,9 @@ cursor = conn.cursor()
 #print(hashed_password)
 
 
-# # Exécutez la requête SQL en utilisant des paramètres pour éviter les injections SQL
+#  Exécutez la requête SQL en utilisant des paramètres pour éviter les injections SQL
 #sql = "INSERT INTO administrateur (nom, prenom, telephone, email,login, mot_pass) VALUES (%s, %s, %s, %s, %s, %s)"
-#values = ('Kra', 'Adephe', '56545678', 'sidiksoum344@gmail.com', 'soum1234', hashed_password)
+#values = ('Kra Adelphe', 'Adephe', '56545678', 'sidiksoum344@gmail.com', 'soum1234', hashed_password)
 
 # # Exécutez la requête avec les valeurs
 #cursor.execute(sql, values)
@@ -220,7 +220,7 @@ def modifier_profil():
         conn.commit()
 
         flash('Profil mis à jour avec succès.', 'success')
-        return redirect(url_for('base'))
+        return redirect(url_for('profil'))
 
     # Récupérez les informations actuelles de l'administrateur pour les afficher dans le formulaire
     cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
@@ -257,7 +257,7 @@ def modifier_access():
         conn.commit()
 
         flash('Les informations de connexion ont été mises à jour avec succès.', 'success')
-        return redirect(url_for('base'))
+        return redirect(url_for('profil'))
 
     # Récupérez les informations actuelles de l'administrateur pour les afficher dans le formulaire
     cursor.execute('SELECT login FROM administrateur WHERE id_admin = %s', (admin_id,))
@@ -438,12 +438,23 @@ def clients():
 
 @app.route('/profil/')
 def profil():
-    curso = conn.cursor()
-    curso.execute("SELECT * FROM administrateur")
-    infos_admin = curso.fetchone()
-    curso.close()
+    # Vérifier si l'administrateur est connecté
+    if 'admin_id' not in session:
+        flash('Veuillez vous connecter d\'abord.', 'danger')
+        return redirect(url_for('adminIndex'))
 
-    return render_template('profil.html',infos_admin=infos_admin)
+    # Récupérer l'ID de l'administrateur depuis la session
+    admin_id = session['admin_id']
+
+    cursor = conn.cursor()
+    # Récupérer les informations de l'administrateur en utilisant son ID
+    cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
+    infos_admin = cursor.fetchone()
+    filename = infos_admin[7].decode('utf-8')  # Convertir bytes en str
+
+    cursor.close()
+
+    return render_template('profil.html', infos_admin=infos_admin,filename=filename)
 
 @app.route('/profil_vendeur/')
 def profil_vendeur():

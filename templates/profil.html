@@ -7,16 +7,20 @@
       <div class="title">Profil</div>
       <p>Tableau de bord / Profil</p><br>
       <div class="sales-details1">
-        <div class="profil" style="background-image: url({{url_for('static', filename='image/upload/pc_dell.jpg') }});"></div>
+        <div class="profil" style="background-image: url({{ url_for('static', filename='image/upload/' + filename) }});"></div>
         <div class="infos">
-          <h3>{{infos_admin[1]}}</h3><br>
-          <p>Responsable</p><br>
-          <p> Cote D'Ivoire, Cocody</p><br>
-          <p>Tel : {{infos_admin[3]}}, Email : {{infos_admin[4]}}, DL SION COMPAGNY, ABIDJAN</p>
+          <div><h3>Nom: {{infos_admin[1]}}</h3><br>
+          <p>Poste: Responsable</p><br>
+          <p>Tel : {{infos_admin[3]}}</p><br>
+          <p>Fax : {{infos_admin[3]}}</p></div><br>
+          <div><h3>Email : {{infos_admin[4]}}</h3><br>
+          <p>Entreprise : DL SION COMPAGNY</p><br>
+          <p> Pays: Cote D'Ivoire</p><br>
+          <p>Ville : Abidjan,Cocody</p></div>
         </div>
         <div class="message">
-          <button>Message</button>
           <button id="open-popup">Modifier</button>
+          <button>Message</button>
         </div>
       </div><br>
       <div class="sales-details2">
