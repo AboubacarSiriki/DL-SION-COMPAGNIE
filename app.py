@@ -1030,6 +1030,7 @@ def modifier_client():
     # Rendre le template index.html
     return render_template('client.html')
 
+
 # Point d'entrée de l'application
 if __name__ == '__main__':
     # Lancer l'application sur le serveur local
