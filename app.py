@@ -1031,6 +1031,11 @@ def modifier_client():
     return render_template('client.html')
 
 
+@app.route("/admin/emailing//")
+def emailing():
+    # Rendre le template index.html
+    return render_template('emailing.html')
+
 # Point d'entrée de l'application
 if __name__ == '__main__':
     # Lancer l'application sur le serveur local

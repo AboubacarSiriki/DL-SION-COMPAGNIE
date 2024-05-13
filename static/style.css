@@ -286,6 +286,33 @@ nav .profile-details i{
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
   height:500px;
 }
+
+.home-content .sales-boxes .recent-sales1 form textarea {
+    width: 100%;
+    height: 300px;
+    border: 2px solid #fff; /* Ajoutez une bordure initiale */
+    border-radius: 10px; /* Ajoutez la bordure arrondie */
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.9); /* RGBA avec une opacité de 0.9 (90%) */
+}
+
+.home-content .sales-boxes .recent-sales1 form textarea:focus {
+    border-color: #3498db; /* Changez la couleur de la bordure lorsque le textarea est en focus */
+    outline: none; /* Supprimez l'effet de contour */
+}
+
+ .home-content .sales-boxes .recent-sales1 form button{
+   font-size: 20px;
+  font-weight: 410;
+  border-radius: 10px; /* Arrondi les bordures */
+  background-color: #3498db; /* Couleur de fond */
+  color: #ffffff; /* Couleur du texte */
+  padding: 10px 20px; /* Espacement interne */
+  border: none; /* Supprime la bordure */
+  cursor: pointer; /* Curseur de la souris */
+  height: 50px;
+ }
+
 .home-content .sales-boxes .sales-details1{
   width:100%;
   display: flex;
