@@ -6,6 +6,7 @@ from flask_bcrypt import Bcrypt
 from werkzeug.utils import secure_filename
 from datetime import datetime
 from flask import jsonify
+from twilio.rest import Client
 
 # Créer une instance de l'application Flask
 app = Flask(__name__)
@@ -99,7 +100,14 @@ def adminIndex():
 @app.route('/admin/dashboard', methods=["POST", "GET"])
 def base():
     if 'admin_id' in session:  # Vérifie si l'administrateur est connecté
-        return render_template('admin/dashboard.html')
+        admin_id = session['admin_id']
+        cursor = conn.cursor()
+        # Récupérer les informations de l'administrateur en utilisant son ID
+        cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
+        infos_admin = cursor.fetchone()
+        filename = infos_admin[7].decode('utf-8')
+
+        return render_template('admin/dashboard.html',filename=filename)
     else:
         flash('Please login first', 'danger') 
         return redirect('/admin')
@@ -264,7 +272,14 @@ def modifier_access():
     admin_login = cursor.fetchone()[0]
     cursor.close()
 
-    return render_template('profil.html', admin_login=admin_login)
+    admin_id = session['admin_id']
+    cursor = conn.cursor()
+    # Récupérer les informations de l'administrateur en utilisant son ID
+    cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
+    infos_admin = cursor.fetchone()
+    filename = infos_admin[7].decode('utf-8')
+
+    return render_template('profil.html', admin_login=admin_login,filename=filename)
 
 
 # ==========================Gestion des membres========================
@@ -319,7 +334,14 @@ def equipe():
     utilisateurs = cursor.fetchall()
     cursor.close()
 
-    return render_template('membres/equipe.html', utilisateurs=utilisateurs)
+    admin_id = session['admin_id']
+    cursor = conn.cursor()
+    # Récupérer les informations de l'administrateur en utilisant son ID
+    cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
+    infos_admin = cursor.fetchone()
+    filename = infos_admin[7].decode('utf-8')
+
+    return render_template('membres/equipe.html', utilisateurs=utilisateurs,filename=filename)
 
 
 @app.route('/userlogin', methods=['GET', 'POST'])
@@ -410,7 +432,14 @@ def Produit():
         resultat = curso.fetchall()
         curso.close()
 
-        return render_template("Produit.html", resultat=resultat)
+        admin_id = session['admin_id']
+        cursor = conn.cursor()
+        # Récupérer les informations de l'administrateur en utilisant son ID
+        cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
+        infos_admin = cursor.fetchone()
+        filename = infos_admin[7].decode('utf-8')
+
+        return render_template("Produit.html", resultat=resultat,filename=filename)
 
 @app.route('/clients/', methods=["post", "get"])
 def clients():
@@ -434,7 +463,16 @@ def clients():
         resultat = curso.fetchall()
         curso.close()
 
-        return render_template("clients.html", resultat=resultat)
+        admin_id = session['admin_id']
+        cursor = conn.cursor()
+        # Récupérer les informations de l'administrateur en utilisant son ID
+        cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
+        infos_admin = cursor.fetchone()
+        filename = infos_admin[7].decode('utf-8')  # Convertir bytes en str
+
+        cursor.close()
+
+        return render_template("clients.html", resultat=resultat,filename=filename)
 
 @app.route('/profil/')
 def profil():
@@ -455,6 +493,26 @@ def profil():
     cursor.close()
 
     return render_template('profil.html', infos_admin=infos_admin,filename=filename)
+
+@app.route('/profil_base/')
+def profil_base():
+    # Vérifier si l'administrateur est connecté
+    if 'admin_id' not in session:
+        flash('Veuillez vous connecter d\'abord.', 'danger')
+        return redirect(url_for('adminIndex'))
+
+    # Récupérer l'ID de l'administrateur depuis la session
+    admin_id = session['admin_id']
+
+    cursor = conn.cursor()
+    # Récupérer les informations de l'administrateur en utilisant son ID
+    cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
+    infos_admin = cursor.fetchone()
+    filename = infos_admin[7].decode('utf-8')  # Convertir bytes en str
+
+    cursor.close()
+
+    return render_template('base.html', infos_admin=infos_admin,filename=filename)
 
 @app.route('/profil_vendeur/')
 def profil_vendeur():
@@ -489,7 +547,17 @@ def fournisseurs():
         resultat = curso.fetchall()
         curso.close()
 
-        return render_template("fournisseurs.html", resultat=resultat)
+        admin_id = session['admin_id']
+
+        cursor = conn.cursor()
+        # Récupérer les informations de l'administrateur en utilisant son ID
+        cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
+        infos_admin = cursor.fetchone()
+        filename = infos_admin[7].decode('utf-8')  # Convertir bytes en str
+
+        cursor.close()
+
+        return render_template("fournisseurs.html", resultat=resultat,filename=filename)
 
 
 @app.route('/ventes/', methods=["POST", "GET"])
@@ -543,7 +611,15 @@ def ventes():
         "select id_vente,date_vente,statut,client.nom_prenoms,produit.nom_produit from vente,client,produit where vente.id_client = client.id_client and vente.id_produit=produit.id_produit ")
     resultat = curso.fetchall()
     curso.close()
-    return render_template("ventes.html", produits=produits, clients=clients,resultat=resultat)
+
+    admin_id = session['admin_id']
+    cursor = conn.cursor()
+    # Récupérer les informations de l'administrateur en utilisant son ID
+    cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
+    infos_admin = cursor.fetchone()
+    filename = infos_admin[7].decode('utf-8')
+
+    return render_template("ventes.html", produits=produits, clients=clients,resultat=resultat,filename=filename)
 
 @app.route('/status_vente/<entry_id>', methods=['POST'])
 def status_vente(entry_id):
@@ -743,7 +819,14 @@ def achats():
     resultat = curso.fetchall()
     curso.close()
 
-    return render_template("achats.html", produits=produits, fournisseurs=fournisseurs,resultat=resultat)
+    admin_id = session['admin_id']
+    cursor = conn.cursor()
+    # Récupérer les informations de l'administrateur en utilisant son ID
+    cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
+    infos_admin = cursor.fetchone()
+    filename = infos_admin[7].decode('utf-8')
+
+    return render_template("achats.html", produits=produits, fournisseurs=fournisseurs,resultat=resultat,filename=filename)
 
 
 
@@ -884,7 +967,14 @@ def stock():
     resultat1 = curso.fetchall()
     curso.close()
 
-    return render_template("stock.html", produits=produits,resultat=resultat,resultat1=resultat1)
+    admin_id = session['admin_id']
+    cursor = conn.cursor()
+    # Récupérer les informations de l'administrateur en utilisant son ID
+    cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
+    infos_admin = cursor.fetchone()
+    filename = infos_admin[7].decode('utf-8')
+
+    return render_template("stock.html", produits=produits,resultat=resultat,resultat1=resultat1,filename=filename)
 
 @app.route('/submit_stock', methods=['POST'])
 def submit_stock():
@@ -955,7 +1045,15 @@ def commandes():
         "select id_commande,date_commande,statut,client.nom_prenoms,produit.nom_produit from commande,client,produit where commande.id_client = client.id_client and commande.id_produit=produit.id_produit ")
     resultat = curso.fetchall()
     curso.close()
-    return render_template('commandes.html', produits=produits, clients=clients,resultat=resultat)
+
+    admin_id = session['admin_id']
+    cursor = conn.cursor()
+    # Récupérer les informations de l'administrateur en utilisant son ID
+    cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
+    infos_admin = cursor.fetchone()
+    filename = infos_admin[7].decode('utf-8')
+
+    return render_template('commandes.html', produits=produits, clients=clients,resultat=resultat,filename=filename)
 
 @app.route('/status_commande/<entry_id>', methods=['POST'])
 def status_commande(entry_id):
@@ -1034,7 +1132,43 @@ def modifier_client():
 @app.route("/admin/emailing//")
 def emailing():
     # Rendre le template index.html
-    return render_template('emailing.html')
+    admin_id = session['admin_id']
+    cursor = conn.cursor()
+    # Récupérer les informations de l'administrateur en utilisant son ID
+    cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
+    infos_admin = cursor.fetchone()
+    filename = infos_admin[7].decode('utf-8')
+
+    return render_template('emailing.html',filename=filename)
+
+
+# Route pour envoyer les SMS
+@app.route('/envoyer-sms', methods=['POST'])
+def envoyer_sms():
+    # Récupérer le message depuis le formulaire
+    message = request.form['message']
+
+    # Récupérer les numéros de téléphone depuis la base de données MySQL
+    # Assurez-vous d'avoir une connexion à votre base de données et de récupérer les numéros
+
+    # Envoyer le message à chaque numéro de téléphone
+    # Utilisez votre service d'envoi de SMS préféré (Twilio, Nexmo, etc.)
+
+    # Exemple avec Twilio (vous devez installer twilio-python via pip)
+
+    account_sid = 'VOTRE_ACCOUNT_SID'
+    auth_token = 'VOTRE_AUTH_TOKEN'
+    client = Client(account_sid, auth_token)
+
+    # Exemple d'envoi de SMS à un numéro
+    # Remplacez 'from_' par votre numéro Twilio et 'to' par le numéro de téléphone de votre client
+    # client.messages.create(
+    #     body=message,
+    #     from_='VOTRE_NUMERO_TWILIO',
+    #     to='NUMERO_DU_CLIENT'
+    # )
+
+    return "Messages envoyés avec succès !"
 
 # Point d'entrée de l'application
 if __name__ == '__main__':
