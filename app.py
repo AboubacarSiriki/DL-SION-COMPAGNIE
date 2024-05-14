@@ -3,6 +3,7 @@ from flask import Flask, render_template, request, redirect, url_for,flash, sess
 import pymysql, string, random
 from send_mail import envoicode
 from flask_bcrypt import Bcrypt
+import re
 from werkzeug.utils import secure_filename
 from datetime import datetime
 from flask import jsonify
@@ -304,6 +305,11 @@ def ajouter_membre():
             flash('Cet email est déjà utilisé.', 'danger')
             return redirect(url_for('ajouter_membre'))
 
+        # Validation du mot de passe
+        if len(mot_pass) < 8 or not re.match(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", mot_pass):
+            flash('Le mot de passe doit contenir au moins 8 caractères, dont des majuscules, des minuscules, des chiffres et des symboles.', 'danger')
+            return redirect(url_for('ajouter_membre'))
+
         if mot_pass != request.form['confmotpass']:
             flash('Les mots de passe ne correspondent pas.', 'danger')
             return redirect(url_for('ajouter_membre'))
@@ -378,6 +384,10 @@ def modifier_membre(id_utilisateur):
             if cursor.fetchone():
                 flash('Cet email est déjà utilisé.', 'danger')
                 return redirect(url_for('modifier_membre', id_utilisateur=id_utilisateur))
+
+        if len(mot_pass) < 8 or not re.match(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", mot_pass):
+            flash('Le mot de passe doit contenir au moins 8 caractères, dont des majuscules, des minuscules, des chiffres et des symboles.', 'danger')
+            return redirect(url_for('modifier_membre'))
 
         if mot_pass != confmotpass:
             flash('Les mots de passe ne correspondent pas.', 'danger')

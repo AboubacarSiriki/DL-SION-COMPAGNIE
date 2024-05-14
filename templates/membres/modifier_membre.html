@@ -9,6 +9,13 @@
 
         <form method="post" action="{{ url_for('modifier_membre', id_utilisateur=membre[0])}}"
           enctype="multipart/form-data">
+          {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            {% for message in messages %}
+              <p class="alert">{{ message }}</p><br>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
           <label for="nom">Nom</label>
           <input type="text" id="nom" name="nom" value="{{ membre[1] }}" required>
 

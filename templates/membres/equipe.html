@@ -74,6 +74,13 @@
     <span class="close" id="close-popup">&times;</span>
     <h2>Ajout d'un nouveau membre</h2><br>
     <form action="/admin/ajouter_membre" method="POST" enctype="multipart/form-data">
+      {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for message in messages %}
+          <p class="alert">{{ message }}</p><br>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
 
       <label for="nom">Nom</label>
       <input type="text" id="nom" name="nom" required>

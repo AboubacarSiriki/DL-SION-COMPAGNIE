@@ -189,6 +189,13 @@
           <h2>Ajout d'une nouvelle commande</h2><br>
 
             <form id="stock-form" method="post" action="{{url_for('achats')}}">
+              {% with messages = get_flashed_messages() %}
+              {% if messages %}
+                {% for message in messages %}
+                  <p class="alert">{{ message }}</p><br>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
 
                  <label for="fournisseur">Fournisseur</label>
                   <select id="fournisseur" name="fournisseur" required>

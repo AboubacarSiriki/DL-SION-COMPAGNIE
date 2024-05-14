@@ -191,6 +191,13 @@
       <button id="btn2">Nouveau client</button>
     </div><br>
     <form class="form1" id="form1 stock-form" method="post" action="{{url_for('ventes')}}" >
+      {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for message in messages %}
+          <p class="alert">{{ message }}</p><br>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
 
       <label for="client">Client</label>
       <select id="client" name="client" required>
@@ -241,6 +248,13 @@
     </form>
 
     <form class="form2" id="form2 stock-form" method="post" action="{{url_for('ventes')}}">
+      {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for message in messages %}
+          <p class="alert">{{ message }}</p><br>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
       <label for="nom">Nom et prénoms</label>
       <input type="text" id="nom" name="nom" required>
 

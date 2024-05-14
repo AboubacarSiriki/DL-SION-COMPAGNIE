@@ -188,6 +188,13 @@
             <span class="close" id="close-popup">&times;</span>
           <h2>Ajout d'une nouvelle commande</h2><br>
             <form method="post" action="{{url_for('commandes')}}" id="stock-form">
+              {% with messages = get_flashed_messages() %}
+              {% if messages %}
+                {% for message in messages %}
+                  <p class="alert">{{ message }}</p><br>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
 
                  <label for="client">Client</label>
                   <select id="client" name="client" required>
