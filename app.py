@@ -343,6 +343,63 @@ def equipe():
 
     return render_template('membres/equipe.html', utilisateurs=utilisateurs,filename=filename)
 
+@app.route('/modifier_membre/<int:id_utilisateur>', methods=['POST', 'GET'])
+def modifier_membre(id_utilisateur):
+    admin_id = session['admin_id']
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
+    infos_admin = cursor.fetchone()
+    filename = infos_admin[7].decode('utf-8')
+
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM utilisateur WHERE id_utilisateur = %s", (id_utilisateur,))
+    membre = cursor.fetchone()
+    image_actuelle = membre[8].decode('utf-8') if membre[8] else None
+    cursor.close()
+
+    if membre is None:
+        flash('Utilisateur non trouvé.', 'danger')
+        return redirect(url_for('equipe'))
+
+    if request.method == 'POST':
+        nom = request.form['nom']
+        prenom = request.form['prenommodif']
+        poste = request.form['postemodif']
+        telephone = request.form['tel']
+        email = request.form['email']
+        login = request.form['login']
+        mot_pass = request.form['password']
+        confmotpass = request.form['confmotpass']
+        photo = request.files['image']
+
+        if email != membre[5]:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM utilisateur WHERE email = %s", (email,))
+            if cursor.fetchone():
+                flash('Cet email est déjà utilisé.', 'danger')
+                return redirect(url_for('modifier_membre', id_utilisateur=id_utilisateur))
+
+        if mot_pass != confmotpass:
+            flash('Les mots de passe ne correspondent pas.', 'danger')
+            return redirect(url_for('modifier_membre', id_utilisateur=id_utilisateur))
+
+        mot_pass = bcrypt.generate_password_hash(mot_pass).decode('utf-8')
+
+        if photo and photo.filename != '':
+            filename = secure_filename(photo.filename)
+            photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        else:
+            filename = image_actuelle
+
+        cursor = conn.cursor()
+        cursor.execute("UPDATE utilisateur SET nom = %s, prenom = %s, poste = %s, telephone = %s, email = %s, login = %s, mot_pass = %s, image = %s WHERE id_utilisateur = %s",
+                       (nom, prenom, poste, telephone, email, login, mot_pass, filename, id_utilisateur))
+        conn.commit()
+        cursor.close()
+        flash('Informations du membre mises à jour avec succès.', 'success')
+        return redirect(url_for('equipe'))
+
+    return render_template('membres/modifier_membre.html', membre=membre, filename=filename, image_actuelle=image_actuelle, id_utilisateur=id_utilisateur)
 
 @app.route('/userlogin', methods=['GET', 'POST'])
 def userLogin():
@@ -1126,18 +1183,6 @@ def donnee_commande(ligne_id):
     data = [{'designation': row[0], 'quantite': row[1], 'prix_vente': row[2], 'montant': row[3], 'date_commande': row[5]} for row in resultat1]
 
     return jsonify(data)
-
-@app.route('/admin/modifier_membre')
-def modifier_membre():
-
-    admin_id = session['admin_id']
-    cursor = conn.cursor()
-    # Récupérer les informations de l'administrateur en utilisant son ID
-    cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
-    infos_admin = cursor.fetchone()
-    filename = infos_admin[7].decode('utf-8')
-
-    return render_template('membres/modifier_membre.html',filename=filename)
 
 @app.route('/modifier_produit/<int:id>',methods=['POST','GET'])
 def modifier_produit(id):

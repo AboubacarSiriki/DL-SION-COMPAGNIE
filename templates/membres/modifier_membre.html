@@ -5,42 +5,45 @@
   <div class="sales-boxes">
     <div class="recent-sales3 box">
       <div class="formulaire">
-       <h2>Modification membre</h2><br>
+        <h2>Modification membre</h2><br>
 
-            <form method="post" action="#">
-                <label for="nom">Nom</label>
-              <input type="text" id="nom" name="nom" required>
-
-              <label for="prenommodif">Prénom</label>
-              <input type="text" id="prenommodif" name="prenommodif" required>
-
-              <label for="categoriemodif">Poste</label>
-              <select id="categoriemodif" name="postemodif" required>
+        <form method="post" action="{{ url_for('modifier_membre', id_utilisateur=membre[0])}}" enctype="multipart/form-data">
+            <label for="nom">Nom</label>
+            <input type="text" id="nom" name="nom" value="{{ membre[1] }}" required>
+        
+            <label for="prenommodif">Prénom</label>
+            <input type="text" id="prenommodif" name="prenommodif" value="{{ membre[2] }}" required>
+        
+            <label for="postemodif">Poste</label>
+            <select id="postemodif" name="postemodif" required>
                 <option value="">Sélectionnez un poste</option>
-                <option value="gestionnaire">Gestionnaire</option>
-                <option value="vendeur">Vendeur</option>
-                <!-- Ajoutez d'autres options selon vos besoins -->
-              </select>
-              <label for="tel">Téléphone</label>
-              <input type="text" id="tel" name="tel" required>
-
-              <label for="email">Email</label>
-              <input type="email" id="email" name="email" required>
-              <label for="login">Login</label>
-              <input type="text" id="login" name="login" required>
-
-              <label for="motpass">Mot de pass</label>
-              <input type="password" id="motpass" name="password" required>
-
-              <label for="confmotpass">Confirmez le mot de pass</label>
-              <input type="password" id="confmotpass" name="confmotpass" required>
-
-              <div><button type="#" ><a href="{{url_for('equipe')}}" style="text-decoration:none;
-    color: #fff;">Annuler</a></button>
-
-                <button type="submit" >Confirmer</button>
-                </div>
-            </form>
+                <option value="gestionnaire" {% if membre[3] == 'gestionnaire' %}selected{% endif %}>Gestionnaire</option>
+                <option value="vendeur" {% if membre[3] == 'vendeur' %}selected{% endif %}>Vendeur</option>
+            </select>
+        
+            <label for="tel">Téléphone</label>
+            <input type="text" id="tel" name="tel" value="{{ membre[4] }}" required>
+        
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" value="{{ membre[5] }}" required>
+        
+            <label for="login">Login</label>
+            <input type="text" id="login" name="login" value="{{ membre[6] }}" required>
+        
+            <label for="password">Mot de passe</label>
+            <input type="password" id="password" name="password" required>
+        
+            <label for="confmotpass">Confirmez le mot de passe</label>
+            <input type="password" id="confmotpass" name="confmotpass" required>
+        
+            <label for="image">Image</label>
+            <input type="file" id="image" name="image" accept="image/*">
+            <br>
+        
+            <button class="btn12"><a href="{{ url_for('equipe') }}" style="text-decoration:none; color: #fff;">Annuler</a></button>
+            <button type="submit">Confirmer</button>
+        </form>
+        
         </div>
   </div><br>
 </div>
