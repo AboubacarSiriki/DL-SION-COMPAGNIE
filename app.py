@@ -1126,6 +1126,55 @@ def commandes():
 
     return render_template('commandes.html', produits=produits, clients=clients,resultat=resultat,filename=filename)
 
+
+@app.route('/modifier_commande/<int:id_commande>', methods=['GET', 'POST'])
+def modifier_commande(id_commande):
+    # Récupérer les informations actuelles de la commande
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM commande WHERE id_commande = %s", (id_commande,))
+    commande_actuelle = cursor.fetchone()
+    cursor.close()
+
+    # Récupérer les informations des produits et clients pour les listes déroulantes
+    cursor = conn.cursor()
+    cursor.execute("SELECT id_produit, nom_produit FROM produit")
+    produits = cursor.fetchall()
+    cursor.execute("SELECT id_client, nom_prenoms FROM client")
+    clients = cursor.fetchall()
+    cursor.close()
+
+    if request.method == 'POST':
+        # Récupération des données du formulaire
+        id_client = request.form['client']
+        id_produit = request.form['produit']
+        quantite = request.form['nombre']
+        prix_vente = request.form['prix_vente']
+
+        # Calcul du montant total
+        montant = int(quantite) * int(prix_vente)
+        
+        # Mise à jour de la commande dans la base de données
+        cursor = conn.cursor()
+        cursor.execute("""
+            UPDATE commande SET id_client = %s, id_produit = %s, quantite = %s, 
+            prix_vente = %s, montant = %s WHERE id_commande = %s
+            """, (id_client, id_produit, quantite, prix_vente, montant, id_commande))
+        conn.commit()
+        cursor.close()
+
+        flash('La commande a été mise à jour avec succès.', 'success')
+        return redirect(url_for('commandes'))
+
+    admin_id = session['admin_id']
+    cursor = conn.cursor()
+    # Récupérer les informations de l'administrateur en utilisant son ID
+    cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
+    infos_admin = cursor.fetchone()
+    filename = infos_admin[7].decode('utf-8')
+    # Afficher le formulaire de modification avec les informations préremplies
+    return render_template('modifier_commande.html', commande=commande_actuelle, produits=produits, clients=clients, filename=filename)
+
+
 @app.route('/status_commande/<entry_id>', methods=['POST'])
 def status_commande(entry_id):
     if request.method == 'POST':
@@ -1258,16 +1307,6 @@ def modifier_vente():
     infos_admin = cursor.fetchone()
     filename = infos_admin[7].decode('utf-8')
     return render_template('modifier_vente.html',filename=filename)
-
-@app.route('/modifier_commande/')
-def modifier_commande():
-    admin_id = session['admin_id']
-    cursor = conn.cursor()
-    # Récupérer les informations de l'administrateur en utilisant son ID
-    cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
-    infos_admin = cursor.fetchone()
-    filename = infos_admin[7].decode('utf-8')
-    return render_template('modifier_commande.html',filename=filename)
 
 @app.route('/modifier_achat/')
 def modifier_achat():

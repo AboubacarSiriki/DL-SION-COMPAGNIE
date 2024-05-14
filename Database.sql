@@ -75,7 +75,7 @@ CREATE TABLE IF NOT EXISTS `commande` (
   `id_client` int(11) NOT NULL,
   `id_produit` int(11) NOT NULL,
   `quantite` int(11) NOT NULL,
-  `prix` int(11) NOT NULL,
+  `prix_vente` int(11) NOT NULL,
   `date_commande` date NOT NULL,
   `statut` varchar(255) NOT NULL,
   PRIMARY KEY (`id_commande`)
