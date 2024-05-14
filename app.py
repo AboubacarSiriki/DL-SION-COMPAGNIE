@@ -1196,7 +1196,6 @@ def donnee_commande(ligne_id):
 
 @app.route('/modifier_produit/<int:id>',methods=['POST','GET'])
 def modifier_produit(id):
-
     admin_id = session['admin_id']
     cursor = conn.cursor()
     # Récupérer les informations de l'administrateur en utilisant son ID
@@ -1231,6 +1230,65 @@ def modifier_produit(id):
 
     return render_template("modifier_produit.html",resultat=resultat,filename=filename,image_actuel=image_actuel)
 
+@app.route('/modifier_client/')
+def modifier_client():
+    admin_id = session['admin_id']
+    cursor = conn.cursor()
+    # Récupérer les informations de l'administrateur en utilisant son ID
+    cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
+    infos_admin = cursor.fetchone()
+    filename = infos_admin[7].decode('utf-8')
+    return render_template('modifier_client.html',filename=filename)
+
+@app.route('/modifier_fournisseur/')
+def modifier_fournisseur():
+    admin_id = session['admin_id']
+    cursor = conn.cursor()
+    # Récupérer les informations de l'administrateur en utilisant son ID
+    cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
+    infos_admin = cursor.fetchone()
+    filename = infos_admin[7].decode('utf-8')
+    return render_template('modifier_fournisseur.html',filename=filename)
+@app.route('/modifier_vente/')
+def modifier_vente():
+    admin_id = session['admin_id']
+    cursor = conn.cursor()
+    # Récupérer les informations de l'administrateur en utilisant son ID
+    cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
+    infos_admin = cursor.fetchone()
+    filename = infos_admin[7].decode('utf-8')
+    return render_template('modifier_vente.html',filename=filename)
+
+@app.route('/modifier_commande/')
+def modifier_commande():
+    admin_id = session['admin_id']
+    cursor = conn.cursor()
+    # Récupérer les informations de l'administrateur en utilisant son ID
+    cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
+    infos_admin = cursor.fetchone()
+    filename = infos_admin[7].decode('utf-8')
+    return render_template('modifier_commande.html',filename=filename)
+
+@app.route('/modifier_achat/')
+def modifier_achat():
+    admin_id = session['admin_id']
+    cursor = conn.cursor()
+    # Récupérer les informations de l'administrateur en utilisant son ID
+    cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
+    infos_admin = cursor.fetchone()
+    filename = infos_admin[7].decode('utf-8')
+    return render_template('modifier_achats.html',filename=filename)
+
+@app.route('/modifier_stock/')
+def modifier_stock():
+    admin_id = session['admin_id']
+    cursor = conn.cursor()
+    # Récupérer les informations de l'administrateur en utilisant son ID
+    cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
+    infos_admin = cursor.fetchone()
+    filename = infos_admin[7].decode('utf-8')
+
+    return render_template('modifier_stock.html',filename=filename)
 
 @app.route("/admin/emailing//")
 def emailing():

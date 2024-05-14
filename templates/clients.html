@@ -78,7 +78,7 @@
                 <li class="topic">Action</li>
                 {% for row in resultat %}
                 <div class="icon">
-                  <i id="modif" class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i>
+                  <a href="{{url_for('modifier_client')}}"><i class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i></a>
                   <i id="sup" class='bx bx-trash delete-icon' style='font-size: 30px; color: red;'></i>
                 </div>
                 {% endfor %}
@@ -102,10 +102,7 @@
 
                   <label for="tel">Téléphone</label>
                   <input type="text" id="tel" name="tel" required>
-    
-                  
-                        <!-- Ajoutez d'autres options selon vos besoins -->
-                    </select>
+
                   <label for="email">Email</label>
                   <input type="email" id="email" name="email" required>
     

@@ -76,15 +76,6 @@
           <li><a href="#">{{ row[2] }}</a></li>
           {% endfor %}
         </ul>
-        <ul class="details">
-          <li class="topic">Action</li>
-          {% for row in resultat1 %}
-          <div class="icon">
-            <i class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i>
-            <i class='bx bx-trash delete-icon' style='font-size: 30px; color: red;'></i>
-          </div>
-          {% endfor %}
-        </ul>
       </div>
             <div class="button">
               <a href="#">Voir plus</a>
@@ -127,7 +118,7 @@
                   <li class="topic">Action</li>
                   {% for row in resultat %}
                   <div class="icon">
-                    <i class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i>
+                    <a href="{{url_for('modifier_stock')}}"><i class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i></a>
                     <i class='bx bx-trash delete-icon' style='font-size: 30px; color: red;'></i>
                   </div>
                   {% endfor %}
