@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block centre%}
+
+<div class="home-content">
+  <div class="sales-boxes">
+    <div class="recent-sales4 box">
+      <div class="formulaire">
+       <h2>Modification client</h2><br>
+
+          <form method="post" action="#">
+
+            <label for="nom">Nom et prénoms</label>
+                  <input type="text" id="nom" name="nom" required>
+
+                  <label for="tel">Téléphone</label>
+                  <input type="text" id="tel" name="tel" required>
+
+                  <label for="email">Email</label>
+                  <input type="email" id="email" name="email" required>
+
+                  <label for="adresse">Adresse</label>
+                  <input type="text" id="adresse" name="adresse" required>
+
+                  <div><button type="#" ><a href="{{url_for('clients')}}" style="text-decoration:none;
+    color: #fff;">Annuler</a></button>
+                  <button type="submit" >Confirmer</button>
+                </div>
+            </form>
+        </div>
+  </div><br>
+</div>
+  </div>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block centre%}
+
+<div class="home-content">
+  <div class="sales-boxes">
+    <div class="recent-sales4 box">
+      <div class="formulaire">
+       <h2>Modification commande client </h2><br>
+
+          <form method="post" action="#">
+
+           <label for="client">Client</label>
+                  <select id="client" name="client" required>
+                    <option value="" disabled selected>Sélectionnez le client</option>
+                    <option > client1</option>
+                    <option > client1</option>
+                  </select>
+
+                  <label for="produit">Produit</label>
+                  <select id="produit" name="produit" required>
+                    <option value="" disabled selected>Sélectionnez un produit</option>
+                    <option >produit</option>
+                      <option >produit</option>
+                  </select>
+                  <label for="nombre">Nombre</label>
+                  <input type="number" id="nombre" name="nombre" required>
+                  <label for="prix_vente">Entrez le prix unitaire de vente</label>
+                  <input type="number" id="prix_vente" name="prix_vente" required>
+
+                  <div><button type="#" ><a href="{{url_for('commandes')}}" style="text-decoration:none;
+    color: #fff;">Annuler</a></button>
+                  <button type="submit" >Confirmer</button>
+                </div>
+            </form>
+        </div>
+  </div><br>
+</div>
+  </div>
+{% endblock %}

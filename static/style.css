@@ -1017,12 +1017,20 @@ nav .profile-details i{
   margin: 0 20px;
   border-radius: 12px;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
-  height:900px;
+  height:950px;
 }
 
+.home-content .sales-boxes .recent-sales4{
+  width: 100%;
+  background: rgba(255, 255, 255, 0.9); /* RGBA avec une opacité de 0.9 (90%) */
+  padding: 20px 30px;
+  margin: 0 20px;
+  border-radius: 12px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+  height:550px;
+}
 
-
-.recent-sales3 .formulaire{
+.recent-sales4 .formulaire{
     width: 70%; /* Pour occuper toute la largeur de .popup-content */
     display: flex; /* Utilisation de flexbox */
     flex-direction: column; /* Les éléments sont disposés en colonne */
@@ -1069,7 +1077,7 @@ nav .profile-details i{
 
 .formulaire form label {
     width: 100%; /* Occupera toute la largeur */
-    max-width: 400px; /* Largeur maximale */
+    max-width: 470px; /* Largeur maximale */
     margin-bottom: 5px; /* Espacement entre chaque élément */
 }
 
