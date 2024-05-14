@@ -414,13 +414,17 @@ def Produit():
         categorie = request.form['categorie']
         designation = request.form['description']
         prix = request.form['prix']
-        image = request.form['image']
+        image = request.files['image']
         stock_min= request.form['nombre']
         stock=0
 
+        filename = secure_filename(image.filename)
+        image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        image.save(image_path)
+
         curso = conn.cursor()
         curso.execute('INSERT INTO produit(nom_produit,categorie,prix,stock,stock_min,designation,image) VALUES (%s, %s, %s ,%s,%s, %s, %s)',
-                      (nom,categorie,prix,stock,stock_min,designation,image))
+                      (nom,categorie,prix,stock,stock_min,designation,filename))
         conn.commit()
         curso.close()
         flash('Produit ajouté avec succès', 'success')
@@ -1123,10 +1127,54 @@ def donnee_commande(ligne_id):
 
     return jsonify(data)
 
-@app.route('/modifier_client/', methods=["post", "get"])
-def modifier_client():
-    # Rendre le template index.html
-    return render_template('client.html')
+@app.route('/admin/modifier_membre')
+def modifier_membre():
+
+    admin_id = session['admin_id']
+    cursor = conn.cursor()
+    # Récupérer les informations de l'administrateur en utilisant son ID
+    cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
+    infos_admin = cursor.fetchone()
+    filename = infos_admin[7].decode('utf-8')
+
+    return render_template('membres/modifier_membre.html',filename=filename)
+
+@app.route('/modifier_produit/<int:id>',methods=['POST','GET'])
+def modifier_produit(id):
+
+    admin_id = session['admin_id']
+    cursor = conn.cursor()
+    # Récupérer les informations de l'administrateur en utilisant son ID
+    cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
+    infos_admin = cursor.fetchone()
+    filename = infos_admin[7].decode('utf-8')
+
+    curso = conn.cursor()
+    curso.execute("SELECT * from produit where id_produit=%s",(id,))
+    resultat = curso.fetchone()
+    image_actuel = resultat[7].decode('utf-8')
+    curso.close()
+    if request.method == 'POST':
+        nom = request.form['nom']
+        categorie = request.form['categorie']
+        designation = request.form['description']
+        prix = request.form['prix']
+        stock_min = request.form['nombre']
+        image= request.files['image']
+
+        filename = secure_filename(image.filename)
+        image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        image.save(image_path)
+
+        curso = conn.cursor()
+        curso.execute("UPDATE produit SET   nom_produit = %s, categorie = %s, prix = %s, stock_min = %s, designation = %s, image = %s WHERE id_produit = %s",
+            ( nom, categorie,prix,stock_min,designation,filename, id))
+        conn.commit()
+        curso.close()
+        return redirect(url_for('Produit'))
+
+
+    return render_template("modifier_produit.html",resultat=resultat,filename=filename,image_actuel=image_actuel)
 
 
 @app.route("/admin/emailing//")

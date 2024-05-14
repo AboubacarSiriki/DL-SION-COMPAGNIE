@@ -55,7 +55,7 @@
               <li class="topic">Action</li>
               {% for row in utilisateurs %}
               <div class="icon">
-                <i class='bx bx-edit edit-icon' id="modif" style='font-size: 30px; color: blue;'></i>
+                <a href="{{url_for('modifier_membre')}}"><i class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i></a>
                 <i class='bx bx-trash delete-icon' style='font-size: 30px; color: red;'></i>
               </div>
               {% endfor %}
@@ -110,66 +110,5 @@
     </form>
   </div>
 </div>
-
-<div id="popup1" class="popup1">
-  <div class="popup-content">
-    <span class="close" id="close-popup1">&times;</span>
-    <h2>Modification des informations membre</h2><br>
-    <form>
-      <label for="nommodif">Nom</label>
-      <input type="text" id="nommodif" name="nommodif" required>
-
-      <label for="prenommodif">Prénom</label>
-      <input type="text" id="prenommodif" name="prenommodif" required>
-
-      <label for="categoriemodif">Poste</label>
-      <select id="categoriemodif" name="postemodif" required>
-        <option value="">Sélectionnez un poste</option>
-        <option value="gestionnaire">Gestionnaire</option>
-        <option value="vendeur">Vendeur</option>
-        <!-- Ajoutez d'autres options selon vos besoins -->
-      </select>
-      <label for="tel">Téléphone</label>
-      <input type="text" id="telmodif" name="telmodif" required>
-
-      <label for="emailmodif">Email</label>
-      <input type="email" id="emailmodif" name="emailmodif" required>
-      <label for="login">Login</label>
-      <input type="text" id="login1" name="login" required>
-
-      <label for="motpassmodif">Mot de pass</label>
-      <input type="password" id="motpassmodif" name="passwordmodif" required>
-
-      <label for="confmotpassmodif">Confirmez le mot de pass</label>
-      <input type="password" id="confmotpassmodif" name="confmotpassmodif" required>
-
-      <div><button class="btn12"><a href="{{url_for('equipe')}}" style="text-decoration:none;
-    color: #fff;">Annuler</a></button>
-                <button  type="submit">Confirmer</button>
-            </div><br>
-    </form>
-  </div>
-</div>
-
-<script>
-       // Ouvrir le popup lorsqu'on clique sur le bouton "Ajouter un Produit"
-document.getElementById("modif").addEventListener("click", function () {
-    document.getElementById("popup1").style.display = "block";
-});
-
-// Fermer le popup lorsqu'on clique sur le bouton de fermeture
-document.getElementById("close-popup1").addEventListener("click", function () {
-    document.getElementById("popup1").style.display = "none";
-});
-
-// Fermer le popup lorsque l'utilisateur clique en dehors du contenu du popup
-window.onclick = function (event) {
-    var popup = document.getElementById("popup1");
-    if (event.target == popup) {
-        popup1.style.display = "none";
-    }
-}
-     </script>
-
 
 {% endblock %}

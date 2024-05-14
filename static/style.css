@@ -287,7 +287,7 @@ nav .profile-details i{
   height:500px;
 }
 
-.home-content .sales-boxes .recent-sales1 form textarea {
+.home-content .sales-boxes .recent-sales1 form .textarea1 {
     width: 100%;
     height: 300px;
     border: 2px solid #fff; /* Ajoutez une bordure initiale */
@@ -660,6 +660,7 @@ nav .profile-details i{
     display: flex; /* Utilisation de flexbox */
     flex-direction: row; /* Les éléments sont disposés en colonne */
     align-items: center; /* Centrer les éléments horizontalement */
+
 }
 .popup-content form label {
     width: 100%; /* Occupera toute la largeur */
@@ -831,6 +832,7 @@ nav .profile-details i{
     padding: 8px; /* Espacement interne */
     margin-bottom: 20px; /* Espacement entre chaque élément */
 }
+
 .popup-content1 table{
   margin-top: 0px;
   width: 100%; /* Occupera toute la largeur */
@@ -981,4 +983,116 @@ nav .profile-details i{
     .popup12, .popup12 * {
         display: block !important; /* S'assurer que tous les éléments de la section à imprimer sont visibles */
     }
+}
+
+.home-content .sales-boxes .recent-sales2{
+  width: 100%;
+  background: rgba(255, 255, 255, 0.9); /* RGBA avec une opacité de 0.9 (90%) */
+  padding: 20px 30px;
+  margin: 0 20px;
+  border-radius: 12px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+  height:800px;
+}
+
+
+
+.recent-sales2 .formulaire{
+    width: 70%; /* Pour occuper toute la largeur de .popup-content */
+    display: flex; /* Utilisation de flexbox */
+    flex-direction: column; /* Les éléments sont disposés en colonne */
+    align-items: center; /* Centrer les éléments horizontalement */
+    height:100%;
+    margin-left:140px;
+    margin-top:5px;
+    border: 2px solid #fff; /* Ajoutez une bordure initiale */
+    border-radius: 10px; /* Ajoutez la bordure arrondie */
+    background: rgba(255, 255, 255, 0.9); /* RGBA avec une opacité de 0.9 (90%) */
+}
+
+.home-content .sales-boxes .recent-sales3{
+  width: 100%;
+  background: rgba(255, 255, 255, 0.9); /* RGBA avec une opacité de 0.9 (90%) */
+  padding: 20px 30px;
+  margin: 0 20px;
+  border-radius: 12px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+  height:900px;
+}
+
+
+
+.recent-sales3 .formulaire{
+    width: 70%; /* Pour occuper toute la largeur de .popup-content */
+    display: flex; /* Utilisation de flexbox */
+    flex-direction: column; /* Les éléments sont disposés en colonne */
+    align-items: center; /* Centrer les éléments horizontalement */
+    height:100%;
+    margin-left:140px;
+    margin-top:5px;
+    border: 2px solid #fff; /* Ajoutez une bordure initiale */
+    border-radius: 10px; /* Ajoutez la bordure arrondie */
+    background: rgba(255, 255, 255, 0.9); /* RGBA avec une opacité de 0.9 (90%) */
+}
+
+.formulaire div{
+   width:50%;
+   display:flex;
+   flex-direction:row;
+   justify-content:space-around;
+   align-items:center;
+}
+
+.formulaire div button {
+    font-size: 20px;
+    font-weight: 400;
+    border-radius: 12px; /* Arrondi les bordures */
+    background-color: #3498db; /* Couleur de fond */
+    color: #ffffff; /* Couleur du texte */
+    padding: 10px 20px; /* Espacement interne */
+    border: none; /* Supprime la bordure */
+    cursor: pointer; /* Curseur de la souris */
+    height: 50px;
+    width: 50%;
+    margin-right: 3%; /* Ajoute de l'espace entre les boutons */
+    margin-left: 3%; /* Ajoute de l'espace entre les boutons */
+    margin-top:5px;
+}
+
+.formulaire form {
+    width: 100%; /* Pour occuper toute la largeur de .popup-content */
+    display: flex; /* Utilisation de flexbox */
+    flex-direction: column; /* Les éléments sont disposés en colonne */
+    align-items: center; /* Centrer les éléments horizontalement */
+
+}
+
+.formulaire form label {
+    width: 100%; /* Occupera toute la largeur */
+    max-width: 400px; /* Largeur maximale */
+    margin-bottom: 5px; /* Espacement entre chaque élément */
+}
+
+.formulaire form input,
+.formulaire form select,
+.formulaire table,
+.formulaire form textarea {
+    width: 100%; /* Occupera toute la largeur */
+    max-width: 470px; /* Largeur maximale */
+    padding: 8px; /* Espacement interne */
+    margin-bottom: 15px; /* Espacement entre chaque élément */
+}
+
+.home-content .sales-boxes .recent-sales1 form textarea:focus,
+.home-content .sales-boxes .recent-sales form textarea:focus,
+.home-content .sales-boxes .formulaire form textarea:focus,
+.popup-content1 form input:focus,
+.popup-content1 form select:focus,
+.popup-content form input:focus,
+.popup-content form select:focus,
+.popup-content form textarea:focus,
+.formulaire form input:focus,
+.formulaire form select:focus{
+    border-color: #3498db; /* Changez la couleur de la bordure lorsque le textarea est en focus */
+    outline: none; /* Supprimez l'effet de contour */
 }
