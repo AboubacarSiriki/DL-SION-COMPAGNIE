@@ -188,6 +188,7 @@
             <span class="close" id="close-popup">&times;</span>
           <h2>Ajout d'une nouvelle commande</h2><br>
 
+            <form id="stock-form" method="post" action="{{url_for('achats')}}">
                  <label for="fournisseur">Fournisseur</label>
                   <select id="fournisseur" name="fournisseur" required>
                       <option value="" disabled selected>Sélectionnez un fournisseur</option>
