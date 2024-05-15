@@ -1043,6 +1043,29 @@ nav .profile-details i{
     background: rgba(255, 255, 255, 0.9); /* RGBA avec une opacité de 0.9 (90%) */
 }
 
+.home-content .sales-boxes .recent-sales5{
+  width: 100%;
+  background: rgba(255, 255, 255, 0.9); /* RGBA avec une opacité de 0.9 (90%) */
+  padding: 20px 30px;
+  margin: 0 20px;
+  border-radius: 12px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+  height:370px;
+}
+
+.recent-sales5 .formulaire{
+    width: 70%; /* Pour occuper toute la largeur de .popup-content */
+    display: flex; /* Utilisation de flexbox */
+    flex-direction: column; /* Les éléments sont disposés en colonne */
+    align-items: center; /* Centrer les éléments horizontalement */
+    height:100%;
+    margin-left:140px;
+    margin-top:5px;
+    border: 2px solid #fff; /* Ajoutez une bordure initiale */
+    border-radius: 10px; /* Ajoutez la bordure arrondie */
+    background: rgba(255, 255, 255, 0.9); /* RGBA avec une opacité de 0.9 (90%) */
+}
+
 .formulaire div{
    width:50%;
    display:flex;
@@ -1104,3 +1127,48 @@ nav .profile-details i{
     border-color: #3498db; /* Changez la couleur de la bordure lorsque le textarea est en focus */
     outline: none; /* Supprimez l'effet de contour */
 }
+
+.icon {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .edit-icon, .delete-icon {
+            cursor: pointer;
+        }
+        .popup0 {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .confirmation-container {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .confirmation-container h2 {
+            margin-bottom: 20px;
+        }
+        .confirmation-container button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn-confirm {
+            background-color: red;
+            color: white;
+        }
+        .btn-cancel {
+            background-color: grey;
+            color: white;
+        }

@@ -689,7 +689,7 @@ def ventes():
 
     curso = conn.cursor()
     curso.execute(
-        "select id_vente,date_vente,client.nom_prenoms,produit.nom_produit from vente,client,produit where vente.id_client = client.id_client and vente.id_produit=produit.id_produit ")
+        "select id_vente,date_vente,client.nom_prenoms,produit.nom_produit,statut from vente,client,produit where vente.id_client = client.id_client and vente.id_produit=produit.id_produit ")
     resultat = curso.fetchall()
     curso.close()
 
@@ -1038,7 +1038,7 @@ def stock():
     else:
         flash('Produit non trouvé', 'danger')
     curso = conn.cursor()
-    curso.execute("select produit.nom_produit,produit.categorie,quantite,date FROM stock,produit WHERE stock.id_produit = produit.id_produit")
+    curso.execute("select produit.nom_produit,produit.categorie,quantite,date,id_stock FROM stock join produit on stock.id_produit=produit.id_produit WHERE stock.id_produit = produit.id_produit")
     resultat = curso.fetchall()
     curso.close()
 
@@ -1057,8 +1057,8 @@ def stock():
 
     return render_template("stock.html", produits=produits,resultat=resultat,resultat1=resultat1,filename=filename)
 
-@app.route('/modifier_stock/<int:id_produit>', methods=['GET', 'POST'])
-def modifier_stock(id_produit):
+@app.route('/modifier_stock/<int:id_stock>', methods=['GET', 'POST'])
+def modifier_stock(id_stock):
     admin_id = session['admin_id']
     cursor = conn.cursor()
     # Récupérer les informations de l'administrateur en utilisant son ID
@@ -1066,28 +1066,34 @@ def modifier_stock(id_produit):
     infos_admin = cursor.fetchone()
     filename = infos_admin[7].decode('utf-8')
 
+    curso = conn.cursor()
+    curso.execute(
+        "select produit.nom_produit,produit.categorie,quantite,date,id_stock FROM stock join produit on stock.id_produit=produit.id_produit where id_stock=%s",(id_stock,))
+    stock = curso.fetchone()
+    curso.close()
+
     # Récupérer les informations actuelles du produit
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM produit WHERE id_produit = %s", (id_produit,))
-    produit = cursor.fetchone()
+    cursor.execute("SELECT * FROM produit")
+    produit = cursor.fetchall()
     cursor.close()
 
     if request.method == 'POST':
         # Récupération des données du formulaire
+        id_produit = request.form['produit']
         nouvelle_quantite = int(request.form['nombre'])
-        prix_vente = float(request.form['prix_vente'])
 
         # Mise à jour du stock et du prix de vente dans la base de données
         cursor = conn.cursor()
         cursor.execute("""
-            UPDATE produit SET stock = %s, prix = %s WHERE id_produit = %s
-            """, (nouvelle_quantite, prix_vente, id_produit))
+            UPDATE stock SET quantite = %s,id_produit=%s WHERE id_stock = %s
+            """, (nouvelle_quantite,id_produit,id_stock))
         conn.commit()
         cursor.close()
 
         flash('Le stock a été mis à jour avec succès.', 'success')
         return redirect(url_for('stock'))
-    return render_template('modifier_stock.html',filename=filename, produit=produit)
+    return render_template('modifier_stock.html',filename=filename, produit=produit,stock=stock)
 
 @app.route('/submit_stock', methods=['POST'])
 def submit_stock():
@@ -1173,7 +1179,7 @@ def commandes():
 def modifier_commande(id_commande):
     # Récupérer les informations actuelles de la commande
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM commande WHERE id_commande = %s", (id_commande,))
+    cursor.execute("SELECT id_commande,client.nom_prenoms,produit.nom_produit,quantite,prix_vente,commande.id_client,commande.id_produit FROM commande join produit on commande.id_produit=produit.id_produit join client on commande.id_client=client.id_client WHERE id_commande = %s", (id_commande,))
     commande_actuelle = cursor.fetchone()
     cursor.close()
 
@@ -1404,6 +1410,32 @@ def modifier_achat():
     infos_admin = cursor.fetchone()
     filename = infos_admin[7].decode('utf-8')
     return render_template('modifier_achats.html',filename=filename)
+
+@app.route('/supprimer_stock/<int:id>', methods=['GET', 'POST'])
+def supprimer_stock(id):
+    if 'admin_id' not in session:
+        return redirect(url_for('login'))  # Rediriger si l'administrateur n'est pas connecté
+
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM stock WHERE id_stock = %s", (id,))
+    resultat = cursor.fetchone()
+    cursor.close()
+
+    if resultat is None:
+        flash('Stock non trouvé', 'danger')
+        return redirect(url_for('stock'))  # Rediriger si le stock n'est pas trouvé
+
+    if request.method == 'POST':
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM stock WHERE id_stock = %s", (id,))
+        conn.commit()
+        cursor.close()
+        flash('Stock supprimé avec succès', 'success')
+        return redirect(url_for('stock'))
+
+    # Si vous voulez afficher une page de confirmation via une route GET, vous pouvez inclure cela :
+    return render_template('stock.html', stock=resultat)
+
 
 @app.route("/admin/emailing//")
 def emailing():
