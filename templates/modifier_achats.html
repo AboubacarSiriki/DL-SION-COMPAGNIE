@@ -7,25 +7,30 @@
       <div class="formulaire">
        <h2>Modification achats </h2><br>
 
-          <form method="post" action="#">
+       <form method="post" action="{{ url_for('modifier_achat', id_entree=achat[0]) }}">
 
-           <label for="client">Client</label>
-                  <select id="client" name="client" required>
-                    <option value="" disabled selected>Sélectionnez le fournisseur</option>
-                    <option > fournisseur 1</option>
-                    <option > fournisseur 2</option>
-                  </select>
-
-                  <label for="produit">Produit</label>
-                  <select id="produit" name="produit" required>
-                    <option value="" disabled selected>Sélectionnez un produit</option>
-                    <option >produit</option>
-                      <option >produit</option>
-                  </select>
-                  <label for="nombre">Nombre</label>
-                  <input type="number" id="nombre" name="nombre" required>
-                  <label for="prix_vente">Entrez le prix unitaire de vente</label>
-                  <input type="number" id="prix_vente" name="prix_vente" required>
+        <label for="fournisseur">Fournisseur</label>
+        <select id="fournisseur" name="fournisseur" required>
+            <option value="" disabled selected>Sélectionnez le fournisseur</option>
+            {% for fournisseur in fournisseurs %}
+                <option value="{{ fournisseur[0] }}" {% if fournisseur[0] == achat[1] %}selected{% endif %}>{{ fournisseur[1] }}</option>
+            {% endfor %}
+        </select>
+    
+        <label for="produit">Produit</label>
+        <select id="produit" name="produit" required>
+            <option value="" disabled selected>Sélectionnez un produit</option>
+            {% for produit in produits %}
+                <option value="{{ produit[0] }}" {% if produit[0] == achat[2] %}selected{% endif %}>{{ produit[1] }}</option>
+            {% endfor %}
+        </select>
+    
+        <label for="nombre">Nombre</label>
+        <input type="number" id="nombre" name="nombre" value="{{ achat[3] }}" required>
+    
+        <label for="prix_vente">Prix unitaire d'achat</label>
+        <input type="number" id="prix_vente" name="prix_vente" value="{{ achat[4] }}" required>
+    
 
                   <div><button type="#" ><a href="{{url_for('achats')}}" style="text-decoration:none;
     color: #fff;">Annuler</a></button>

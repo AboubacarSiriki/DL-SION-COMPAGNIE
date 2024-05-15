@@ -994,7 +994,45 @@ def achats():
 
     return render_template("achats.html", produits=produits, fournisseurs=fournisseurs,resultat=resultat,filename=filename)
 
+@app.route('/modifier_achat/<int:id_entree>', methods=['GET', 'POST'])
+def modifier_achat(id_entree):
+    admin_id = session['admin_id']
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
+    infos_admin = cursor.fetchone()
+    filename = infos_admin[7].decode('utf-8')
 
+    # Récupérer les informations actuelles de l'achat
+    cursor.execute("SELECT * FROM entree WHERE id_entree = %s", (id_entree,))
+    achat = cursor.fetchone()
+
+    # Récupérer les informations des produits et fournisseurs pour les listes déroulantes
+    cursor.execute("SELECT id_produit, nom_produit, prix FROM produit")
+    produits = cursor.fetchall()
+    cursor.execute("SELECT id_fournisseur, nom_prenoms FROM fournisseur")
+    fournisseurs = cursor.fetchall()
+    cursor.close()
+
+    if request.method == 'POST':
+        produit_id = request.form['produit']
+        fournisseur_id = request.form['fournisseur']
+        nouvelle_quantite = int(request.form['nombre'])
+        prix_vente = float(request.form['prix_vente'])  # Ce champ doit correspondre au prix d'achat
+
+        # Mise à jour de l'achat dans la base de données
+        cursor = conn.cursor()
+        cursor.execute("""
+            UPDATE entree SET id_fournisseur = %s, id_produit = %s, quantite = %s, 
+            prix = %s WHERE id_entree = %s
+            """, (fournisseur_id, produit_id, nouvelle_quantite, prix_vente, id_entree))
+        conn.commit()
+        cursor.close()
+
+        flash('Achat modifié avec succès', 'success')
+        return redirect(url_for('achats'))
+
+    return render_template('modifier_achats.html',
+                           filename=filename, produits=produits, fournisseurs=fournisseurs, achat=achat)
 
 @app.route('/get_row_data/<int:row_id>', methods=['GET'])
 def get_row_data(row_id):
@@ -1473,16 +1511,6 @@ def modifier_fournisseur(id):
         return redirect(url_for('fournisseurs'))
 
     return render_template('modifier_fournisseur.html', resultat=resultat ,filename=filename )
-
-@app.route('/modifier_achat/')
-def modifier_achat():
-    admin_id = session['admin_id']
-    cursor = conn.cursor()
-    # Récupérer les informations de l'administrateur en utilisant son ID
-    cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
-    infos_admin = cursor.fetchone()
-    filename = infos_admin[7].decode('utf-8')
-    return render_template('modifier_achats.html',filename=filename)
 
 @app.route('/supprimer_stock/<int:id>', methods=['GET', 'POST'])
 def supprimer_stock(id):
