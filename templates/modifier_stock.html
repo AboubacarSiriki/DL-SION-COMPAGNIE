@@ -7,18 +7,22 @@
       <div class="formulaire">
        <h2>Modification stock</h2><br>
 
-          <form method="post" action="#">
+       <form method="post" action="{{ url_for('modifier_stock', id_produit=produit[0]) }}">
 
-                  <label for="produit">Produit</label>
-                  <select id="produit" name="produit" required>
-                    <option value="" disabled selected>Sélectionnez un produit</option>
-                    <option >produit</option>
-                      <option >produit</option>
-                  </select>
-                  <label for="nombre">Nombre</label>
-                  <input type="number" id="nombre" name="nombre" required>
-                  <label for="prix_vente">Entrez le prix unitaire de vente</label>
-                  <input type="number" id="prix_vente" name="prix_vente" required>
+        <label for="produit">Produit</label>
+        <select id="produit" name="produit" required>
+            <option value="" disabled selected>Sélectionnez un produit</option>
+  
+            {% for prod in produit %}
+                <option value="{{ prod[0] }}">{{ prod[1] }}</option>
+            {% endfor %}
+        </select>
+    
+        <label for="nombre">Nombre</label>
+        <input type="number" id="nombre" name="nombre" value="{{ produit[4] }}" required>
+    
+        <label for="prix_vente">Entrez le prix unitaire de vente</label>
+        <input type="number" id="prix_vente" name="prix_vente" value="{{ produit[3] }}" required>
 
                   <div><button type="#" ><a href="{{url_for('stock')}}" style="text-decoration:none;
     color: #fff;">Annuler</a></button>

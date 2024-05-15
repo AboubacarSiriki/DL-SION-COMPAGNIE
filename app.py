@@ -679,7 +679,7 @@ def ventes():
 
     curso = conn.cursor()
     curso.execute(
-        "select id_vente,date_vente,statut,client.nom_prenoms,produit.nom_produit from vente,client,produit where vente.id_client = client.id_client and vente.id_produit=produit.id_produit ")
+        "select id_vente,date_vente,client.nom_prenoms,produit.nom_produit from vente,client,produit where vente.id_client = client.id_client and vente.id_produit=produit.id_produit ")
     resultat = curso.fetchall()
     curso.close()
 
@@ -1047,6 +1047,38 @@ def stock():
 
     return render_template("stock.html", produits=produits,resultat=resultat,resultat1=resultat1,filename=filename)
 
+@app.route('/modifier_stock/<int:id_produit>', methods=['GET', 'POST'])
+def modifier_stock(id_produit):
+    admin_id = session['admin_id']
+    cursor = conn.cursor()
+    # Récupérer les informations de l'administrateur en utilisant son ID
+    cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
+    infos_admin = cursor.fetchone()
+    filename = infos_admin[7].decode('utf-8')
+
+    # Récupérer les informations actuelles du produit
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM produit WHERE id_produit = %s", (id_produit,))
+    produit = cursor.fetchone()
+    cursor.close()
+
+    if request.method == 'POST':
+        # Récupération des données du formulaire
+        nouvelle_quantite = int(request.form['nombre'])
+        prix_vente = float(request.form['prix_vente'])
+
+        # Mise à jour du stock et du prix de vente dans la base de données
+        cursor = conn.cursor()
+        cursor.execute("""
+            UPDATE produit SET stock = %s, prix = %s WHERE id_produit = %s
+            """, (nouvelle_quantite, prix_vente, id_produit))
+        conn.commit()
+        cursor.close()
+
+        flash('Le stock a été mis à jour avec succès.', 'success')
+        return redirect(url_for('stock'))
+    return render_template('modifier_stock.html',filename=filename, produit=produit)
+
 @app.route('/submit_stock', methods=['POST'])
 def submit_stock():
     # Récupérer les données de la commande à partir du corps de la requête
@@ -1275,8 +1307,6 @@ def modifier_produit(id):
         conn.commit()
         curso.close()
         return redirect(url_for('Produit'))
-
-
     return render_template("modifier_produit.html",resultat=resultat,filename=filename,image_actuel=image_actuel)
 
 @app.route('/modifier_client/')
@@ -1317,17 +1347,6 @@ def modifier_achat():
     infos_admin = cursor.fetchone()
     filename = infos_admin[7].decode('utf-8')
     return render_template('modifier_achats.html',filename=filename)
-
-@app.route('/modifier_stock/')
-def modifier_stock():
-    admin_id = session['admin_id']
-    cursor = conn.cursor()
-    # Récupérer les informations de l'administrateur en utilisant son ID
-    cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
-    infos_admin = cursor.fetchone()
-    filename = infos_admin[7].decode('utf-8')
-
-    return render_template('modifier_stock.html',filename=filename)
 
 @app.route("/admin/emailing//")
 def emailing():
