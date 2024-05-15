@@ -656,6 +656,15 @@ def ventes():
         quantite = request.form.get("nombre")
         prix_vente = request.form.get("prix_vente")  # Récupérer le prix de vente du formulaire
 
+        # Vérifier la quantité en stock avant de procéder à la vente
+        cursor = conn.cursor()
+        cursor.execute("SELECT stock FROM produit WHERE id_produit = %s", (produit_id,))
+        quantite_en_stock = cursor.fetchone()[0]
+
+        if quantite > quantite_en_stock:
+            flash('Quantité demandée excède le stock disponible. Vente annulée.', 'danger')
+            return redirect(url_for('ventes'))
+
         if not client_id:  # Si aucun client_id n'est fourni, créez un nouveau client
             nom = request.form.get("nom")
             tel = request.form.get("tel")
@@ -701,6 +710,82 @@ def ventes():
     filename = infos_admin[7].decode('utf-8')
 
     return render_template("ventes.html", produits=produits, clients=clients,resultat=resultat,filename=filename)
+
+@app.route('/modifier_vente/<int:id_vente>', methods=['GET', 'POST'])
+def modifier_vente(id_vente):
+    admin_id = session['admin_id']
+    cursor = conn.cursor()
+    # Récupérer les informations de l'administrateur en utilisant son ID
+    cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
+    infos_admin = cursor.fetchone()
+    filename = infos_admin[7].decode('utf-8')
+
+    # Récupérer les informations actuelles de la vente
+    cursor.execute(
+        "SELECT vente.*, produit.nom_produit, client.nom_prenoms FROM vente "
+        "JOIN produit ON vente.id_produit = produit.id_produit "
+        "JOIN client ON vente.id_client = client.id_client "
+        "WHERE id_vente = %s", (id_vente,))
+    vente = cursor.fetchone()
+
+    # Récupérer les informations des produits et clients pour les listes déroulantes
+    cursor.execute("SELECT id_produit, nom_produit FROM produit")
+    produits = cursor.fetchall()
+    cursor.execute("SELECT id_client, nom_prenoms FROM client")
+    clients = cursor.fetchall()
+    cursor.close()
+
+    if request.method == 'POST':
+        # Récupération des données du formulaire
+        id_produit = request.form['produit']
+        id_client = request.form['client']
+        nouvelle_quantite = int(request.form['nombre'])
+        prix_vente = float(request.form['prix_vente'])
+
+        # Vérifier la quantité en stock avant de procéder à la vente
+        cursor = conn.cursor()
+        cursor.execute("SELECT stock FROM produit WHERE id_produit = %s", (id_produit,))
+        quantite_en_stock = cursor.fetchone()[0]
+
+        if nouvelle_quantite > quantite_en_stock:
+            flash('Quantité demandée excède le stock disponible. Vente annulée.', 'danger')
+            return redirect(url_for('ventes'))
+
+        # Récupérer la quantité originale et le produit de la vente avant la mise à jour
+        cursor = conn.cursor()
+        cursor.execute("SELECT quantite, id_produit FROM vente WHERE id_vente = %s", (id_vente,))
+        quantite_originale, produit_original = cursor.fetchone()
+
+        # Calcul du montant total
+        montant = nouvelle_quantite * prix_vente
+
+        # Mise à jour de la vente dans la base de données
+        cursor.execute("""
+            UPDATE vente SET id_produit = %s, id_client = %s, quantite = %s, 
+            prix_vente = %s, montant = %s WHERE id_vente = %s
+            """, (id_produit, id_client, nouvelle_quantite, prix_vente, montant, id_vente))
+        conn.commit()
+
+        # Mise à jour du stock dans la table produit
+        # Si le produit est le même, ajuster le stock basé sur la différence de quantité
+        if str(id_produit) == str(produit_original):  # Assurez-vous que les comparaisons sont de même type
+            difference_quantite = quantite_originale - nouvelle_quantite
+            cursor.execute("""
+                UPDATE produit SET stock = stock + %s WHERE id_produit = %s
+                """, (difference_quantite, id_produit))
+        else:
+            # Si le produit a changé, augmenter le stock de l'ancien produit et diminuer celui du nouveau
+            cursor.execute("UPDATE produit SET stock = stock + %s WHERE id_produit = %s", (quantite_originale, produit_original))
+            cursor.execute("UPDATE produit SET stock = stock - %s WHERE id_produit = %s", (nouvelle_quantite, id_produit))
+
+        conn.commit()
+        cursor.close()
+
+        flash('La vente et le stock ont été mis à jour avec succès.', 'success')
+        return redirect(url_for('ventes'))
+    return render_template('modifier_vente.html', 
+                           filename=filename, produits=produits, clients=clients, vente=vente)
+
 
 @app.route('/status_vente/<entry_id>', methods=['POST'])
 def status_vente(entry_id):
@@ -1388,18 +1473,6 @@ def modifier_fournisseur(id):
         return redirect(url_for('fournisseurs'))
 
     return render_template('modifier_fournisseur.html', resultat=resultat ,filename=filename )
-
-
-
-@app.route('/modifier_vente/')
-def modifier_vente():
-    admin_id = session['admin_id']
-    cursor = conn.cursor()
-    # Récupérer les informations de l'administrateur en utilisant son ID
-    cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
-    infos_admin = cursor.fetchone()
-    filename = infos_admin[7].decode('utf-8')
-    return render_template('modifier_vente.html',filename=filename)
 
 @app.route('/modifier_achat/')
 def modifier_achat():
