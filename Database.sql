@@ -77,6 +77,8 @@ CREATE TABLE IF NOT EXISTS `commande` (
   `quantite` int(11) NOT NULL,
   `prix_vente` int(11) NOT NULL,
   `date_commande` date NOT NULL,
+  `prix` int(11) NOT NULL,
+  `date_commande` DATETIME NOT NULL,
   `statut` varchar(255) NOT NULL,
   PRIMARY KEY (`id_commande`)
 ) ENGINE=InnoDB;
@@ -88,7 +90,7 @@ CREATE TABLE IF NOT EXISTS `entree` (
   `id_produit` int(11) NOT NULL,
   `quantite` int(11) NOT NULL,
   `prix` int(11) NOT NULL,
-  `date_entree` date NOT NULL,
+  `date_entree` DATETIME NOT NULL,
   `statut` varchar(255) NOT NULL,
   PRIMARY KEY (`id_entree`)
 ) ENGINE=InnoDB;
@@ -161,7 +163,7 @@ CREATE TABLE IF NOT EXISTS `stock` (
   `id_stock` int(11) NOT NULL AUTO_INCREMENT,
   `id_produit` int(11) NOT NULL,
   `quantite` int(11) NOT NULL,
-  `date` date NOT NULL,
+  `date` DATETIME NOT NULL,
   PRIMARY KEY (`id_stock`)
 ) ENGINE=InnoDB;
 
@@ -205,7 +207,7 @@ CREATE TABLE IF NOT EXISTS `vente` (
   `id_client` int(11) NOT NULL,
   `quantite` int(11) NOT NULL,
   `montant` int(11) NOT NULL,
-  `date_vente` date NOT NULL,
+  `date_vente` DATETIME NOT NULL,
   PRIMARY KEY (`id_vente`)  
 ) ENGINE=InnoDB;
 

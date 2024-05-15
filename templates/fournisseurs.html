@@ -81,7 +81,7 @@
           <li class="topic">Action</li>
           {% for row in resultat %}
           <div class="icon">
-            <a href="{{url_for('modifier_fournisseur')}}"><i class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i></a>
+            <a href="/modifier_fournisseur/{{row[0]}}"><i class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i></a>
             <i class='bx bx-trash delete-icon' style='font-size: 30px; color: red;'></i>
           </div>
           {% endfor %}

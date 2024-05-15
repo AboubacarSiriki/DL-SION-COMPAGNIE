@@ -32,17 +32,22 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 cursor = conn.cursor()
 
-#hashed_password = bcrypt.generate_password_hash('soum1234')
-#print(hashed_password)
+# hashed_password = bcrypt.generate_password_hash('kra1234')
+# print(hashed_password)
 
 
 #  Exécutez la requête SQL en utilisant des paramètres pour éviter les injections SQL
 #sql = "INSERT INTO administrateur (nom, prenom, telephone, email,login, mot_pass) VALUES (%s, %s, %s, %s, %s, %s)"
 #values = ('Kra Adelphe', 'Adephe', '56545678', 'sidiksoum344@gmail.com', 'soum1234', hashed_password)
 
+# # # Exécutez la requête SQL en utilisant des paramètres pour éviter les injections SQL
+# sql = "INSERT INTO administrateur (nom, prenom, telephone, email,login, mot_pass) VALUES (%s, %s, %s, %s, %s, %s)"
+# values = ('Kra', 'Adephe', '0759934211', 'adelphekra@gmail.com', 'kra1234', hashed_password)
+
+
 # # Exécutez la requête avec les valeurs
-#cursor.execute(sql, values)
-#conn.commit()
+# cursor.execute(sql, values)
+# conn.commit()
 # ===================================Admin espace ==============================
 
 # Définir une route et la fonction associée
@@ -559,9 +564,14 @@ def profil():
     # Récupérer les informations de l'administrateur en utilisant son ID
     cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
     infos_admin = cursor.fetchone()
-    filename = infos_admin[7].decode('utf-8')  # Convertir bytes en str
+    if infos_admin:
+     filename = infos_admin[7].decode('utf-8') if infos_admin[7] is not None else None
+    else:
+       filename = None
 
     cursor.close()
+
+  
 
     return render_template('profil.html', infos_admin=infos_admin,filename=filename)
 
@@ -1309,25 +1319,72 @@ def modifier_produit(id):
         return redirect(url_for('Produit'))
     return render_template("modifier_produit.html",resultat=resultat,filename=filename,image_actuel=image_actuel)
 
-@app.route('/modifier_client/')
-def modifier_client():
+@app.route('/modifier_client/<int:id>',methods=['POST','GET'])
+def modifier_client(id):
     admin_id = session['admin_id']
     cursor = conn.cursor()
     # Récupérer les informations de l'administrateur en utilisant son ID
     cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
     infos_admin = cursor.fetchone()
     filename = infos_admin[7].decode('utf-8')
-    return render_template('modifier_client.html',filename=filename)
 
-@app.route('/modifier_fournisseur/')
-def modifier_fournisseur():
+    
+    curso = conn.cursor()
+    curso.execute("SELECT * from client where id_client=%s",(id,))
+    resultat = curso.fetchone()
+    # image_actuel = resultat[7].decode('utf-8')
+    curso.close()
+
+    if request.method == 'POST':
+        nom = request.form['nom']
+        telephone = request.form['tel']
+        Email = request.form['email']
+        adresse = request.form['adresse']
+
+        curso = conn.cursor()
+        curso.execute("UPDATE client SET   nom_prenoms = %s, telephone = %s, email = %s, adresse = %s  WHERE id_client = %s",
+            ( nom, telephone,Email,adresse, id))
+        conn.commit()
+        curso.close()
+        return redirect(url_for('clients'))
+
+
+
+    return render_template('modifier_client.html', resultat=resultat ,filename=filename )
+
+@app.route('/modifier_fournisseur/<int:id>',methods=['POST','GET'])
+def modifier_fournisseur(id):
     admin_id = session['admin_id']
     cursor = conn.cursor()
     # Récupérer les informations de l'administrateur en utilisant son ID
     cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
     infos_admin = cursor.fetchone()
     filename = infos_admin[7].decode('utf-8')
-    return render_template('modifier_fournisseur.html',filename=filename)
+
+    
+    curso = conn.cursor()
+    curso.execute("SELECT * from fournisseur where id_fournisseur=%s",(id,))
+    resultat = curso.fetchone()
+    # image_actuel = resultat[7].decode('utf-8')
+    curso.close()
+
+    if request.method == 'POST':
+        nom = request.form['nom']
+        telephone = request.form['tel']
+        Email = request.form['email']
+        adresse = request.form['adresse']
+
+        curso = conn.cursor()
+        curso.execute("UPDATE fournisseur SET   nom_prenoms = %s, telephone = %s, email = %s, adresse = %s  WHERE id_fournisseur = %s",
+            ( nom, telephone,Email,adresse, id))
+        conn.commit()
+        curso.close()
+        return redirect(url_for('fournisseurs'))
+
+    return render_template('modifier_fournisseur.html', resultat=resultat ,filename=filename )
+
+
+
 @app.route('/modifier_vente/')
 def modifier_vente():
     admin_id = session['admin_id']
