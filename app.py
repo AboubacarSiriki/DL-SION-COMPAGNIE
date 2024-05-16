@@ -310,11 +310,6 @@ def ajouter_membre():
             flash('Cet email est déjà utilisé.', 'danger')
             return redirect(url_for('ajouter_membre'))
 
-        # Validation du mot de passe
-        # if len(mot_pass) < 8 or not re.match(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", mot_pass):
-        #     flash('Le mot de passe doit contenir au moins 8 caractères, dont des majuscules, des minuscules, des chiffres et des symboles.', 'danger')
-        #     return redirect(url_for('ajouter_membre'))
-
         if mot_pass != request.form['confmotpass']:
             flash('Les mots de passe ne correspondent pas.', 'danger')
             return redirect(url_for('ajouter_membre'))
@@ -521,34 +516,45 @@ def Produit():
 def clients():
     if request.method == 'POST':
         nom = request.form['nom']
-        telephone = request.form['tel']  # Correction de la clé 'tel' à 'telephone'
+        telephone = request.form['tel']
         email = request.form['email']
         adresse = request.form['adresse']
 
-        curso = conn.cursor()
-        curso.execute('INSERT INTO client (nom_prenoms,telephone,email,adresse) VALUES (%s, %s, %s, %s)',
-                      (nom,telephone,email,adresse))  # Correction de la requête SQL
+        # Vérifier si le numéro de téléphone est valide
+        if not (telephone.startswith('07') or telephone.startswith('05') or telephone.startswith('01')) or len(telephone) != 10:
+            flash('Le numéro de téléphone doit commencer par 07, 05 ou 01 et contenir 10 chiffres.', 'danger')
+            return redirect(url_for("clients"))
+
+        # Vérifier si le numéro de téléphone est unique
+        cursor = conn.cursor()
+        cursor.execute('SELECT * FROM client WHERE telephone = %s', (telephone,))
+        if cursor.fetchone():
+            flash('Ce numéro de téléphone est déjà utilisé.', 'danger')
+            return redirect(url_for("clients"))
+
+        # Insérer le nouveau client
+        cursor.execute('INSERT INTO client (nom_prenoms,telephone,email,adresse) VALUES (%s, %s, %s, %s)',
+                       (nom, telephone, email, adresse))
         conn.commit()
-        curso.close()
+        cursor.close()
         flash('Client ajouté avec succès', 'success')
-        return redirect(url_for("clients"))  # Redirection vers la même page clients après ajout
+        return redirect(url_for("clients"))
     else:
         # Récupération des éléments de la table client
-        curso = conn.cursor()
-        curso.execute("SELECT * FROM client")
-        resultat = curso.fetchall()
-        curso.close()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM client")
+        resultat = cursor.fetchall()
+        cursor.close()
 
         admin_id = session['admin_id']
         cursor = conn.cursor()
-        # Récupérer les informations de l'administrateur en utilisant son ID
         cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
         infos_admin = cursor.fetchone()
-        filename = infos_admin[7].decode('utf-8')  # Convertir bytes en str
-
+        filename = infos_admin[7].decode('utf-8')
         cursor.close()
 
-        return render_template("clients.html", resultat=resultat,filename=filename)
+        return render_template("clients.html", resultat=resultat, filename=filename)
+
 
 @app.route('/profil/')
 def profil():
@@ -1465,38 +1471,47 @@ def modifier_produit(id):
         return redirect(url_for('Produit'))
     return render_template("modifier_produit.html",resultat=resultat,filename=filename,image_actuel=image_actuel)
 
-@app.route('/modifier_client/<int:id>',methods=['POST','GET'])
+@app.route('/modifier_client/<int:id>', methods=['POST', 'GET'])
 def modifier_client(id):
     admin_id = session['admin_id']
     cursor = conn.cursor()
-    # Récupérer les informations de l'administrateur en utilisant son ID
     cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
     infos_admin = cursor.fetchone()
     filename = infos_admin[7].decode('utf-8')
 
-    
-    curso = conn.cursor()
-    curso.execute("SELECT * from client where id_client=%s",(id,))
-    resultat = curso.fetchone()
-    # image_actuel = resultat[7].decode('utf-8')
-    curso.close()
+    cursor.execute("SELECT * from client where id_client=%s", (id,))
+    client_actuel = cursor.fetchone()
+    cursor.close()
 
     if request.method == 'POST':
         nom = request.form['nom']
         telephone = request.form['tel']
-        Email = request.form['email']
+        email = request.form['email']
         adresse = request.form['adresse']
 
-        curso = conn.cursor()
-        curso.execute("UPDATE client SET   nom_prenoms = %s, telephone = %s, email = %s, adresse = %s  WHERE id_client = %s",
-            ( nom, telephone,Email,adresse, id))
+        # Validation du numéro de téléphone
+        if not (telephone.startswith('07') or telephone.startswith('05') or telephone.startswith('01')) or len(telephone) != 10:
+            flash('Le numéro de téléphone doit commencer par 07, 05 ou 01 et contenir 10 chiffres.', 'danger')
+            return redirect(url_for('modifier_client', id=id))
+
+        # Vérification de l'unicité du numéro de téléphone
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM client WHERE telephone = %s AND id_client != %s", (telephone, id))
+        if cursor.fetchone():
+            flash('Ce numéro de téléphone est déjà utilisé par un autre client.', 'danger')
+            return redirect(url_for('modifier_client', id=id))
+
+        # Mise à jour des informations du client
+        cursor.execute("""
+            UPDATE client SET nom_prenoms = %s, telephone = %s, email = %s, adresse = %s
+            WHERE id_client = %s
+            """, (nom, telephone, email, adresse, id))
         conn.commit()
-        curso.close()
+        cursor.close()
+        flash('Informations du client mises à jour avec succès.', 'success')
         return redirect(url_for('clients'))
 
-
-
-    return render_template('modifier_client.html', resultat=resultat ,filename=filename )
+    return render_template('modifier_client.html', resultat=client_actuel, filename=filename)
 
 @app.route('/modifier_fournisseur/<int:id>',methods=['POST','GET'])
 def modifier_fournisseur(id):
@@ -1567,12 +1582,29 @@ def emailing():
 
     return render_template('emailing.html',filename=filename)
 
+# Vos clés d'authentification Twilio
+account_sid = 'ACdfc75c2ae8c08af7880860fa955e67bd'
+auth_token = 'aabc1d3c93d103dc515221ffdb06cc3c'
+client = Client(account_sid, auth_token)
 
 # Route pour envoyer les SMS
 @app.route('/envoyer-sms', methods=['POST'])
 def envoyer_sms():
+    message_to_send = request.form['message']
+    # Vous devrez récupérer les numéros de téléphone de votre base de données
+    list_of_phone_numbers = ['+2250768140413', '+2250556479723']  # Exemple de numéros
+
+    for number in list_of_phone_numbers:
+        message = client.messages.create(
+            body=message_to_send,
+            from_='+12073863823',
+            to='+2250507283550'
+        )
+
+    # flash('SMS envoyé avec succès à tous les clients.', 'success')
+    return 'SMS envoyé avec succès à tous les clients.', 'success'
     # Récupérer le message depuis le formulaire
-    message = request.form['message']
+    # message = request.form['message']
 
     # Récupérer les numéros de téléphone depuis la base de données MySQL
     # Assurez-vous d'avoir une connexion à votre base de données et de récupérer les numéros
@@ -1582,9 +1614,9 @@ def envoyer_sms():
 
     # Exemple avec Twilio (vous devez installer twilio-python via pip)
 
-    account_sid = 'VOTRE_ACCOUNT_SID'
-    auth_token = 'VOTRE_AUTH_TOKEN'
-    client = Client(account_sid, auth_token)
+    # account_sid = 'VOTRE_ACCOUNT_SID'
+    # auth_token = 'VOTRE_AUTH_TOKEN'
+    # client = Client(account_sid, auth_token)
 
     # Exemple d'envoi de SMS à un numéro
     # Remplacez 'from_' par votre numéro Twilio et 'to' par le numéro de téléphone de votre client
