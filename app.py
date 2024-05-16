@@ -1189,34 +1189,51 @@ def modifier_stock(id_stock):
     infos_admin = cursor.fetchone()
     filename = infos_admin[7].decode('utf-8')
 
-    curso = conn.cursor()
-    curso.execute(
-        "select produit.nom_produit,produit.categorie,quantite,date,id_stock FROM stock join produit on stock.id_produit=produit.id_produit where id_stock=%s",(id_stock,))
-    stock = curso.fetchone()
-    curso.close()
+    # Récupérer les informations actuelles du stock
+    cursor.execute("SELECT * FROM stock WHERE id_stock = %s", (id_stock,))
+    stock_actuel = cursor.fetchone()
 
-    # Récupérer les informations actuelles du produit
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM produit")
-    produit = cursor.fetchall()
+    # Récupérer les informations des produits pour la liste déroulante
+    cursor.execute("SELECT id_produit, nom_produit FROM produit")
+    produits = cursor.fetchall()
     cursor.close()
 
     if request.method == 'POST':
-        # Récupération des données du formulaire
         id_produit = request.form['produit']
         nouvelle_quantite = int(request.form['nombre'])
 
-        # Mise à jour du stock et du prix de vente dans la base de données
+        # Vérifier si le produit existe dans la table produit
         cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(1) FROM produit WHERE id_produit = %s", (id_produit,))
+        if cursor.fetchone()[0] == 0:
+            flash('Le produit sélectionné n\'existe pas.', 'danger')
+            return redirect(url_for('modifier_stock', id_stock=id_stock))
+
+# Récupérer la quantité originale du stock pour ce produit
+        cursor.execute("SELECT quantite FROM stock WHERE id_stock = %s", (id_stock,))
+        quantite_originale = cursor.fetchone()[0]
+
+        # Calculer la différence de quantité pour ajuster le stock dans la table produit
+        difference_quantite = nouvelle_quantite - quantite_originale
+
+        # Mise à jour du stock dans la table stock
         cursor.execute("""
-            UPDATE stock SET quantite = %s,id_produit=%s WHERE id_stock = %s
-            """, (nouvelle_quantite,id_produit,id_stock))
+            UPDATE stock SET id_produit = %s, quantite = %s WHERE id_stock = %s
+            """, (id_produit, nouvelle_quantite, id_stock))
+
+        # Mise à jour du stock dans la table produit
+        cursor.execute("""
+            UPDATE produit SET stock = stock + %s WHERE id_produit = %s
+            """, (difference_quantite, id_produit))
+
         conn.commit()
         cursor.close()
 
         flash('Le stock a été mis à jour avec succès.', 'success')
         return redirect(url_for('stock'))
-    return render_template('modifier_stock.html',filename=filename, produit=produit,stock=stock)
+
+    return render_template('modifier_stock.html', filename=filename, produits=produits, stock=stock_actuel)
+
 
 @app.route('/submit_stock', methods=['POST'])
 def submit_stock():

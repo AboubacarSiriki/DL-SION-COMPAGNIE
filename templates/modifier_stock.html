@@ -7,16 +7,15 @@
       <div class="formulaire">
        <h2>Modification stock</h2><br>
 
-       <form method="post" action="{{ url_for('modifier_stock', id_stock=stock[4]) }}">
-                <label for="produit">Produit</label>
-                <select id="produit" name="produit" required>
-                    <option value="{{ stock[4] }}">{{ stock[0] }}</option>
-                    {% for prod in produit %}
-                        <option value="{{ prod[0] }}">{{ prod[1] }}</option>
-                    {% endfor %}
-                </select>
-                <label for="nombre">Nombre</label>
-                <input type="number" id="nombre" name="nombre" value="{{ stock[2] }}" required>
+       <form method="post" action="{{ url_for('modifier_stock', id_stock=stock[0]) }}">
+        <label for="produit">Produit</label>
+        <select id="produit" name="produit" required>
+            {% for prod in produits %}
+                <option value="{{ prod[0] }}" {% if prod[0] == stock[1] %}selected{% endif %}>{{ prod[1] }}</option>
+            {% endfor %}
+        </select>
+        <label for="nombre">Quantité</label>
+        <input type="number" id="nombre" name="nombre" value="{{ stock[2] }}" required>
 
                   <div><button type="#" ><a href="{{url_for('stock')}}" style="text-decoration:none;
     color: #fff;">Annuler</a></button>
