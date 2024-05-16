@@ -41,6 +41,13 @@
           <div class="recent-sales box">
             <div class="title">
                 <p>Stock</p>
+                {% with messages = get_flashed_messages() %}
+                  {% if messages %}
+                    {% for message in messages %}
+                      <p class="alert" style="color:green;">{{ message }}</p><br>
+                    {% endfor %}
+                  {% endif %}
+                {% endwith %}
                 <button id="open-popup">Faire une mise à jour</button>
             </div>
               <div class="sales-details">
@@ -48,6 +55,12 @@
           <li class="topic">Nom</li>
           {% for row in resultat1 %}
           <li><a href="#">{{ row[0] }}</a></li>
+          {% endfor %}
+        </ul>
+                  <ul class="details">
+          <li class="topic">Stock</li>
+          {% for row in resultat1 %}
+          <li><a href="#">{{ row[2] }}</a></li>
           {% endfor %}
         </ul>
         <ul class="details">
@@ -69,13 +82,6 @@
             {% endfor %}
 
         </ul>
-
-        <ul class="details">
-          <li class="topic">Stock</li>
-          {% for row in resultat1 %}
-          <li><a href="#">{{ row[2] }}</a></li>
-          {% endfor %}
-        </ul>
       </div>
             <div class="button">
               <a href="#">Voir plus</a>
@@ -88,6 +94,13 @@
           <div class="recent-sales box">
             <div class="title">
                 <p>Listes des mises à jour stock</p>
+                {% with messages = get_flashed_messages() %}
+                  {% if messages %}
+                    {% for message in messages %}
+                      <p class="alert" style="color:green;">{{ message }}</p><br>
+                    {% endfor %}
+                  {% endif %}
+                {% endwith %}
                 <button id="print-report1">Imprimer le rapport</button>
                 <div id="dropdown-list1" class="dropdown-content">
                     <a href="#">Journalier</a>

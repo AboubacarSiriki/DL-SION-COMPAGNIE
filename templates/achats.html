@@ -41,6 +41,13 @@
           <div class="recent-sales box">
             <div class="title">
                 <p>Liste des commandes</p>
+                {% with messages = get_flashed_messages() %}
+                  {% if messages %}
+                    {% for message in messages %}
+                      <p class="alert" style="color:green;">{{ message }}</p><br>
+                    {% endfor %}
+                  {% endif %}
+                {% endwith %}
                 <button id="open-popup">Passer une commande</button>
             </div>
 
@@ -90,7 +97,7 @@
                   {% for row in resultat %}
                     <div class="icon">
                       <a href="{{url_for('modifier_achat', id_entree=row[0])}}"><i class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i></a>
-                      <i class='bx bx-trash delete-icon' style='font-size: 30px; color: red;'></i>
+                     <i class='bx bx-trash delete-icon' data-id="{{ row[0] }}" style='font-size: 30px; color: red;'></i>
                     </div>
                   {% endfor %}
               </ul>
@@ -314,6 +321,16 @@
         </div>
 </div>
 
+<div class="popup0" id="confirmationPopup">
+        <div class="confirmation-container">
+            <h2>Êtes-vous sûr de vouloir supprimer cet achat ?</h2>
+            <form id="deleteForm" method="POST">
+                <button type="submit" class="btn-confirm">Confirmer</button>
+                <button type="button" class="btn-cancel" onclick="closePopup()">Annuler</button>
+            </form>
+        </div>
+</div>
+
    <script>
    document.addEventListener('DOMContentLoaded', function() {
   var addButton = document.querySelector('#add-button');
@@ -515,5 +532,26 @@ function getColor(status) {
         });
     });
 </script>
+
+<script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const deleteIcons = document.querySelectorAll('.delete-icon');
+            const popup = document.getElementById('confirmationPopup');
+            const deleteForm = document.getElementById('deleteForm');
+
+            deleteIcons.forEach(icon => {
+                icon.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    deleteForm.action = `/supprimer_achat/${id}`;
+                    popup.style.display = 'flex';
+                });
+            });
+        });
+
+        function closePopup() {
+            document.getElementById('confirmationPopup').style.display = 'none';
+        }
+</script>
+
 
 {% endblock %}
