@@ -335,7 +335,7 @@ def ajouter_membre():
         # flash('Nouveau membre ajouté avec succès.', 'success')
         
         return redirect('/admin/equipe/')
-
+ 
     return redirect('/admin/equipe/')
 
 @app.route('/admin/equipe/')
@@ -532,23 +532,22 @@ def clients():
         curso.close()
         flash('Client ajouté avec succès', 'success')
         return redirect(url_for("clients"))  # Redirection vers la même page clients après ajout
-    else:
-        # Récupération des éléments de la table client
-        curso = conn.cursor()
-        curso.execute("SELECT * FROM client")
-        resultat = curso.fetchall()
-        curso.close()
 
-        admin_id = session['admin_id']
-        cursor = conn.cursor()
-        # Récupérer les informations de l'administrateur en utilisant son ID
-        cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
-        infos_admin = cursor.fetchone()
-        filename = infos_admin[7].decode('utf-8')  # Convertir bytes en str
+    curso = conn.cursor()
+    curso.execute("SELECT * FROM client")
+    resultat = curso.fetchall()
+    curso.close()
 
-        cursor.close()
+    admin_id = session['admin_id']
+    cursor = conn.cursor()
+    # Récupérer les informations de l'administrateur en utilisant son ID
+    cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
+    infos_admin = cursor.fetchone()
+    filename = infos_admin[7].decode('utf-8')  # Convertir bytes en str
 
-        return render_template("clients.html", resultat=resultat,filename=filename)
+    cursor.close()
+
+    return render_template("clients.html", resultat=resultat,filename=filename)
 
 @app.route('/profil/')
 def profil():
@@ -781,7 +780,7 @@ def modifier_vente(id_vente):
         conn.commit()
         cursor.close()
 
-        flash('La vente et le stock ont été mis à jour avec succès.', 'success')
+        flash('vente modifiée avec succès.', 'success')
         return redirect(url_for('ventes'))
     return render_template('modifier_vente.html', 
                            filename=filename, produits=produits, clients=clients, vente=vente)
@@ -827,6 +826,7 @@ def submit_vente():
         )
         conn.commit()
         cursor.close()
+        flash('Vente ajoutée avec succès', 'success')
 
         cursor = conn.cursor()
         cursor.execute(
@@ -880,7 +880,7 @@ def submit_vente_client():
             (quantity, product_id))
         conn.commit()
         cursor.close()
-
+        flash('Vente effectuée avec succès', 'success')
         # Calculer le prix total (si nécessaire)
 
     # Préparer la réponse
@@ -912,7 +912,7 @@ def submit_order():
         )
         conn.commit()
         cursor.close()
-
+        flash('Commande soumise avec succès', 'success')
         # Calculer le prix total (si nécessaire)
 
     # Préparer la réponse
@@ -970,8 +970,6 @@ def achats():
         cursor.close()
         flash('Achat ajouté avec succès', 'success')
         return redirect(url_for('achats'))
-    else:
-        flash('Produit non trouvé', 'danger')
 
     cursor = conn.cursor()
     cursor.execute(
@@ -1158,8 +1156,7 @@ def stock():
 
         flash('Stock ajouté avec succès', 'success')
         return redirect(url_for('stock'))
-    else:
-        flash('Produit non trouvé', 'danger')
+
     curso = conn.cursor()
     curso.execute("select produit.nom_produit,produit.categorie,quantite,date,id_stock FROM stock join produit on stock.id_produit=produit.id_produit WHERE stock.id_produit = produit.id_produit")
     resultat = curso.fetchall()
@@ -1229,7 +1226,7 @@ def modifier_stock(id_stock):
         conn.commit()
         cursor.close()
 
-        flash('Le stock a été mis à jour avec succès.', 'success')
+        flash(' stock modifié avec succès.', 'success')
         return redirect(url_for('stock'))
 
     return render_template('modifier_stock.html', filename=filename, produits=produits, stock=stock_actuel)
@@ -1260,7 +1257,7 @@ def submit_stock():
             (quantite, produit_id))
         conn.commit()
         cursor.close()
-
+        flash('stock mis à jour avec succès', 'success')
     # Préparer la réponse
     response_data = {
     }
@@ -1296,8 +1293,6 @@ def commandes():
         cursor.close()
         flash('Achat ajouté avec succès', 'success')
         return redirect(url_for('commandes'))
-    else:
-        flash('Produit non trouvé', 'danger')
 
     curso = conn.cursor()
     curso.execute(
@@ -1350,7 +1345,7 @@ def modifier_commande(id_commande):
         conn.commit()
         cursor.close()
 
-        flash('La commande a été mise à jour avec succès.', 'success')
+        flash('Commande mise à jour avec succès.', 'success')
         return redirect(url_for('commandes'))
 
     admin_id = session['admin_id']
@@ -1403,7 +1398,7 @@ def submit_commande():
         )
         conn.commit()
         cursor.close()
-
+        flash('commande ajoutée avec succès', 'success')
         # Calculer le prix total (si nécessaire)
 
     # Préparer la réponse
@@ -1462,6 +1457,7 @@ def modifier_produit(id):
             ( nom, categorie,prix,stock_min,designation,filename, id))
         conn.commit()
         curso.close()
+        flash('produit modifié avec succès', 'success')
         return redirect(url_for('Produit'))
     return render_template("modifier_produit.html",resultat=resultat,filename=filename,image_actuel=image_actuel)
 
@@ -1492,6 +1488,7 @@ def modifier_client(id):
             ( nom, telephone,Email,adresse, id))
         conn.commit()
         curso.close()
+        flash('client modifié avec succès', 'success')
         return redirect(url_for('clients'))
 
 
@@ -1525,6 +1522,7 @@ def modifier_fournisseur(id):
             ( nom, telephone,Email,adresse, id))
         conn.commit()
         curso.close()
+        flash('Fournisseur modifié avec succès', 'success')
         return redirect(url_for('fournisseurs'))
 
     return render_template('modifier_fournisseur.html', resultat=resultat ,filename=filename )
@@ -1553,6 +1551,31 @@ def supprimer_stock(id):
 
     # Si vous voulez afficher une page de confirmation via une route GET, vous pouvez inclure cela :
     return render_template('stock.html', stock=resultat)
+
+@app.route('/supprimer_client/<int:id>', methods=['GET', 'POST'])
+def supprimer_client(id):
+    if 'admin_id' not in session:
+        return redirect(url_for('login'))  # Rediriger si l'administrateur n'est pas connecté
+
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM client WHERE id_client = %s", (id,))
+    resultat = cursor.fetchone()
+    cursor.close()
+
+    if resultat is None:
+        flash('client non trouvé', 'danger')
+        return redirect(url_for('clients'))  # Rediriger si le stock n'est pas trouvé
+
+    if request.method == 'POST':
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM client WHERE id_client = %s", (id,))
+        conn.commit()
+        cursor.close()
+        flash('Client  supprimé avec succès', 'success')
+        return redirect(url_for('clients'))
+
+    # Si vous voulez afficher une page de confirmation via une route GET, vous pouvez inclure cela :
+    return render_template('clients.html', client=resultat)
 
 
 @app.route("/admin/emailing//")
