@@ -8,6 +8,9 @@ from werkzeug.utils import secure_filename
 from datetime import datetime
 from flask import jsonify
 from twilio.rest import Client
+from dotenv import load_dotenv
+load_dotenv()
+
 
 # Créer une instance de l'application Flask
 app = Flask(__name__)
@@ -538,12 +541,13 @@ def clients():
         conn.commit()
         cursor.close()
         flash('Client ajouté avec succès', 'success')
-        return redirect(url_for("clients"))
-
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM client")
-    resultat = cursor.fetchall()
-    cursor.close()
+        return redirect(url_for("clients"))  # Redirection vers la même page clients après ajout
+    else:
+        # Récupération des éléments de la table client
+        curso = conn.cursor()
+        curso.execute("SELECT * FROM client")
+        resultat = curso.fetchall()
+        curso.close()
 
         admin_id = session['admin_id']
         cursor = conn.cursor()
@@ -1504,7 +1508,7 @@ def modifier_client(id):
             WHERE id_client = %s
             """, (nom, telephone, email, adresse, id))
         conn.commit()
-        curso.close()
+        cursor.close()
         return redirect(url_for('clients'))
 
     return render_template('modifier_client.html', resultat=client_actuel, filename=filename)
@@ -1705,27 +1709,33 @@ def emailing():
 
     return render_template('emailing.html',filename=filename)
 
-# Vos clés d'authentification Twilio
-account_sid = 'ACdfc75c2ae8c08af7880860fa955e67bd'
-auth_token = 'aabc1d3c93d103dc515221ffdb06cc3c'
+from twilioConfig import account_sid, auth_token
+
 client = Client(account_sid, auth_token)
 
 # Route pour envoyer les SMS
-@app.route('/envoyer-sms', methods=['POST'])
+@app.route('/envoyer-sms', methods=['GET', 'POST'])
 def envoyer_sms():
     message_to_send = request.form['message']
     # Vous devrez récupérer les numéros de téléphone de votre base de données
-    list_of_phone_numbers = ['+2250768140413', '+2250556479723']  # Exemple de numéros
+    # list_of_phone_numbers = ['+2250768140413', '+2250556479723']  
 
-    for number in list_of_phone_numbers:
-        message = client.messages.create(
-            body=message_to_send,
-            from_='+12073863823',
-            to='+2250507283550'
-        )
+
+    client.messages.create(
+        body=message_to_send,
+        from_='+12073863823',
+        to='+2250507283550'
+    )
+    flash('SMS envoyé avec succès à tous les clients.', 'success')
+    # for number in list_of_phone_numbers:
+    #     message = client.messages.create(
+    #         body=message_to_send,
+    #         from_='+12073863823',
+    #         to='+2250507283550'
+    #     )
 
     # flash('SMS envoyé avec succès à tous les clients.', 'success')
-    return 'SMS envoyé avec succès à tous les clients.', 'success'
+    # return 'SMS envoyé avec succès à tous les clients.', 'success'
     # Récupérer le message depuis le formulaire
     # message = request.form['message']
 
