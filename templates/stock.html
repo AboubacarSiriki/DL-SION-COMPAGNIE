@@ -57,6 +57,12 @@
           <li><a href="#">{{ row[0] }}</a></li>
           {% endfor %}
         </ul>
+                  <ul class="details">
+          <li class="topic">Stock</li>
+          {% for row in resultat1 %}
+          <li><a href="#">{{ row[2] }}</a></li>
+          {% endfor %}
+        </ul>
         <ul class="details">
           <li class="topic">Catégorie</li>
           {% for row in resultat1 %}
@@ -75,13 +81,6 @@
                 {% endif %}
             {% endfor %}
 
-        </ul>
-
-        <ul class="details">
-          <li class="topic">Stock</li>
-          {% for row in resultat1 %}
-          <li><a href="#">{{ row[2] }}</a></li>
-          {% endfor %}
         </ul>
       </div>
             <div class="button">

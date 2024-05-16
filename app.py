@@ -1577,6 +1577,107 @@ def supprimer_client(id):
     # Si vous voulez afficher une page de confirmation via une route GET, vous pouvez inclure cela :
     return render_template('clients.html', client=resultat)
 
+@app.route('/supprimer_fournisseur/<int:id>', methods=['GET', 'POST'])
+def supprimer_fournisseur(id):
+    if 'admin_id' not in session:
+        return redirect(url_for('login'))  # Rediriger si l'administrateur n'est pas connecté
+
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM fournisseur WHERE id_fournisseur = %s", (id,))
+    resultat = cursor.fetchone()
+    cursor.close()
+
+    if resultat is None:
+        flash('fournisseur non trouvé', 'danger')
+        return redirect(url_for('fournisseurs'))  # Rediriger si le stock n'est pas trouvé
+
+    if request.method == 'POST':
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM fournisseur WHERE id_fournisseur = %s", (id,))
+        conn.commit()
+        cursor.close()
+        flash('Fournisseur  supprimé avec succès', 'success')
+        return redirect(url_for('fournisseurs'))
+
+    # Si vous voulez afficher une page de confirmation via une route GET, vous pouvez inclure cela :
+    return render_template('fournisseurs.html', fournisseur=resultat)
+
+
+@app.route('/supprimer_vente/<int:id>', methods=['GET', 'POST'])
+def supprimer_vente(id):
+    if 'admin_id' not in session:
+        return redirect(url_for('login'))  # Rediriger si l'administrateur n'est pas connecté
+
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM vente WHERE id_vente = %s", (id,))
+    resultat = cursor.fetchone()
+    cursor.close()
+
+    if resultat is None:
+        flash('vente non trouvé', 'danger')
+        return redirect(url_for('ventes'))  # Rediriger si le stock n'est pas trouvé
+
+    if request.method == 'POST':
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM vente WHERE id_vente = %s", (id,))
+        conn.commit()
+        cursor.close()
+        flash('vente  supprimée avec succès', 'success')
+        return redirect(url_for('ventes'))
+
+    # Si vous voulez afficher une page de confirmation via une route GET, vous pouvez inclure cela :
+    return render_template('ventes.html', vente=resultat)
+
+@app.route('/supprimer_commande/<int:id>', methods=['GET', 'POST'])
+def supprimer_commande(id):
+    if 'admin_id' not in session:
+        return redirect(url_for('login'))  # Rediriger si l'administrateur n'est pas connecté
+
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM commande WHERE id_commande = %s", (id,))
+    resultat = cursor.fetchone()
+    cursor.close()
+
+    if resultat is None:
+        flash('commande non trouvé', 'danger')
+        return redirect(url_for('commandes'))  # Rediriger si le stock n'est pas trouvé
+
+    if request.method == 'POST':
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM commande WHERE id_commande = %s", (id,))
+        conn.commit()
+        cursor.close()
+        flash('commande  supprimée avec succès', 'success')
+        return redirect(url_for('commandes'))
+
+    # Si vous voulez afficher une page de confirmation via une route GET, vous pouvez inclure cela :
+    return render_template('commandes.html', commande=resultat)
+
+@app.route('/supprimer_achat/<int:id>', methods=['GET', 'POST'])
+def supprimer_achat(id):
+    if 'admin_id' not in session:
+        return redirect(url_for('login'))  # Rediriger si l'administrateur n'est pas connecté
+
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM entree WHERE id_entree = %s", (id,))
+    resultat = cursor.fetchone()
+    cursor.close()
+
+    if resultat is None:
+        flash('achat non trouvé', 'danger')
+        return redirect(url_for('achats'))  # Rediriger si le stock n'est pas trouvé
+
+    if request.method == 'POST':
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM entree WHERE id_entree = %s", (id,))
+        conn.commit()
+        cursor.close()
+        flash('achat  supprimée avec succès', 'success')
+        return redirect(url_for('achats'))
+
+    # Si vous voulez afficher une page de confirmation via une route GET, vous pouvez inclure cela :
+    return render_template('achats.html', vente=resultat)
+
 
 @app.route("/admin/emailing//")
 def emailing():
