@@ -1508,7 +1508,7 @@ def modifier_client(id):
             """, (nom, telephone, email, adresse, id))
         conn.commit()
         cursor.close()
-        flash('Informations du client mises à jour avec succès.', 'success')
+        flash('client modifié avec succès', 'success')
         return redirect(url_for('clients'))
 
     return render_template('modifier_client.html', resultat=client_actuel, filename=filename)
