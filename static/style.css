@@ -284,7 +284,6 @@ nav .profile-details i{
   margin: 0 20px;
   border-radius: 12px;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
-  height:500px;
 }
 
 .home-content .sales-boxes .recent-sales1 form .textarea1 {
@@ -1020,6 +1019,19 @@ nav .profile-details i{
   height:950px;
 }
 
+.recent-sales3 .formulaire{
+    width: 70%; /* Pour occuper toute la largeur de .popup-content */
+    display: flex; /* Utilisation de flexbox */
+    flex-direction: column; /* Les éléments sont disposés en colonne */
+    align-items: center; /* Centrer les éléments horizontalement */
+    height:100%;
+    margin-left:140px;
+    margin-top:5px;
+    border: 2px solid #fff; /* Ajoutez une bordure initiale */
+    border-radius: 10px; /* Ajoutez la bordure arrondie */
+    background: rgba(255, 255, 255, 0.9); /* RGBA avec une opacité de 0.9 (90%) */
+}
+
 .home-content .sales-boxes .recent-sales4{
   width: 100%;
   background: rgba(255, 255, 255, 0.9); /* RGBA avec une opacité de 0.9 (90%) */
@@ -1172,3 +1184,58 @@ nav .profile-details i{
             background-color: grey;
             color: white;
         }
+
+@media screen and (max-width: 768px) {
+
+   .recent-sales2 .formulaire,
+   .recent-sales3 .formulaire,
+   .recent-sales4 .formulaire,
+   .recent-sales5 .formulaire{
+      width: 100%;
+     margin-left:0px;
+   }
+
+   .formulaire div button {
+      font-size: 17px;
+      width:100%;
+      height:35px;
+   }
+   .home-content .sales-boxes  .sales-details1{
+
+       flex-direction:column;
+       margin-bottom:20px;
+       justify-column:space-between;
+       width:100%;
+       height:100%;
+
+   }
+
+   .home-content .sales-boxes .sales-details1 .infos{
+  width: 80%;
+  height: 80%;
+  flex-direction:column;
+}
+.home-content .sales-boxes .sales-details1 .message{
+  width: 50%;
+  height: 10%;
+  display:flex;
+  flex-direction:row;
+  margin-top:50px;
+  justify-content:space-between;
+}
+.profil {
+    width: 35%; /* Largeur de la div */
+    height: 20%; /* Hauteur de la div */
+    position:absolute;
+    top: 170px;
+    right:20px;
+
+}
+.home-content .sales-boxes .recent-sales .sales-details{
+
+      flex-direction:column;
+      align-items: start;
+
+}
+
+}
