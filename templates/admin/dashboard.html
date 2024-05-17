@@ -5,10 +5,10 @@
           <div class="box">
             <div class="right-side">
               <div class="box-topic">Vente</div>
-              <div class="number">60</div>
+              <div class="number">{{ total_ventes[0] }}</div>
               <div class="indicator">
                 <i class="bx bx-up-arrow-alt"></i>
-                <span class="text">Aujourd'hui</span>
+                <span class="text">cumulée</span>
               </div>
             </div>
             <i class="bx bx-cart-alt cart"></i>
@@ -16,10 +16,10 @@
           <div class="box">
             <div class="right-side">
               <div class="box-topic">Commande</div>
-              <div class="number">50</div>
+              <div class="number">{{ total_commande[0] }}</div>
               <div class="indicator">
                 <i class="bx bx-up-arrow-alt"></i>
-                <span class="text">Aujourd'hui</span>
+                <span class="text">cumulée</span>
               </div>
             </div>
             <i class="bx bxs-cart-add cart two"></i>
@@ -27,10 +27,10 @@
           <div class="box">
             <div class="right-side">
               <div class="box-topic">Clients</div>
-              <div class="number">10</div>
+              <div class="number">{{ total_client[0] }}</div>
               <div class="indicator">
                 <i class="bx bx-up-arrow-alt"></i>
-                <span class="text">Aujourd'hui</span>
+                <span class="text">cumulée</span>
               </div>
             </div>
             <i class="bx bx-cart cart three"></i>
@@ -38,7 +38,7 @@
           <div class="box">
             <div class="right-side">
               <div class="box-topic">Caisse</div>
-              <div class="number">10 000K</div>
+              <div class="number">{{ total_CA[0] }}</div>
               <div class="indicator">
                 <i class="bx bx-down-arrow-alt down"></i>
                 <span class="text">Chiffre d'affaire</span>
@@ -56,40 +56,28 @@
             <div class="sales-details">
               <ul class="details">
                 <li class="topic">Date</li>
-                <li><a href="#">02 Jan 2021</a></li>
-                <li><a href="#">02 Jan 2021</a></li>
-                <li><a href="#">02 Jan 2021</a></li>
-                <li><a href="#">02 Jan 2021</a></li>
-                <li><a href="#">02 Jan 2021</a></li>
-                <li><a href="#">02 Jan 2021</a></li>
+                {%for row in dash%}
+                <li><a href="#">{{row[0]}}</a></li>
+                {%endfor%}
+               
               </ul>
               <ul class="details">
                 <li class="topic">Clients</li>
-                <li><a href="#">Alex Doe</a></li>
-                <li><a href="#">David Mart</a></li>
-                <li><a href="#">David Mart</a></li>
-                <li><a href="#">Alex Doe</a></li>
-                <li><a href="#">David Mart</a></li>
-                <li><a href="#">David Mart</a></li>
+                {%for row in dash%}
+                <li><a href="#">{{row[1]}}</a></li>
+                {%endfor%}
               </ul>
               <ul class="details">
-                <li class="topic">Etat</li>
-                <li><a href="#">En attente</a></li>
-                <li><a href="#">Annulé</a></li>
-                <li><a href="#">Rétourné</a></li>
-                <li><a href="#">En attente</a></li>
-                <li><a href="#">Annulé</a></li>
-                <li><a href="#">Rétourné</a></li>
+                <li class="topic">Statut</li>
+                {%for row in dash%}
+                <li><a href="#">{{row[2]}}</a></li>
+                {%endfor%}
               </ul>
               <ul class="details">
                 <li class="topic">Montant</li>
-                <li><a href="#">1200000 FCFA</a></li>
-                <li><a href="#">500000 FCFA</a></li>
-                <li><a href="#">2000000 FCFA</a></li>
-                <li><a href="#">1200000 FCFA</a></li>
-                <li><a href="#">500000 FCFA</a></li>
-                <li><a href="#">2000000 FCFA</a></li>
-
+                {%for row in dash%}
+                <li><a href="#">{{row[3]}}</a></li>
+                {%endfor%}
               </ul>
             </div>
             <div class="button">
@@ -98,35 +86,17 @@
           </div>
           <div class="top-sales box">
             <div class="title">Meilleur ventes</div>
+            
             <ul class="top-sales-details">
+              {%for row in meilleurs%}
               <li>
                 <a href="#">
-                  <img src="../static/image/dell.jpg" alt="" />
-                  <span class="product">Dell I5 </span>
+                  <img src="{{ row[0] }}" alt="" />
+                  <span class="product">{{ row[1] }}</span>
                 </a>
-                <span class="price">300K</span>
+                <span class="price">{{ row[2] }}</span>
               </li>
-              <li>
-                <a href="#">
-                  <img src="../static/image/HP.png" alt="" />
-                  <span class="product">Lonovo I5</span>
-                </a>
-                <span class="price">150K</span>
-              </li>
-              <li>
-                <a href="#">
-                  <img src="../static/image/hp.webp" alt="" />
-                  <span class="product">HP I7</span>
-                </a>
-                <span class="price">200K</span>
-              </li>
-              <li>
-                <a href="#">
-                  <img src="../static/image/dell.jpg" alt="" />
-                  <span class="product">Dell I5 </span>
-                </a>
-                <span class="price">300K</span>
-              </li>
+              {%endfor%}
             </ul>
           </div>
         </div>
