@@ -6,7 +6,13 @@
     <div class="recent-sales4 box">
       <div class="formulaire">
        <h2>Modification client</h2><br>
-
+       {% with messages = get_flashed_messages() %}
+       {% if messages %}
+         {% for message in messages %}
+           <p class="alert" style="color:green;">{{ message }}</p><br>
+         {% endfor %}
+       {% endif %}
+     {% endwith %}
           <form method="post" action="{{ url_for('modifier_client', id=resultat[0])}}">
 
             <label for="nom">Nom et prénoms</label>
