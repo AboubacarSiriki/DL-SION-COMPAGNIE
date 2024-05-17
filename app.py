@@ -523,9 +523,10 @@ def clients():
         email = request.form['email']
         adresse = request.form['adresse']
 
-        # Vérifier si le numéro de téléphone est valide
-        if not (telephone.startswith('07') or telephone.startswith('05') or telephone.startswith('01')) or len(telephone) != 10:
-            flash('Le numéro de téléphone doit commencer par 07, 05 ou 01 et contenir 10 chiffres.', 'danger')
+        # Ajout automatique du préfixe +225 si nécessaire et validation du numéro
+        telephone = '+225' + telephone.lstrip('+225')
+        if len(telephone) != 14 or not telephone[4:].isdigit() or not (telephone[4:6] in ['07', '05', '01']):
+            flash('Le numéro de téléphone doit être valide et contenir 14 chiffres y compris le préfixe +225.', 'danger')
             return redirect(url_for("clients"))
 
         # Vérifier si le numéro de téléphone est unique
@@ -533,6 +534,12 @@ def clients():
         cursor.execute('SELECT * FROM client WHERE telephone = %s', (telephone,))
         if cursor.fetchone():
             flash('Ce numéro de téléphone est déjà utilisé.', 'danger')
+            return redirect(url_for("clients"))
+
+        # Vérification de l'unicité de l'email
+        cursor.execute("SELECT * FROM client WHERE email = %s AND id_client != %s", (email, id))
+        if cursor.fetchone():
+            flash('Cet email est déjà utilisé par un autre client.', 'danger')
             return redirect(url_for("clients"))
 
         # Insérer le nouveau client
@@ -1490,9 +1497,10 @@ def modifier_client(id):
         email = request.form['email']
         adresse = request.form['adresse']
 
-        # Validation du numéro de téléphone
-        if not (telephone.startswith('07') or telephone.startswith('05') or telephone.startswith('01')) or len(telephone) != 10:
-            flash('Le numéro de téléphone doit commencer par 07, 05 ou 01 et contenir 10 chiffres.', 'danger')
+        # Ajout automatique du préfixe +225 si nécessaire et validation du numéro
+        telephone = '+225' + telephone.lstrip('+225')
+        if len(telephone) != 14 or not telephone[4:].isdigit() or not (telephone[4:6] in ['07', '05', '01']):
+            flash('Le numéro de téléphone doit être valide et contenir 14 chiffres y compris le préfixe +225.', 'danger')
             return redirect(url_for('modifier_client', id=id))
 
         # Vérification de l'unicité du numéro de téléphone
@@ -1500,6 +1508,12 @@ def modifier_client(id):
         cursor.execute("SELECT * FROM client WHERE telephone = %s AND id_client != %s", (telephone, id))
         if cursor.fetchone():
             flash('Ce numéro de téléphone est déjà utilisé par un autre client.', 'danger')
+            return redirect(url_for('modifier_client', id=id))
+
+        # Vérification de l'unicité de l'email
+        cursor.execute("SELECT * FROM client WHERE email = %s AND id_client != %s", (email, id))
+        if cursor.fetchone():
+            flash('Cet email est déjà utilisé par un autre client.', 'danger')
             return redirect(url_for('modifier_client', id=id))
 
         # Mise à jour des informations du client
