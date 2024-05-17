@@ -149,7 +149,7 @@ def base():
         cursor.close
 
         cursor=conn.cursor()
-        cursor.execute(''' SELECT date_vente, client.nom_prenoms, statut, montant FROM vente JOIN client ON vente.id_client = client.id_client ORDER BY date_vente DESC;
+        cursor.execute(''' SELECT date_vente, client.nom_prenoms, statut, montant,id_vente FROM vente JOIN client ON vente.id_client = client.id_client ORDER BY date_vente DESC;
 ''')
         dash=cursor.fetchall()
         conn.commit
@@ -491,11 +491,11 @@ def userLogout():
 
 @app.route('/dashboard/vendeur')
 def dashboard_vendeur():
-    return render_template('membres/dashboard_vendeur.html')
+    return render_template('membres/vendeur/dashboard_vendeur.html')
 
 @app.route('/dashboard/gestionnaire')
 def dashboard_gestionnaire():
-    return render_template('membres/dashboard_gestionnaire.html')
+    return render_template('membres/gestionnaire/dashboard_gestionnaire.html')
 
 @app.route('/user/dashboard')
 def userDashboard():
@@ -646,10 +646,49 @@ def profil_base():
 
     return render_template('base.html', infos_admin=infos_admin,filename=filename)
 
+#Debut Session vendeur
 @app.route('/profil_vendeur/')
 def profil_vendeur():
     # Rendre le template index.html
-    return render_template('profil_vendeur.html')
+    return render_template('membres/vendeur/profil_vendeur.html')
+
+@app.route('/vendeur_client/')
+def vendeur_client():
+    if request.method == 'POST':
+        nom = request.form['nom']
+        telephone = request.form['tel']
+        email = request.form['email']
+        adresse = request.form['adresse']
+
+        # Vérifier si le numéro de téléphone est valide
+        if not (telephone.startswith('07') or telephone.startswith('05') or telephone.startswith('01')) or len(telephone) != 10:
+            flash('Le numéro de téléphone doit commencer par 07, 05 ou 01 et contenir 10 chiffres.', 'danger')
+            return redirect(url_for("clients"))
+
+        # Vérifier si le numéro de téléphone est unique
+        cursor = conn.cursor()
+        cursor.execute('SELECT * FROM client WHERE telephone = %s', (telephone,))
+        if cursor.fetchone():
+            flash('Ce numéro de téléphone est déjà utilisé.', 'danger')
+            return redirect(url_for("clients"))
+
+        # Insérer le nouveau client
+        cursor.execute('INSERT INTO client (nom_prenoms,telephone,email,adresse) VALUES (%s, %s, %s, %s)',
+                       (nom, telephone, email, adresse))
+        conn.commit()
+        cursor.close()
+        flash('Client ajouté avec succès', 'success')
+        return redirect(url_for("clients"))  # Redirection vers la même page clients après ajout
+    else:
+        # Récupération des éléments de la table client
+        curso = conn.cursor()
+        curso.execute("SELECT * FROM client")
+        resultat = curso.fetchall()
+        curso.close()
+        return render_template('membres/vendeur/vendeur_client.html', resultat=resultat)
+
+
+#fin session vendeur
 
 @app.route('/profil_gestionnaire/')
 def profil_gestionnaire():
@@ -1736,6 +1775,62 @@ def supprimer_achat(id):
 
     # Si vous voulez afficher une page de confirmation via une route GET, vous pouvez inclure cela :
     return render_template('achats.html', vente=resultat)
+
+# Supprimer membre
+
+@app.route('/supprimer_membre/<int:id>', methods=['GET', 'POST'])
+def supprimer_membre(id):
+    if 'admin_id' not in session:
+        return redirect(url_for('login'))  # Rediriger si l'administrateur n'est pas connecté
+
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM utilisateur WHERE id_utilisateur = %s", (id,))
+    resultat = cursor.fetchone()
+    cursor.close()
+
+    if resultat is None:
+        flash('membre non trouvé', 'danger')
+        return redirect(url_for('equipe'))  # Rediriger si le stock n'est pas trouvé
+
+    if request.method == 'POST':
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM utilisateur WHERE id_utilisateur = %s", (id,))
+        conn.commit()
+        cursor.close()
+        flash('membre supprimé avec succès', 'success')
+        return redirect(url_for('equipe'))
+
+    # Si vous voulez afficher une page de confirmation via une route GET, vous pouvez inclure cela :
+    return render_template('membre/equipe.html', equipe=resultat)
+
+# supprimer produit
+
+
+@app.route('/supprimer_Produit/<int:id>', methods=['GET', 'POST'])
+def supprimer_Produit(id):
+    if 'admin_id' not in session:
+        return redirect(url_for('login'))  # Rediriger si l'administrateur n'est pas connecté
+
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM produit WHERE id_produit = %s", (id,))
+    resultat = cursor.fetchone()
+    cursor.close()
+
+    if resultat is None:
+        flash('produit non trouvé', 'danger')
+        return redirect(url_for('Produit'))  # Rediriger si le stock n'est pas trouvé
+
+    if request.method == 'POST':
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM produit WHERE id_produit = %s", (id,))
+        conn.commit()
+        cursor.close()
+        flash('produit supprimé avec succès', 'success')
+        return redirect(url_for('Produit'))
+
+    # Si vous voulez afficher une page de confirmation via une route GET, vous pouvez inclure cela :
+    return render_template('Produit.html', equipe=resultat)
+
 
 
 @app.route("/admin/emailing//")
