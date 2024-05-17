@@ -115,8 +115,49 @@ def base():
         cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
         infos_admin = cursor.fetchone()
         filename = infos_admin[7].decode('utf-8')
+        
+        cursor=conn.cursor()
+        cursor.execute('''
+        SELECT count(*) from vente''')
+        total_ventes = cursor.fetchone()
+        conn.commit
+        cursor.close
 
-        return render_template('admin/dashboard.html',filename=filename)
+        cursor=conn.cursor()
+        cursor.execute(''' select count(*) from commande ''')
+        total_commande = cursor.fetchone()
+        conn.commit
+        cursor.close
+
+        cursor=conn.cursor()
+        cursor.execute(''' select count(*) from client ''')
+        total_client = cursor.fetchone()
+        conn.commit
+        cursor.close
+
+        cursor=conn.cursor()
+        cursor.execute(''' select SUM(montant) as CA from vente ''')
+        total_CA=cursor.fetchone()
+        conn.commit
+        cursor.close
+
+        cursor=conn.cursor()
+        cursor.execute('''SELECT produit.image , produit.nom_produit, SUM(vente.quantite) AS total_quantite FROM vente INNER JOIN produit ON produit.id_produit = vente.id_produit GROUP BY produit.nom_produit ORDER BY total_quantite DESC LIMIT 10
+ ''')
+        meilleurs=cursor.fetchall()
+        conn.commit
+        cursor.close
+
+        cursor=conn.cursor()
+        cursor.execute(''' SELECT date_vente, client.nom_prenoms, statut, montant FROM vente JOIN client ON vente.id_client = client.id_client ORDER BY date_vente DESC;
+''')
+        dash=cursor.fetchall()
+        conn.commit
+        cursor.close
+
+
+
+        return render_template('admin/dashboard.html',filename=filename, total_ventes=total_ventes ,  total_commande= total_commande ,  total_client= total_client, total_CA= total_CA , meilleurs=meilleurs,dash=dash)
     else:
         flash('Please login first', 'danger') 
         return redirect('/admin')
