@@ -149,7 +149,11 @@ def base():
         cursor.close
 
         cursor=conn.cursor()
+<<<<<<< HEAD
         cursor.execute(''' SELECT date_vente, client.nom_prenoms,statut,montant,id_vente FROM vente JOIN client ON vente.id_client = client.id_client ORDER BY date_vente DESC;
+=======
+        cursor.execute(''' SELECT date_vente, client.nom_prenoms, statut, montant FROM vente JOIN client ON vente.id_client = client.id_client ORDER BY date_vente DESC;
+>>>>>>> eb7f7df035391a99df8a95cf2751decf9ca4c357
 ''')
         dash=cursor.fetchall()
         conn.commit

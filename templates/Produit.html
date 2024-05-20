@@ -98,7 +98,7 @@
           {% for row in resultat %}
           <div class="icon">
             <a href="{{ url_for('modifier_produit', id=row[0]) }}"><i class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i></a>
-            <i class='bx bx-trash delete-icon' data-id="{{ row[0] }}" style='font-size: 30px; color: red;'></i>
+            <i class='bx bx-trash delete-icon' style='font-size: 30px; color: red;'></i>
           </div>
           {% endfor %}
         </ul>
@@ -142,6 +142,7 @@
 
 </div>
 
+<<<<<<< HEAD
 <div class="popup0" id="confirmationPopup">
   <div class="confirmation-container">
       <h2>Êtes-vous sûr de vouloir supprimer ce Produit?</h2>
@@ -172,4 +173,6 @@
   }
 </script>
 
+=======
+>>>>>>> eb7f7df035391a99df8a95cf2751decf9ca4c357
 {% endblock %}
