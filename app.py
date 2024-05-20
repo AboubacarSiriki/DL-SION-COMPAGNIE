@@ -489,13 +489,186 @@ def userLogout():
         # flash('Vous êtes déconnecté.', 'success')
     return redirect(url_for('userLogin'))
 
+
+#Ssession vendeur###############################################
+
+@app.route('/profil_vendeur/')
+def profil_vendeur():
+    # Rendre le template index.html
+    return render_template('membres/vendeur/profil_vendeur.html')
+
 @app.route('/dashboard/vendeur')
 def dashboard_vendeur():
-    return render_template('membres/dashboard_vendeur.html')
+
+    cursor=conn.cursor()
+    cursor.execute('''
+        SELECT count(*) from vente''')
+    total_ventes = cursor.fetchone()
+    conn.commit()
+    cursor.close()
+
+    cursor=conn.cursor()
+    cursor.execute(''' select count(*) from commande ''')
+    total_commande = cursor.fetchone()
+    conn.commit()
+    cursor.close()
+
+    cursor=conn.cursor()
+    cursor.execute(''' select count(*) from client ''')
+    total_client = cursor.fetchone()
+    conn.commit()
+    cursor.close()
+      
+    return render_template('membres/vendeur/dashboard_vendeur.html', total_ventes=total_ventes , total_commande=total_commande , total_client=total_client)
+
+@app.route('/vendeur_client/', methods=["post", "get"])
+def vendeur_client():
+    if request.method == 'POST':
+        nom = request.form['nom']
+        telephone = request.form['tel']
+        email = request.form['email']
+        adresse = request.form['adresse']
+
+        # Ajout automatique du préfixe +225 si nécessaire et validation du numéro
+        telephone = '+225' + telephone.lstrip('+225')
+        if len(telephone) != 14 or not telephone[4:].isdigit() or not (telephone[4:6] in ['07', '05', '01']):
+            flash('Le numéro de téléphone doit être valide et contenir 14 chiffres y compris le préfixe +225.', 'danger')
+            return redirect(url_for("vendeur_client"))
+
+        # Vérifier si le numéro de téléphone est unique
+        cursor = conn.cursor()
+        cursor.execute('SELECT * FROM client WHERE telephone = %s', (telephone,))
+        if cursor.fetchone():
+            flash('Ce numéro de téléphone est déjà utilisé.', 'danger')
+            return redirect(url_for("vendeur_client"))
+
+        # Vérification de l'unicité de l'email
+        cursor.execute("SELECT * FROM client WHERE email = %s AND id_client != %s", (email, id))
+        if cursor.fetchone():
+            flash('Cet email est déjà utilisé par un autre client.', 'danger')
+            return redirect(url_for("vendeur_client"))
+
+        # Insérer le nouveau client
+        cursor.execute('INSERT INTO client (nom_prenoms,telephone,email,adresse) VALUES (%s, %s, %s, %s)',
+                       (nom, telephone, email, adresse))
+        conn.commit()
+        cursor.close()
+        flash('Client ajouté avec succès', 'success')
+        return redirect(url_for("vendeur_client"))  # Redirection vers la même page clients après ajout
+    else:
+        # Récupération des éléments de la table client
+        curso = conn.cursor()
+        curso.execute("SELECT * FROM client")
+        resultat = curso.fetchall()
+        curso.close()
+
+        return render_template("membres/vendeur/vendeur_client.html", resultat=resultat)
+
+@app.route('/vendeur_ventes/', methods=["POST", "GET"])
+def vendeur_ventes():
+    with conn.cursor() as cursor:
+        cursor.execute("SELECT id_produit, nom_produit, categorie, prix FROM produit")
+        produits = cursor.fetchall()
+
+        cursor.execute("SELECT id_client, nom_prenoms FROM client")
+        clients = cursor.fetchall()
+
+    if request.method == 'POST':
+        client_id = request.form.get("client")
+        produit_id = request.form.get("produit")
+        quantite = request.form.get("nombre")
+        prix_vente = request.form.get("prix_vente")  # Récupérer le prix de vente du formulaire
+
+        # Vérifier la quantité en stock avant de procéder à la vente
+        cursor = conn.cursor()
+        cursor.execute("SELECT stock FROM produit WHERE id_produit = %s", (produit_id,))
+        quantite_en_stock = cursor.fetchone()[0]
+
+        if quantite > quantite_en_stock:
+            flash('Quantité demandée excède le stock disponible. Vente annulée.', 'danger')
+            return redirect(url_for('vendeur_ventes'))
+
+        if not client_id:  # Si aucun client_id n'est fourni, créez un nouveau client
+            nom = request.form.get("nom")
+            tel = request.form.get("tel")
+            email = request.form.get("email")
+            adresse = request.form.get("adresse")
+            with conn.cursor() as cursor:
+                cursor.execute(
+                    'INSERT INTO client (nom_prenoms, telephone, email, adresse) VALUES (%s, %s, %s, %s)',
+                    (nom, tel, email, adresse))
+                conn.commit()
+                client_id = cursor.lastrowid
+
+        if produit_id and quantite and prix_vente:
+            quantite = int(quantite)  # Convertir en entier pour la manipulation
+            prix_vente = int(prix_vente) 
+            montant = prix_vente * quantite
+            date_aujourdhui = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            with conn.cursor() as cursor:
+                cursor.execute(
+                    'INSERT INTO vente (id_client, id_produit, quantite, montant, prix_vente, date_vente,statut) VALUES (%s, %s, %s, %s, %s, %s,%s)',
+                    (client_id, produit_id, quantite, montant, prix_vente, date_aujourdhui,"Vendu"))
+                conn.commit()
+                cursor.execute(
+                    'UPDATE produit SET stock = stock - %s WHERE id_produit = %s',
+                    (quantite, produit_id))
+                conn.commit()
+                cursor.close()
+                flash('Vente ajoutée avec succès', 'success')
+        else:
+            flash('Informations de vente manquantes ou incorrectes', 'danger')
+
+    curso = conn.cursor()
+    curso.execute(
+        "select id_vente,date_vente,client.nom_prenoms,produit.nom_produit,statut from vente,client,produit where vente.id_client = client.id_client and vente.id_produit=produit.id_produit ")
+    resultat = curso.fetchall()
+    curso.close()
+
+    return render_template("membres/vendeur/vendeur_vente.html", produits=produits, clients=clients,resultat=resultat)
+
+@app.route('/vendeur_commande/', methods=["POST", "GET"])
+def vendeur_commande():
+    cursor = conn.cursor()
+    cursor.execute("SELECT id_produit, nom_produit, categorie, prix FROM produit")
+    produits = cursor.fetchall()
+    cursor.close()
+
+    cursor = conn.cursor()
+    cursor.execute("SELECT id_client, nom_prenoms FROM client")
+    clients = cursor.fetchall()
+    cursor.close()
+    if request.method == 'POST':
+        produit_id = request.form["produit"]
+        quantite = int(request.form["nombre"])  # Convertir en entier pour la manipulation
+        id_client = request.form["client"]
+        prix_vente = int(request.form["prix"])
+
+        montant = quantite*prix_vente
+        date_aujourdhui = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+        cursor = conn.cursor()
+        # Enregistrement de l'achat dans la base de données avec la date d'aujourd'hui
+        cursor.execute(
+            'INSERT INTO commande (id_client, id_produit, Quantite, prix_vente,Montant, date_commande, statut) VALUES (%s, %s, %s, %s, %s, %s, %s)',
+            (id_client, produit_id, quantite, prix_vente,montant, date_aujourdhui, "En cours"))
+        conn.commit()
+        cursor.close()
+        flash('Achat ajouté avec succès', 'success')
+        return redirect(url_for('vendeur_commande'))
+
+    curso = conn.cursor()
+    curso.execute(
+        "select id_commande,date_commande,statut,client.nom_prenoms,produit.nom_produit from commande,client,produit where commande.id_client = client.id_client and commande.id_produit=produit.id_produit ")
+    resultat = curso.fetchall()
+    curso.close()
+
+    return render_template('membres/vendeur/vendeur_commande.html', produits=produits, clients=clients,resultat=resultat)
+#Ssession vendeur###############################################
 
 @app.route('/dashboard/gestionnaire')
 def dashboard_gestionnaire():
-    return render_template('membres/dashboard_gestionnaire.html')
+    return render_template('membres/gestionnaire/dashboard_gestionnaire.html')
 
 @app.route('/user/dashboard')
 def userDashboard():
@@ -629,8 +802,6 @@ def profil():
 
     cursor.close()
 
-  
-
     return render_template('profil.html', infos_admin=infos_admin,filename=filename)
 
 @app.route('/profil_base/')
@@ -652,11 +823,6 @@ def profil_base():
     cursor.close()
 
     return render_template('base.html', infos_admin=infos_admin,filename=filename)
-
-@app.route('/profil_vendeur/')
-def profil_vendeur():
-    # Rendre le template index.html
-    return render_template('profil_vendeur.html')
 
 @app.route('/profil_gestionnaire/')
 def profil_gestionnaire():
