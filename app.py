@@ -518,8 +518,28 @@ def dashboard_vendeur():
     total_client = cursor.fetchone()
     conn.commit()
     cursor.close()
+
+    cursor=conn.cursor()
+    cursor.execute(''' select count(*) from vente where statut="Retourné" ''')
+    retourne = cursor.fetchone()
+    conn.commit()
+    cursor.close()
+
+    cursor=conn.cursor()
+    cursor.execute('''SELECT produit.image , produit.nom_produit, SUM(vente.quantite) AS total_quantite FROM vente INNER JOIN produit ON produit.id_produit = vente.id_produit GROUP BY produit.nom_produit ORDER BY total_quantite DESC LIMIT 10
+ ''')
+    meilleurs=cursor.fetchall()
+    conn.commit()
+    cursor.close()
+
+    cursor=conn.cursor()
+    cursor.execute(''' SELECT date_vente, client.nom_prenoms,statut,montant,id_vente FROM vente JOIN client ON vente.id_client = client.id_client ORDER BY date_vente DESC;
+''')
+    dash=cursor.fetchall()
+    conn.commit()
+    cursor.close()
       
-    return render_template('membres/vendeur/dashboard_vendeur.html', total_ventes=total_ventes , total_commande=total_commande , total_client=total_client)
+    return render_template('membres/vendeur/dashboard_vendeur.html', total_ventes=total_ventes , total_commande=total_commande , total_client=total_client , retourne=retourne , meilleurs=meilleurs , dash = dash)
 
 @app.route('/vendeur_client/', methods=["post", "get"])
 def vendeur_client():
