@@ -149,7 +149,7 @@ def base():
         cursor.close
 
         cursor=conn.cursor()
-        cursor.execute(''' SELECT date_vente, client.nom_prenoms, statut, montant FROM vente JOIN client ON vente.id_client = client.id_client ORDER BY date_vente DESC;
+        cursor.execute(''' SELECT date_vente, client.nom_prenoms,statut,montant,id_vente FROM vente JOIN client ON vente.id_client = client.id_client ORDER BY date_vente DESC;
 ''')
         dash=cursor.fetchall()
         conn.commit
@@ -1624,6 +1624,63 @@ def supprimer_stock(id):
 
     # Si vous voulez afficher une page de confirmation via une route GET, vous pouvez inclure cela :
     return render_template('stock.html', stock=resultat)
+
+
+    # supprimer membre
+
+@app.route('/supprimer_membre/<int:id>', methods=['GET', 'POST'])
+def supprimer_membre(id):
+    if 'admin_id' not in session:
+         return redirect(url_for('login'))  # Rediriger si l'administrateur n'est pas connecté
+        
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM utilisateur WHERE id_utilisateur = %s", (id,))
+    resultat = cursor.fetchone()
+    cursor.close()
+
+    if resultat is None:
+        flash('membre non trouvé', 'danger')
+        return redirect(url_for('equipe'))  # Rediriger si le stock n'est pas trouvé
+
+    if request.method == 'POST':
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM utilisateur WHERE id_utilisateur = %s", (id,))
+        conn.commit()
+        cursor.close()
+        flash('membre supprimé avec succès', 'success')
+        return redirect(url_for('equipe'))
+
+    # Si vous voulez afficher une page de confirmation via une route GET, vous pouvez inclure cela :
+    return render_template('/membre/equipe.html',resultat =resultat)
+
+# supprimer produit  
+
+@app.route('/supprimer_produit/<int:id>', methods=['GET', 'POST'])
+def supprimer_produit(id):
+    if 'admin_id' not in session:
+         return redirect(url_for('login'))  # Rediriger si l'administrateur n'est pas connecté
+        
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM produit WHERE id_produit = %s", (id,))
+    resultat = cursor.fetchone()
+    cursor.close()
+
+    if resultat is None:
+        flash('membre non trouvé', 'danger')
+        return redirect(url_for('Produit'))  # Rediriger si le stock n'est pas trouvé
+
+    if request.method == 'POST':
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM produit WHERE id_produit = %s", (id,))
+        conn.commit()
+        cursor.close()
+        flash('membre supprimé avec succès', 'success')
+        return redirect(url_for('Produit'))
+
+    # Si vous voulez afficher une page de confirmation via une route GET, vous pouvez inclure cela :
+    return render_template('Produit.html',resultat =resultat)
+
+
 
 @app.route('/supprimer_client/<int:id>', methods=['GET', 'POST'])
 def supprimer_client(id):
