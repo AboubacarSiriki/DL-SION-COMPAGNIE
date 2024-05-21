@@ -18,7 +18,7 @@
               <div class="box-topic">Faible</div>
               <div class="number">50</div>
               <div class="indicator">
-                <i class="bx bx-down-arrow-alt down"></i>
+                <i class="bx bx-up-arrow-alt"></i>
                 <span class="text"></span>
               </div>
             </div>
@@ -29,7 +29,7 @@
               <div class="box-topic">Montant</div>
               <div class="number">200 000K</div>
               <div class="indicator">
-                <i class="bx bx-up-arrow-alt"></i>
+                <i class="bx bx-down-arrow-alt down"></i>
                 <span class="text"></span>
               </div>
             </div>
@@ -48,6 +48,7 @@
                     {% endfor %}
                   {% endif %}
                 {% endwith %}
+                <button id="open-popup">Faire une mise à jour</button>
             </div>
               <div class="sales-details">
         <ul class="details">
@@ -100,6 +101,12 @@
                     {% endfor %}
                   {% endif %}
                 {% endwith %}
+                <button id="print-report1">Imprimer le rapport</button>
+                <div id="dropdown-list1" class="dropdown-content">
+                    <a href="#">Journalier</a>
+                    <a href="#">Hebdomadaire</a>
+                    <a href="#">Mensuel</a>
+                </div>
             </div>
             <div class="sales-details">
               <ul class="details">
@@ -120,6 +127,15 @@
                   <li><a href="#">{{ row[2] }}</a></li>
                   {% endfor %}
               </ul>
+                <ul class="details">
+                    <li class="topic">Action</li>
+                    {% for row in resultat %}
+                    <div class="icon">
+                        <a href="{{ url_for('modifier_stock', id_stock=row[4]) }}"><i class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i></a>
+                        <i class='bx bx-trash delete-icon' data-id="{{ row[4] }}" style='font-size: 30px; color: red;'></i>
+                    </div>
+                    {% endfor %}
+                 </ul>
             </div>
             <div class="button">
               <a href="#">Voir plus</a>
@@ -159,7 +175,7 @@
                 </tbody>
             </table>
 
-            <div><button class="btn12"><a href="{{url_for('stock')}}" style="text-decoration:none;
+            <div><button class="btn12"><a href="{{url_for('gestion_stock')}}" style="text-decoration:none;
     color: #fff;">Retour</a></button>
                 <button id="btn11" type="submit">Valider</button>
             </div>
