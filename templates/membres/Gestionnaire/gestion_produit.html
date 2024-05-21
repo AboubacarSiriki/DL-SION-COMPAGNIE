@@ -1,4 +1,4 @@
-{% extends "base.html"%}
+{% extends "membres/gestionnaire/base_gestion.html"%}
 {% block centre%}
 <div class="home-content">
   <div class="overview-boxes">
@@ -8,7 +8,7 @@
         <div class="number">60</div>
         <div class="indicator">
           <i class="bx bx-up-arrow-alt"></i>
-          <span class="text"></span>
+          <span class="text">Cumulés</span>
         </div>
       </div>
       <i class="bx bx-cart-alt cart"></i>
@@ -19,7 +19,7 @@
         <div class="number">50</div>
         <div class="indicator">
           <i class="bx bx-up-arrow-alt"></i>
-          <span class="text"></span>
+          <span class="text">Cumulés</span>
         </div>
       </div>
       <i class="bx bxs-cart-add cart two"></i>
@@ -30,7 +30,7 @@
         <div class="number">11</div>
         <div class="indicator">
           <i class="bx bx-down-arrow-alt down"></i>
-          <span class="text"></span>
+          <span class="text">Cumulés</span>
         </div>
       </div>
       <i class="bx bxs-cart-download cart four"></i>
@@ -115,7 +115,7 @@
     <span class="close" id="close-popup">&times;</span>
     <h2>Ajout d'un nouveau produit</h2><br>
 
-    <form method="post" action="{{url_for('Produit')}}" enctype="multipart/form-data">
+    <form method="post" action="{{url_for('gestion_produit')}}" enctype="multipart/form-data">
 
       <label for="nom">Nom du produit</label>
       <input type="text" id="nom" name="nom" required>
@@ -142,7 +142,6 @@
 
 </div>
 
-<<<<<<< HEAD
 <div class="popup0" id="confirmationPopup">
   <div class="confirmation-container">
       <h2>Êtes-vous sûr de vouloir supprimer ce Produit?</h2>
@@ -173,6 +172,4 @@
   }
 </script>
 
-=======
->>>>>>> eb7f7df035391a99df8a95cf2751decf9ca4c357
 {% endblock %}

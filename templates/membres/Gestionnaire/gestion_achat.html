@@ -1,115 +1,114 @@
-{% extends "base.html"%}
+{% extends "membres/gestionnaire/base_gestion.html"%}
 {% block centre%}
 <div class="home-content">
-  <div class="overview-boxes">
-    <div class="box">
-      <div class="right-side">
-        <div class="box-topic">Ventes</div>
-        <div class="number">60</div>
-        <div class="indicator">
-          <i class="bx bx-up-arrow-alt"></i>
-          <span class="text">Aujourd'hui</span>
-        </div>
-      </div>
-      <i class="bx bx-cart-alt cart"></i>
-    </div>
-    <div class="box">
-      <div class="right-side">
-        <div class="box-topic">Total vente</div>
-        <div class="number">50</div>
-        <div class="indicator">
-          <i class="bx bx-up-arrow-alt"></i>
-          <span class="text">cumulées</span>
-        </div>
-      </div>
-      <i class="bx bxs-cart-add cart two"></i>
-    </div>
-    <div class="box">
-      <div class="right-side">
-        <div class="box-topic">Montant</div>
-        <div class="number">120 000 K</div>
-        <div class="indicator">
-          <i class="bx bx-down-arrow-alt down"></i>
-          <span class="text"></span>
-        </div>
-      </div>
-      <i class="bx bxs-cart-download cart four"></i>
-    </div>
-  </div>
-
-  <div class="sales-boxes">
-    <div class="recent-sales box">
-      <div class="title">
-        <p>Liste des ventes</p>
-          {% with messages = get_flashed_messages() %}
-          {% if messages %}
-            {% for message in messages %}
-              <p class="alert" style="color:green;">{{ message }}</p><br>
-            {% endfor %}
-          {% endif %}
-        {% endwith %}
-        <button id="open-popup">Ajouter une nouvelle vente</button>
-      </div>
-      <div class="sales-details">
-        <ul class="details">
-          <li class="topic">Date de la vente</li>
-          {% for row in resultat %}
-             <li><a href="#">{{ row[1] }}</a></li>
-          {% endfor %}
-        </ul>
-
-        <ul class="details">
-          <li class="topic">Statut</li>
-          {% for row in resultat %}
-          <li>
-            <a href="#" onclick="toggleDropdown(this, '{{ row[4] }}')">{{ row[4] }}</a>
-            <form action="/status_vente/{{ row[0] }}" method="POST" class="select-wrapper">
-              <select class="select" name="status" onchange="hideDropdownAndSubmit(this.form, '{{ row[2] }}')">
-                <option disabled selected>Choisissez un statut</option>
-                <option value="Vendu">Vendu</option>
-                <option value="Retourné">Retourné</option>
-                <option value="Annuler">Annuler</option>
-              </select>
-            </form>
-          </li>
-          {% endfor %}
-        </ul>
-        <ul class="details">
-          <li class="topic">Produit</li>
-          {% for row in resultat %}
-          <li><a href="#">{{ row[3] }}</a></li>
-          {% endfor %}
-        </ul>
-
-        <ul class="details">
-          <li class="topic">details</li>
-          {% for row in resultat %}
-          <li><button class="gauche voir-btn1" data-id="{{ row[0] }}"><a href="#"><i class='bx bx-show eyes-icon' style='font-size: 22px; color:white;'></i></a></button></li>
-          {% endfor %}
-        </ul>
-
-        <ul class="details">
-          <li class="topic">Nom clients</li>
-          {% for row in resultat %}
-          <li><a href="#">{{ row[2] }}</a></li>
-          {% endfor %}
-        </ul>
-        <ul class="details">
-          <li class="topic">Action</li>
-          {% for row in resultat %}
-          <div class="icon">
-            <a href="{{url_for('modifier_vente', id_vente=row[0])}}"><i class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i></a>
-            <i class='bx bx-trash delete-icon' data-id="{{ row[0] }}" style='font-size: 30px; color: red;'></i>
+        <div class="overview-boxes">
+          <div class="box">
+            <div class="right-side">
+              <div class="box-topic">Commande</div>
+              <div class="number">60</div>
+              <div class="indicator">
+                <i class="bx bx-up-arrow-alt"></i>
+                <span class="text">Cumulées</span>
+              </div>
+            </div>
+            <i class="bx bx-cart-alt cart"></i>
           </div>
-          {% endfor %}
-        </ul>
+          <div class="box">
+            <div class="right-side">
+              <div class="box-topic">Reçus</div>
+              <div class="number">50</div>
+              <div class="indicator">
+                <i class="bx bx-up-arrow-alt"></i>
+                <span class="text">Aujourd'hui</span>
+              </div>
+            </div>
+            <i class="bx bxs-cart-add cart two"></i>
+          </div>
+          <div class="box">
+            <div class="right-side">
+              <div class="box-topic">Cout total</div>
+              <div class="number">11</div>
+              <div class="indicator">
+                <i class="bx bx-down-arrow-alt down"></i>
+                <span class="text">Cumulés</span>
+              </div>
+            </div>
+            <i class="bx bxs-cart-download cart four"></i>
+          </div>
+        </div>
+
+        <div class="sales-boxes">
+          <div class="recent-sales box">
+            <div class="title">
+                <p>Liste des commandes</p>
+                {% with messages = get_flashed_messages() %}
+                  {% if messages %}
+                    {% for message in messages %}
+                      <p class="alert" style="color:green;">{{ message }}</p><br>
+                    {% endfor %}
+                  {% endif %}
+                {% endwith %}
+                <button id="open-popup">Passer une commande</button>
+            </div>
+
+            <div class="sales-details">
+              <ul class="details">
+                <li class="topic">Date</li>
+                {% for row in resultat %}
+                  <li><a href="#">{{ row[1] }}</a></li>
+                  {% endfor %}
+              </ul>
+              <ul class="details">
+                <li class="topic">Statut</li>
+                {% for row in resultat %}
+                <li>
+                    <a href="#" onclick="toggleDropdown(this, '{{ row[2] }}')">{{ row[2] }}</a>
+                    <form action="/status_achat/{{ row[0] }}" method="POST" class="select-wrapper">
+                        <select class="select" name="status" onchange="hideDropdownAndSubmit(this.form, '{{ row[2] }}')">
+                            <option disabled selected>Choisissez un statut</option>
+                            <option value="En cours">En cours</option>
+                            <option value="Livré">Livré</option>
+                            <option value="Annuler">Annuler</option>
+                        </select>
+                    </form>
+                </li>
+                {% endfor %}
+            </ul>
+                <ul class="details">
+                <li class="topic">Produit</li>
+                {% for row in resultat %}
+                  <li><a href="#">{{ row[4] }}</a></li>
+                  {% endfor %}
+              </ul>
+              <ul class="details">
+                <li class="topic">details</li>
+                  {% for row in resultat %}
+                    <li><button class="gauche voir-btn" data-id="{{ row[0] }}"><a href="#"><i class='bx bx-show eyes-icon' style='font-size: 22px; color:white;'></i></a></button></li>
+                  {% endfor %}
+              </ul>
+              <ul class="details">
+                <li class="topic">Fournisseur</li>
+                {% for row in resultat %}
+                  <li><a href="#">{{ row[3] }}</a></li>
+                  {% endfor %}
+              </ul>
+              <ul class="details">
+                <li class="topic">Action</li>
+                  {% for row in resultat %}
+                    <div class="icon">
+                      <a href="{{url_for('modifier_achat', id_entree=row[0])}}"><i class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i></a>
+                     <i class='bx bx-trash delete-icon' data-id="{{ row[0] }}" style='font-size: 30px; color: red;'></i>
+                    </div>
+                  {% endfor %}
+              </ul>
+            </div>
+            <div class="button">
+              <a href="#">Voir plus</a>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="button">
-        <a href="#">Voir plus</a>
-      </div>
-    </div>
-  </div>
-</div>
+
 
 <div id="popup121" class="popup121">
         <div class="popup-content1">
@@ -183,136 +182,66 @@
                  <p style="color:orange;">.....................................................................................................................................................................</p><br>
                  <p style="color:orange; text-align:center;">Facturation de la TVA non autorisée</p>
             </form>
-            <div><button class="btn12"><a href="{{url_for('ventes')}}" style="text-decoration:none;
+            <div><button class="btn12"><a href="{{url_for('achats')}}" style="text-decoration:none;
     color: #fff;">Retour</a></button>
                 <button id="btn111" onclick="printSection('popup121')">Imprimer</button>
             </div><br>
         </div>
 </div>
 
-<div id="popup" class="popup">
-  <div class="popup-content">
-    <span class="close" id="close-popup">&times;</span>
-    <h2>Ajout d'une nouvelle vente</h2><br>
-    <div><button id="btn1">Client existant</button>
-      <button id="btn2">Nouveau client</button>
-    </div><br>
-    <form class="form1" id="form1 stock-form" method="post" action="{{url_for('ventes')}}" >
 
-      <label for="client">Client</label>
-      <select id="client" name="client" required>
-        <option value="" disabled selected>Sélectionnez le client</option>
-        {% for client in clients %}
-        <option value="{{ client[0] }}">{{ client[1] }}</option>
-        {% endfor %}
-        <!-- Ajoutez d'autres options selon vos besoins -->
-      </select>
+      <div id="popup" class="popup">
+        <div class="popup-content">
+            <span class="close" id="close-popup">&times;</span>
+          <h2>Ajout d'une nouvelle commande</h2><br>
 
-      <label for="produit">Produit</label>
-      <select id="produit" name="produit" required>
-        <option value="" disabled selected>Sélectionnez un produit</option>
-        {% for produit in produits %}
-        <option value="{{ produit[0] }}">{{ produit[1] }}</option>
-        {% endfor %}
-        <!-- Ajoutez d'autres options selon vos besoins -->
-      </select>
-      <label for="nombre">Nombre</label>
-      <input type="number" id="nombre" name="nombre" required>
-      <label for="prix_vente">Entrez le prix unitaire de vente</label>
-      <input type="number" id="prix_vente" name="prix_vente" required>
+            <form id="stock-form" method="post" action="{{url_for('achats')}}">
+                 <label for="fournisseur">Fournisseur</label>
+                  <select id="fournisseur" name="fournisseur" required>
+                      <option value="" disabled selected>Sélectionnez un fournisseur</option>
+                      {% for fournisseur in fournisseurs %}
+                        <option value="{{fournisseur[0] }}">{{ fournisseur[1] }}</option>
+                      {% endfor %}
+                      <!-- Ajoutez d'autres options selon vos besoins -->
+                  </select>
 
-      <button type="button" id="add-button">Ajouter</button>
+                  <label for="produit">Produit</label>
+                  <select id="produit" name="produit" required>
+                      <option value="" disabled selected>Sélectionnez un produit</option>
+                      {% for produit in produits %}
+                        <option value="{{ produit[0] }}">{{ produit[1] }}</option>
+                      {% endfor %}
+                      <!-- Ajoutez d'autres options selon vos besoins -->
+                  </select>
 
-      <table id="ventes-table">
-        <thead>
-          <tr>
-            <td>Réf</td>
-            <td>Designation</td>
-            <td>Quantité</td>
-            <td>PU TTC</td>
-            <td>Montant TTC</td>
-          </tr>
-        </thead>
+                  <label for="nombre">Nombre</label>
+                  <input type="number" id="nombre" name="nombre" required>
 
-        <tbody>
-          <!-- <tr>
-            <td>1</td>
-            <td>Nolovo XP core I5</td>
-            <td>2</td>
-            <td>400 000</td>
-            <td>400 000</td>
-          </tr> -->
-        </tbody>
-      </table>
-      <button type="submit" id="submit-button">Valider la vente</button>
-    </form>
+                  <button type="#" id="add-button">Ajouter</button>
 
-    <form class="form2" id="form2" method="post" action="{{url_for('vente_clients')}}">
-        <div id="response-message"></div>
-        {% with messages = get_flashed_messages() %}
-          {% if messages %}
-            {% for message in messages %}
-              <p class="alert" style="color:green;">{{ message }}</p><br>
-            {% endfor %}
-          {% endif %}
-        {% endwith %}
-      <label for="nom">Nom et prénoms</label>
-      <input type="text" id="nom" name="nom" required>
+              <table id="stock-table">
+                <thead>
+                    <tr>
+                        <td>Id</td>
+                        <td>Nom</td>
+                        <td>Quantité</td>
+                        <td>Prix</td>
+                        <td>Désignation</td>
+                    </tr>
+                </thead>
+                <tbody>
 
-      <label for="tel">Téléphone</label>
-      <input type="tel" id="tel" name="tel" required>
+                </tbody>
+            </table>
 
-      <label for="email">Email</label>
-      <input type="email" id="email" name="email" required>
-
-      <label for="adresse">Adresse</label>
-      <input type="text" id="adresse" name="adresse" required>
-        <button type="submit">Enregistrer le client</button>
-    </form><br>
-
-       <form class="form3" id="form3 stock-form" method="post" action="{{url_for('ventes')}}">
-               <label for="clientnouveau">Client</label>
-             <select id="clientnouveau" name="clientnouveau" required>
-            <option value="" disabled selected>Sélectionnez le client</option>
-            {% for client in clients %}
-            <option value="{{ client[0] }}">{{ client[1] }}</option>
-            {% endfor %}
-            <!-- Ajoutez d'autres options selon vos besoins -->
-          </select>
-          <label for="produit">Produit</label>
-          <select id="n_produit" name="produit" required>
-            <option value="" disabled selected>Sélectionnez un produit</option>
-            {% for produit in produits %}
-            <option value="{{ produit[0] }}">{{ produit[1] }}</option>
-            {% endfor %}
-          </select>
-
-          <label for="n_nombre">Nombre</label>
-          <input type="number" id="n_nombre" name="nombre" required>
-          <label for="prix_vente">Entrez le prix unitaire de vente</label>
-          <input type="number" id="n_prix_vente" name="prix_vente" required>
-
-          <button type="button" id="add-button1">Ajouter</button>
-
-          <table id="ventes-table1">
-            <thead>
-              <tr>
-                <td>Réf</td>
-                <td>Designation</td>
-                <td>Quantité</td>
-                <td>PU TTC</td>
-                <td>Montant TTC</td>
-              </tr>
-            </thead>
-            <tbody>
-
-            </tbody>
-          </table>
-          <button type="submit">Valider la vente</button>
-    </form>
-
-  </div>
-</div>
+            <div><button class="btn12"><a href="{{url_for('achats')}}" style="text-decoration:none;
+    color: #fff;">Retour</a></button>
+                <button type="submit">Valider</button>
+            </div>
+            </form>
+        </div>
+      </div>
+    </div>
 
 <div id="popup12" class="popup12">
         <div class="popup-content1">
@@ -385,7 +314,7 @@
                  <p style="color:orange;">.....................................................................................................................................................................</p><br>
                  <p style="color:orange; text-align:center;">Facturation de la TVA non autorisée</p>
             </form>
-            <div><button class="btn12"><a href="{{url_for('ventes')}}" style="text-decoration:none;
+            <div><button class="btn12"><a href="{{url_for('achats')}}" style="text-decoration:none;
     color: #fff;">Retour</a></button>
                 <button id="btn11" onclick="printSection('popup12')">Imprimer</button>
             </div><br>
@@ -394,7 +323,7 @@
 
 <div class="popup0" id="confirmationPopup">
         <div class="confirmation-container">
-            <h2>Êtes-vous sûr de vouloir supprimer cette vente ?</h2>
+            <h2>Êtes-vous sûr de vouloir supprimer cet achat ?</h2>
             <form id="deleteForm" method="POST">
                 <button type="submit" class="btn-confirm">Confirmer</button>
                 <button type="button" class="btn-cancel" onclick="closePopup()">Annuler</button>
@@ -402,11 +331,10 @@
         </div>
 </div>
 
-
    <script>
    document.addEventListener('DOMContentLoaded', function() {
   var addButton = document.querySelector('#add-button');
-  var ventTable = document.querySelector('#ventes-table tbody');
+  var stockTable = document.querySelector('#stock-table tbody');
   var stockTable1 = document.querySelector('#stock-table1 tbody');
   var submitButton = document.querySelector('button[type="submit"]'); // Get the submit button
   var rowNum = 1;
@@ -416,29 +344,27 @@
 
     var produitId = document.querySelector('#produit').value;
     var nombre = document.querySelector('#nombre').value;
-    var id_client = document.querySelector('#client').value; // Assuming supplier ID selector
-    var prixVente = document.querySelector('#prix_vente').value;
-    var montantTTC = parseInt(nombre, 10) * parseFloat(prixVente);
+    var fournisseurId = document.querySelector('#fournisseur').value; // Assuming supplier ID selector
 
     fetch('/get_product_info/' + produitId)
       .then(response => response.json())
       .then(data => {
         var newRow = document.createElement('tr');
         newRow.innerHTML = '<td>' + produitId + '</td>' +
-                            '<td>' + data.designation + '</td>' +
+                            '<td>' + data.nom + '</td>' +
                             '<td>' + nombre + '</td>' +
-                            '<td>' + prixVente + '</td>' +
-                            '<td>' + montantTTC + '</td>' +
-                            '<td>' + id_client + '</td>'; // Add supplier ID cell
+                            '<td>' + data.prix + '</td>' +
+                            '<td>' + data.designation + '</td>' +
+                            '<td>' + fournisseurId + '</td>'; // Add supplier ID cell
 
         var newRow1 = document.createElement('tr');
         newRow1.innerHTML = '<td>' + rowNum + '</td>' +
                             '<td>' + data.designation + '</td>' +
                             '<td>' + nombre + '</td>' +
-                            '<td>' + prixVente + '</td>' +
-                            '<td>' + montantTTC + '</td>';
+                            '<td>' + data.prix + '</td>' +
+                            '<td>' + (nombre * data.prix) + '</td>'; // Add supplier ID cell
 
-        ventTable.appendChild(newRow);
+        stockTable.appendChild(newRow);
         stockTable1.appendChild(newRow1);
 
         rowNum++;
@@ -469,7 +395,7 @@ function updateTotal() {
     event.preventDefault(); // Prevent default form submission
 
     // Get all rows from the stock table
-    var rows = ventTable.querySelectorAll('tr');
+    var rows = stockTable.querySelectorAll('tr');
 
     // Prepare an array to store order data
     var orderData = [];
@@ -479,16 +405,15 @@ function updateTotal() {
       var rowData = {
         produit_id: parseInt(rows[i].cells[0].textContent),
         nombre: parseInt(rows[i].cells[2].textContent),
-        prix_vente: parseFloat(rows[i].cells[3].textContent),
-        montant: parseFloat(rows[i].cells[4].textContent),
-        id_client: parseInt(rows[i].cells[5].textContent), // Supplier ID from cell 5
+        prix_unitaire: parseFloat(rows[i].cells[3].textContent),
+        fournisseur_id: parseInt(rows[i].cells[5].textContent), // Supplier ID from cell 5
       };
 
       orderData.push(rowData);
     }
 
     // Send the order data to the server using fetch
-    fetch('/submit_vente', {
+    fetch('/submit_order', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -500,18 +425,18 @@ function updateTotal() {
         // Handle successful submission response
         console.log('Commande soumise avec succès:', data);
 
-        // Clear the vente table
-        ventTable.innerHTML = '';
+        // Clear the stock table
+        stockTable.innerHTML = '';
 
         // Display a success message to the user
-        alert('Vente soumise avec succès!');
+        alert('Commande soumise avec succès!');
       })
       .catch(error => {
         // Handle submission error
-        console.error('Erreur lors de la soumission de la vente:', error);
+        console.error('Erreur lors de la soumission de la commande:', error);
 
         // Display an error message to the user
-        alert('Erreur lors de la soumission de la vente.');
+        alert('Erreur lors de la soumission de la commande.');
       });
 
       document.querySelector(".popup12").style.display = "block";
@@ -552,9 +477,9 @@ function hideDropdownAndSubmit(form, color) {
 // Fonction pour obtenir la couleur en fonction du statut sélectionné
 function getColor(status) {
     switch (status) {
-        case 'Vendu':
+        case 'En cours':
             return 'green'; // Vert
-        case 'Retourné':
+        case 'Livré':
             return 'blue'; // Bleu
         case 'Annuler':
             return 'red'; // Rouge
@@ -564,9 +489,10 @@ function getColor(status) {
 }
 </script>
 
+
 <script>
     // Sélectionnez tous les boutons "Voir"
-    var voirButtons = document.querySelectorAll(".voir-btn1");
+    var voirButtons = document.querySelectorAll(".voir-btn");
 
     // Ajoutez un écouteur d'événements à chaque bouton "Voir"
     voirButtons.forEach(function(button) {
@@ -576,7 +502,7 @@ function getColor(status) {
             var rowNum = 1;
 
             // Faire une requête AJAX pour récupérer les données associées à cette ligne
-            fetch('/donnee_vente/' + rowId)
+            fetch('/get_row_data/' + rowId)
                 .then(response => response.json())
                 .then(data => {
                     // Afficher les données dans le popup
@@ -586,12 +512,12 @@ function getColor(status) {
 
                     data.forEach(function(item) {
                         var tr = document.createElement('tr');
-                        tr.innerHTML = '<td>' + item.date_commande + '</td>' +
+                        tr.innerHTML = '<td>' + rowNum + '</td>' +
+                                       '<td>' + item.date_entree + '</td>'
                                        '<td>' + item.designation + '</td>' +
                                        '<td>' + item.quantite + '</td>' +
-                                       '<td>' + item.prix_vente + '</td>' +
-                                       '<td>' + item.montant + '</td>';
-
+                                       '<td>' + item.prix_produit + '</td>' +
+                                       '<td>' + item.prix_entree + '</td>' +;
                         tbody.appendChild(tr);
 
                         rowNum++;
@@ -616,7 +542,7 @@ function getColor(status) {
             deleteIcons.forEach(icon => {
                 icon.addEventListener('click', function() {
                     const id = this.getAttribute('data-id');
-                    deleteForm.action = `/supprimer_vente/${id}`;
+                    deleteForm.action = `/supprimer_achat/${id}`;
                     popup.style.display = 'flex';
                 });
             });
@@ -627,42 +553,5 @@ function getColor(status) {
         }
 </script>
 
-<script>
-        document.getElementById('form2').addEventListener('submit', function(event) {
-            event.preventDefault();
-
-            const formData = new FormData(this);
-            const orderData = {};
-            formData.forEach((value, key) => {
-                orderData[key] = value;
-            });
-
-            fetch('/vente_clients', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(orderData) // Convert order data to JSON
-            })
-            .then(response => response.json())
-            .then(data => {
-                // Handle successful submission response
-                console.log('Client enregistré avec succès:', data);
-
-                // Clear the form
-                document.getElementById('form2').reset();
-
-                // Display a success message to the user
-                document.getElementById('response-message').innerHTML = '<p style="color:green;">' + data.message + '</p>';
-            })
-            .catch(error => {
-                // Handle submission error
-                console.error('Erreur lors de la soumission du formulaire:', error);
-
-                // Display an error message to the user
-                document.getElementById('response-message').innerHTML = '<p style="color:red;">Erreur lors de la soumission du formulaire.</p>';
-            });
-        });
-    </script>
 
 {% endblock %}

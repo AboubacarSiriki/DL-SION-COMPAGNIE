@@ -4,9 +4,10 @@
           <span class="dashboard">Tableau de bord</span>
         </div>
         <div class="search-box">
-          <input type="text" placeholder="Rechercher..." />
-          <i class="bx bx-search"></i>
+            <input type="text" id="searchInput" placeholder="Rechercher..." />
+            <i class="bx bx-search"></i>
         </div>
+
         <div class="profile-details" id="profile">
           <img src="{{ url_for('static', filename='image/upload/' + filename) }}" alt="" />
           <span class="admin_name">Responsable</span>

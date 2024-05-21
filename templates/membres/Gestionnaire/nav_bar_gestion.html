@@ -7,38 +7,38 @@ hheight: 100vh;
       </div>
       <ul class="nav-links">
         <li>
-          <a href="{{ url_for('base') }}" class="active">
+          <a href="{{ url_for('dashboard_gestionnaire') }}" class="active">
             <i class="bx bx-grid-alt"></i>
             <span class="links_name">Tableau de bord</span>
           </a>
         </li>
         <li>
-          <a href="{{ url_for('Produit') }}">
+          <a href="{{ url_for('gestion_produit') }}">
             <i class="bx bx-box"></i>
             <span class="links_name">Produits</span>
           </a>
         </li>
         <li>
-          <a href="{{ url_for('fournisseurs') }}">
+          <a href="{{ url_for('gestion_fournisseur') }}">
             <i class="bx bx-user"></i>
             <span class="links_name">fournisseurs</span>
           </a>
         </li>
         <li>
-          <a href="{{ url_for('achats') }}">
+          <a href="{{ url_for('gestion_achat') }}">
             <i class="bx bx-cart-alt cart"></i>
             <span class="links_name">Achats</span>
           </a>
         </li>
         <li>
-          <a href="{{ url_for('stock') }}">
+          <a href="{{ url_for('gestion_stock') }}">
             <i class="bx bx-coin-stack"></i>
             <span class="links_name">Stock</span>
           </a>
         </li>
 
         <li class="log_out">
-          <a href="{{url_for('adminLogout')}}">
+          <a href="{{url_for('userLogout')}}">
             <i class="bx bx-log-out"></i>
             <span class="links_name">Déconnexion</span>
           </a>

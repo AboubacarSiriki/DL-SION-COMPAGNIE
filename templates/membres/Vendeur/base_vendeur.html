@@ -10,10 +10,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   </head>
   <body>
-    {% include "nav_bar_gestion.html"%}
-    <section class="home-section" style="background-image: url({{ url_for('static', filename='image/logo.jpg') }});">
+    {% include "membres/vendeur/nav_bar_vendeur.html"%}
+    <section class="home-section" style="background-image: url({{ url_for('static', filename='image/logo.jpg') }});;">
 
-      {% include "header_gestion.html"%}
+      {% include "membres/vendeur/header_vendeur.html"%}
 
       {% block centre%}{% endblock%}
     </section>
