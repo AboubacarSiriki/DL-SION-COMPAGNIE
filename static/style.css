@@ -654,6 +654,14 @@ nav .profile-details i{
 
 }
 
+.popup-content .form3 {
+    width: 100%; /* Pour occuper toute la largeur de .popup-content */
+    display: none; /* Utilisation de flexbox */
+    flex-direction: column; /* Les éléments sont disposés en colonne */
+    align-items: center; /* Centrer les éléments horizontalement */
+
+}
+
 .popup-content div{
     width: 70%; /* Pour occuper toute la largeur de .popup-content */
     display: flex; /* Utilisation de flexbox */

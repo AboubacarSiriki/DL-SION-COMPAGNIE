@@ -70,7 +70,7 @@
           <li class="topic">Statut</li>
           {% for row in dash %}
           <li>
-            <a href="#" onclick="toggleDropdown(this, '{{ row[2] }}')">{{ row[2] }}</a>
+            <a class="topic" href="#" onclick="toggleDropdown(this, '{{ row[2] }}')">{{ row[2] }}</a>
             <form action="/status_vente/{{ row[4] }}" method="POST" class="select-wrapper">
               <select class="select" name="status" onchange="hideDropdownAndSubmit(this.form, '{{ row[4] }}')">
                 <option disabled selected>Choisissez un statut</option>

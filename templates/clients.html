@@ -103,7 +103,7 @@
             <span class="close" id="close-popup">&times;</span>
           <h2>Ajout d'un nouveau Client</h2><br>
           <form method="post" action="{{url_for('clients')}}">
-            
+
             <label for="nom">Nom et prénoms</label>
                   <input type="text" id="nom" name="nom" required>
 
@@ -112,10 +112,10 @@
 
                   <label for="email">Email</label>
                   <input type="email" id="email" name="email" required>
-    
+
                   <label for="adresse">Adresse</label>
                   <input type="text" id="adresse" name="adresse" required>
-    
+
                   <button type="submit">Ajouter</button>
             </form>
         </div>
@@ -151,7 +151,7 @@
 
 <div class="popup0" id="confirmationPopup">
         <div class="confirmation-container">
-            <h2>Êtes-vous sûr de vouloir supprimer ce client ?</h2>
+            <h2>Êtes-vous sûr de vouloir supprimer ce client  ?</h2>
             <form id="deleteForm" method="POST">
                 <button type="submit" class="btn-confirm">Confirmer</button>
                 <button type="button" class="btn-cancel" onclick="closePopup()">Annuler</button>

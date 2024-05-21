@@ -246,7 +246,7 @@
             <button type="submit" id="submit-button">Valider la vente</button>
         </form>
 
-        <form class="form2" id="form2 stock-form" method="post" action="{{url_for('ventes')}}">
+        <form class="form2" id="form2 stock-form" method="post" action="{{url_for('vendeur_ventes')}}">
             {% with messages = get_flashed_messages() %}
             {% if messages %}
             {% for message in messages %}
@@ -377,7 +377,7 @@
             </p><br>
             <p style="color:orange; text-align:center;">Facturation de la TVA non autorisée</p>
         </form>
-        <div><button class="btn12"><a href="{{url_for('ventes')}}" style="text-decoration:none;
+        <div><button class="btn12"><a href="{{url_for('vendeur_ventes')}}" style="text-decoration:none;
     color: #fff;">Retour</a></button>
             <button id="btn11" onclick="printSection('popup12')">Imprimer</button>
         </div><br>

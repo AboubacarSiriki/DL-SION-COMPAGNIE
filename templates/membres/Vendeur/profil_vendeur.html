@@ -1,4 +1,4 @@
-{% extends "membres/vendeur/base.html"%}
+{% extends "membres/vendeur/base_vendeur.html"%}
 {% block centre%}
 <div class="home-content">
 
@@ -7,20 +7,19 @@
       <div class="title">Profil</div>
       <p>Tableau de bord / Profil</p><br>
       <div class="sales-details1">
-        <div class="profil" style="background-image: url({{url_for('static', filename='image/profile.jpg') }});"></div>
-        <div class="infos">
-          <div><h3>Nom: {{infos_admin[1]}}</h3><br>
-            <h3>Prénom: {{infos_admin[2]}}</h3><br>
-          <p>Poste: Responsable</p><br>
-          <p>Tel : {{infos_admin[3]}}</p></div><br>
-          <div><h3>Email : {{infos_admin[4]}}</h3><br>
+        <div class="profil" style="background-image: url({{ url_for('static', filename='image/upload/' + filename) }});"></div>
+         <div class="infos">
+          <div><h3>Nom: {{infos_membre[1]}}</h3><br>
+            <h3>Prénom: {{infos_membre[2]}}</h3><br>
+          <p>Poste: {{infos_membre[3]}}</p><br>
+          <p>Tel : {{infos_membre[4]}}</p></div><br>
+          <div><h3>Email : {{infos_membre[5]}}</h3><br>
           <h3>Entreprise : DL SION COMPAGNY</h3><br>
           <p> Pays: Cote D'Ivoire</p><br>
           <p>Ville : Abidjan,Cocody</p></div>
         </div>
         <div class="message">
           <button id="open-popup">Modifier</button>
-          <button>Message</button>
         </div>
       </div><br>
     </div>
@@ -32,7 +31,7 @@
   <div class="popup-content">
     <span class="close" id="close-popup">&times;</span>
     <h2>Modifications des information du responsable</h2><br>
-    <form method="post" action="{{ url_for('modifier_profil') }}" enctype="multipart/form-data">
+    <form method="post" action="{{ url_for('modifier_profil_membre') }}" enctype="multipart/form-data">
 
       <label for="nom">Nom</label>
       <input type="text" id="nom" name="nom" required>
@@ -49,7 +48,7 @@
        <label for="image">Photo</label>
       <input type="file" id="image" name="image" accept="image/*" required>
 
-      <div><button class="btn12"><a href="{{url_for('profil')}}" style="text-decoration:none;
+      <div><button class="btn12"><a href="{{url_for('profil_vendeur')}}" style="text-decoration:none;
     color: #fff;">Annuler</a></button>
                 <button  type="submit">Confirmer</button>
             </div><br>
