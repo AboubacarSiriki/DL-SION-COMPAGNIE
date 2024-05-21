@@ -7,9 +7,7 @@ import re
 from werkzeug.utils import secure_filename
 from datetime import datetime
 from flask import jsonify
-from twilio.rest import Client
-from dotenv import load_dotenv
-load_dotenv()
+from infobipConfig import envoyer_sms_api
 
 
 # Créer une instance de l'application Flask
@@ -1764,59 +1762,29 @@ def emailing():
 
     return render_template('emailing.html',filename=filename)
 
-from twilioConfig import account_sid, auth_token
 
-client = Client(account_sid, auth_token)
-
-# Route pour envoyer les SMS
-@app.route('/envoyer-sms', methods=['GET', 'POST'])
+@app.route('/envoyer_sms', methods=['POST'])
 def envoyer_sms():
-    message_to_send = request.form['message']
-    # Vous devrez récupérer les numéros de téléphone de votre base de données
-    # list_of_phone_numbers = ['+2250768140413', '+2250556479723']  
+    message = request.form['message']
+    sender = "InnovTech"  # Changez cette valeur pour votre nom d'expéditeur souhaité
+    if not message:
+        flash('Message non fourni', 'error')
+        return redirect(url_for('index'))
+    
+    response = envoyer_sms_api(message, sender)
+    if 'requestError' in response:
+        flash(f'Erreur lors de l\'envoi du SMS : {response}', 'error')
+    else:
+        flash('SMS envoyé avec succès', 'success')
+    
+    return redirect(url_for('emailing'))
 
-
-    client.messages.create(
-        body=message_to_send,
-        from_='+12073863823',
-        to='+2250507283550'
-    )
-    flash('SMS envoyé avec succès à tous les clients.', 'success')
-    # for number in list_of_phone_numbers:
-    #     message = client.messages.create(
-    #         body=message_to_send,
-    #         from_='+12073863823',
-    #         to='+2250507283550'
-    #     )
-
-    # flash('SMS envoyé avec succès à tous les clients.', 'success')
-    # return 'SMS envoyé avec succès à tous les clients.', 'success'
-    # Récupérer le message depuis le formulaire
-    # message = request.form['message']
-
-    # Récupérer les numéros de téléphone depuis la base de données MySQL
-    # Assurez-vous d'avoir une connexion à votre base de données et de récupérer les numéros
-
-    # Envoyer le message à chaque numéro de téléphone
-    # Utilisez votre service d'envoi de SMS préféré (Twilio, Nexmo, etc.)
-
-    # Exemple avec Twilio (vous devez installer twilio-python via pip)
-
-    # account_sid = 'VOTRE_ACCOUNT_SID'
-    # auth_token = 'VOTRE_AUTH_TOKEN'
-    # client = Client(account_sid, auth_token)
-
-    # Exemple d'envoi de SMS à un numéro
-    # Remplacez 'from_' par votre numéro Twilio et 'to' par le numéro de téléphone de votre client
-    # client.messages.create(
-    #     body=message,
-    #     from_='VOTRE_NUMERO_TWILIO',
-    #     to='NUMERO_DU_CLIENT'
-    # )
-
-    return "Messages envoyés avec succès !"
 
 # Point d'entrée de l'application
 if __name__ == '__main__':
     # Lancer l'application sur le serveur local
     app.run(debug=True)
+
+
+
+
