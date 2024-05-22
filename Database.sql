@@ -232,6 +232,8 @@ ALTER TABLE `entree`
   ADD CONSTRAINT `fk_entree_fournisseur` FOREIGN KEY (`id_fournisseur`) REFERENCES `fournisseur` (`id_fournisseur`),
   ADD CONSTRAINT `fk_entree_produit` FOREIGN KEY (`id_produit`) REFERENCES `produit` (`id_produit`);
 
+ ALTER TABLE commande DROP FOREIGN KEY fk_commande_produit;
+
 --
 -- Contraintes pour la table `stock`
 --

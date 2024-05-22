@@ -101,12 +101,6 @@
                     {% endfor %}
                   {% endif %}
                 {% endwith %}
-                <button id="print-report1">Imprimer le rapport</button>
-                <div id="dropdown-list1" class="dropdown-content">
-                    <a href="#">Journalier</a>
-                    <a href="#">Hebdomadaire</a>
-                    <a href="#">Mensuel</a>
-                </div>
             </div>
             <div class="sales-details">
               <ul class="details">
@@ -127,15 +121,6 @@
                   <li><a href="#">{{ row[2] }}</a></li>
                   {% endfor %}
               </ul>
-                <ul class="details">
-                    <li class="topic">Action</li>
-                    {% for row in resultat %}
-                    <div class="icon">
-                        <a href="{{ url_for('modifier_stock', id_stock=row[4]) }}"><i class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i></a>
-                        <i class='bx bx-trash delete-icon' data-id="{{ row[4] }}" style='font-size: 30px; color: red;'></i>
-                    </div>
-                    {% endfor %}
-                 </ul>
             </div>
             <div class="button">
               <a href="#">Voir plus</a>

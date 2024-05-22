@@ -51,22 +51,23 @@
         <button id="open-popup">Ajouter un produit</button>
       </div>
       <div class="sales-details">
-        <ul class="details">
+        <ul class="details" >
           <li class="topic">Réf</li>
           {% for row in resultat %}
-          <li><a href="#">{{ row[0] }}</a></li>
+          <li ><a href="#">{{ row[0] }}</a></li>
           {% endfor %}
         </ul>
         <ul class="details">
           <li class="topic">Nom</li>
           {% for row in resultat %}
-          <li><a href="#">{{ row[1] }}</a></li>
+          <li ><a href="#">{{ row[1] }}</a></li>
           {% endfor %}
         </ul>
-        <ul class="details">
+        <ul class="details" >
           <li class="topic">Catégorie</li>
+
           {% for row in resultat %}
-          <li><a href="#">{{ row[2] }}</a></li>
+          <li ><a href="#">{{ row[2] }}</a></li>
           {% endfor %}
         </ul>
         <ul class="details">
@@ -78,16 +79,16 @@
         <ul class="details">
           <li class="topic">Stock</li>
           {% for row in resultat %}
-          <li><a href="#">{{ row[4] }}</a></li>
+          <li ><a href="#">{{ row[4] }}</a></li>
           {% endfor %}
         </ul>
-        <ul class="details">
+        <ul class="details" data-index="5">
           <li class="topic">Stock min</li>
           {% for row in resultat %}
-          <li><a href="#">{{ row[5] }}</a></li>
+          <li ><a href="#">{{ row[5] }}</a></li>
           {% endfor %}
         </ul>
-        <ul class="details">
+        <ul class="details" >
           <li class="topic">Designation</li>
           {% for row in resultat %}
           <li><a href="#">{{ row[6]}}</a></li>
@@ -98,15 +99,14 @@
           {% for row in resultat %}
           <div class="icon">
             <a href="{{ url_for('modifier_produit', id=row[0]) }}"><i class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i></a>
-            <i class='bx bx-trash delete-icon' style='font-size: 30px; color: red;'></i>
+            <i class='bx bx-trash delete-icon' data-id="{{ row[0] }}" style='font-size: 30px; color: red;'></i>
           </div>
           {% endfor %}
         </ul>
       </div>
       <div class="button">
-        <a href="#">Voir plus</a>
+        <a href="#">Voir plus</a></div>
       </div>
-    </div>
   </div>
 
 </div>
@@ -142,7 +142,6 @@
 
 </div>
 
-<<<<<<< HEAD
 <div class="popup0" id="confirmationPopup">
   <div class="confirmation-container">
       <h2>Êtes-vous sûr de vouloir supprimer ce Produit?</h2>
@@ -173,6 +172,4 @@
   }
 </script>
 
-=======
->>>>>>> eb7f7df035391a99df8a95cf2751decf9ca4c357
 {% endblock %}

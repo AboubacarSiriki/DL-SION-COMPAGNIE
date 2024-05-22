@@ -1247,3 +1247,16 @@ nav .profile-details i{
 }
 
 }
+
+.select2-container--default .select2-selection--single {
+    height: 100px; /* Ajustez cette valeur pour changer la hauteur */
+    font-size: 14px; /* Ajustez cette valeur pour changer la taille de la police */
+  }
+
+  .select2-container .select2-selection--single .select2-selection__rendered {
+    line-height: 100px; /* Doit correspondre à la hauteur pour centrer le texte */
+  }
+
+  .select2-container .select2-selection--single .select2-selection__arrow {
+    height: 100px; /* Doit correspondre à la hauteur pour centrer la flèche */
+  }

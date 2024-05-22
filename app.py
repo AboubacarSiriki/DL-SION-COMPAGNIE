@@ -146,6 +146,13 @@ def base():
         conn.commit()
         cursor.close()
 
+        products = []
+        for produit in meilleurs:
+            image = produit[0].decode('utf-8') if isinstance(produit[0], bytes) else produit[0]
+            nom_produit = produit[1]
+            total_quantite = produit[2]
+            products.append({'image': image, 'nom_produit': nom_produit, 'total_quantite': total_quantite})
+
         cursor=conn.cursor()
         cursor.execute(''' SELECT date_vente, client.nom_prenoms,statut,montant,id_vente FROM vente JOIN client ON vente.id_client = client.id_client ORDER BY date_vente DESC;
 ''')
@@ -155,7 +162,7 @@ def base():
 
 
 
-        return render_template('admin/dashboard.html',filename=filename, total_ventes=total_ventes ,  total_commande= total_commande ,  total_client= total_client, total_CA= total_CA , meilleurs=meilleurs,dash=dash)
+        return render_template('admin/dashboard.html',filename=filename, total_ventes=total_ventes ,  total_commande= total_commande ,  total_client= total_client, total_CA= total_CA , products=products,dash=dash)
     else:
         flash('Please login first', 'danger') 
         return redirect('/admin')
@@ -489,7 +496,7 @@ def userLogout():
 
 #Ssession vendeur###############################################
 
-@app.route('/profil_vendeur/')
+@app.route('/vendeur/profil/')
 def profil_vendeur():
     # Vérifier si l'administrateur est connecté
     if 'utilisateur_id' not in session:
@@ -550,6 +557,14 @@ def dashboard_vendeur():
         conn.commit()
         cursor.close()
 
+        products = []
+        for produit in meilleurs:
+            image = produit[0].decode('utf-8') if isinstance(produit[0], bytes) else produit[0]
+            nom_produit = produit[1]
+            total_quantite = produit[2]
+            products.append({'image': image, 'nom_produit': nom_produit, 'total_quantite': total_quantite})
+
+
         cursor=conn.cursor()
         cursor.execute(''' SELECT date_vente, client.nom_prenoms,statut,montant,id_vente FROM vente JOIN client ON vente.id_client = client.id_client ORDER BY date_vente DESC;
     ''')
@@ -557,13 +572,13 @@ def dashboard_vendeur():
         conn.commit()
         cursor.close()
 
-        return render_template('membres/vendeur/dashboard_vendeur.html', total_ventes=total_ventes , total_commande=total_commande , total_client=total_client , retourne=retourne , meilleurs=meilleurs , dash = dash,filename=filename)
+        return render_template('membres/vendeur/dashboard_vendeur.html', total_ventes=total_ventes , total_commande=total_commande , total_client=total_client , retourne=retourne , products=products , dash = dash,filename=filename)
     else:
         flash('Please login first', 'danger')
         return redirect('/userlogin')
 
 
-@app.route('/vendeur_client/', methods=["post", "get"])
+@app.route('/vendeur/client/', methods=["post", "get"])
 def vendeur_client():
     if request.method == 'POST':
         nom = request.form['nom']
@@ -614,7 +629,7 @@ def vendeur_client():
         cursor.close()
         return render_template("membres/vendeur/vendeur_client.html", resultat=resultat,filename=filename)
 
-@app.route('/vendeur_ventes/', methods=["POST", "GET"])
+@app.route('/vendeur/ventes/', methods=["POST", "GET"])
 def vendeur_ventes():
     with conn.cursor() as cursor:
         cursor.execute("SELECT id_produit, nom_produit, categorie, prix FROM produit")
@@ -687,7 +702,7 @@ def vendeur_ventes():
 
     return render_template("membres/vendeur/vendeur_vente.html", produits=produits, clients=clients,resultat=resultat,filename=filename)
 
-@app.route('/vendeur_commande/', methods=["POST", "GET"])
+@app.route('/vendeur/commande/', methods=["POST", "GET"])
 def vendeur_commande():
     cursor = conn.cursor()
     cursor.execute("SELECT id_produit, nom_produit, categorie, prix FROM produit")
@@ -825,7 +840,7 @@ def vendeur_modifier_client(id):
 
 #Session Gestionnaire###############################################
 
-@app.route('/profil_gestionnaire/')
+@app.route('/gestionnaire/profil/')
 def profil_gestionnaire():
     # Vérifier si l'administrateur est connecté
     if 'utilisateur_id' not in session:
@@ -844,6 +859,41 @@ def profil_gestionnaire():
     cursor.close()
     return render_template('/membres/Gestionnaire/profil_gestionnaire.html',filename=filename,infos_membre=infos_membre)
 
+@app.route('/gestionnaire/modifier_profil', methods=['GET', 'POST'])
+def modifier_profil_gestion():
+    if 'utilisateur_id' not in session:
+        flash('Veuillez vous connecter d\'abord.', 'danger')
+        return redirect(url_for('userLogin'))
+
+    utilisateur_id = session['utilisateur_id']
+    cursor = conn.cursor()
+
+    if request.method == 'POST':
+        nom = request.form['nom']
+        prenom = request.form['prenom']
+        tel = request.form['tel']
+        email = request.form['email']
+        image = request.files['image']
+
+        # Sécurisez le nom du fichier
+        filename = secure_filename(image.filename)
+        image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        image.save(image_path)
+
+        # Mettez à jour les informations dans la base de données
+        cursor.execute('UPDATE utilisateur SET nom = %s, prenom = %s, telephone = %s, email = %s, image = %s WHERE id_utilisateur = %s',
+                       (nom, prenom, tel, email, filename, utilisateur_id))
+        conn.commit()
+
+        flash('Profil mis à jour avec succès.', 'success')
+        return redirect(url_for('profil_gestionnaire'))
+
+    # Récupérez les informations actuelles de l'administrateur pour les afficher dans le formulaire
+    cursor.execute('SELECT * FROM utilisateur WHERE id_utilisateur = %s', (utilisateur_id,))
+    membre_info = cursor.fetchone()
+    cursor.close()
+
+    return render_template('/membres/Gestionnaire/profil_vendeur.html', membre_info=membre_info)
 
 @app.route('/dashboard/gestionnaire')
 def dashboard_gestionnaire():
@@ -1028,7 +1078,7 @@ def gestion_achat():
     curso = conn.cursor()
     curso.execute(
         "select id_entree,date_entree,statut,fournisseur.nom_prenoms,produit.nom_produit from entree,fournisseur,produit where entree.id_fournisseur = fournisseur.id_fournisseur and entree.id_produit=produit.id_produit ")
-    resultat = curso.fetchall()
+    resultat1 = curso.fetchall()
     curso.close()
 
     utilisateur_id = session['utilisateur_id']
@@ -1038,7 +1088,7 @@ def gestion_achat():
     infos_admin = cursor.fetchone()
     filename = infos_admin[8].decode('utf-8')
 
-    return render_template("membres/Gestionnaire/gestion_achat.html", produits=produits, fournisseurs=fournisseurs,resultat=resultat,filename=filename)
+    return render_template("membres/Gestionnaire/gestion_achat.html", produits=produits, fournisseurs=fournisseurs, resultat=resultat1,filename=filename)
 
 @app.route('/gestionnaire/stock/', methods=["POST", "GET"])
 def gestion_stock():
@@ -2464,6 +2514,31 @@ def envoyer_sms():
         flash('SMS envoyé avec succès', 'success')
     
     return redirect(url_for('emailing'))
+
+
+# Route pour la recherche
+@app.route('/search', methods=['POST'])
+def search():
+    keyword = request.form['keyword']
+    results = search_in_database(keyword)
+    return jsonify(results)
+
+
+# Fonction de recherche dans la base de données
+def search_in_database(mot):
+    cursor = conn.cursor()
+    query = "SELECT * FROM produit WHERE nom_produit LIKE ?"
+    result = cursor.execute(query, ('%' + mot + '%',)).fetchall()
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    # Conversion des résultats en une liste de dictionnaires
+    results = []
+    for row in result:
+        results.append(dict(row))
+
+    return results
 
 
 # Point d'entrée de l'application

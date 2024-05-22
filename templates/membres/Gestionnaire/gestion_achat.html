@@ -92,15 +92,6 @@
                   <li><a href="#">{{ row[3] }}</a></li>
                   {% endfor %}
               </ul>
-              <ul class="details">
-                <li class="topic">Action</li>
-                  {% for row in resultat %}
-                    <div class="icon">
-                      <a href="{{url_for('modifier_achat', id_entree=row[0])}}"><i class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i></a>
-                     <i class='bx bx-trash delete-icon' data-id="{{ row[0] }}" style='font-size: 30px; color: red;'></i>
-                    </div>
-                  {% endfor %}
-              </ul>
             </div>
             <div class="button">
               <a href="#">Voir plus</a>
@@ -182,7 +173,7 @@
                  <p style="color:orange;">.....................................................................................................................................................................</p><br>
                  <p style="color:orange; text-align:center;">Facturation de la TVA non autorisée</p>
             </form>
-            <div><button class="btn12"><a href="{{url_for('achats')}}" style="text-decoration:none;
+            <div><button class="btn12"><a href="{{url_for('gestion_achat')}}" style="text-decoration:none;
     color: #fff;">Retour</a></button>
                 <button id="btn111" onclick="printSection('popup121')">Imprimer</button>
             </div><br>
@@ -195,7 +186,7 @@
             <span class="close" id="close-popup">&times;</span>
           <h2>Ajout d'une nouvelle commande</h2><br>
 
-            <form id="stock-form" method="post" action="{{url_for('achats')}}">
+            <form id="stock-form" method="post" action="{{url_for('gestion_achat')}}">
                  <label for="fournisseur">Fournisseur</label>
                   <select id="fournisseur" name="fournisseur" required>
                       <option value="" disabled selected>Sélectionnez un fournisseur</option>
@@ -234,7 +225,7 @@
                 </tbody>
             </table>
 
-            <div><button class="btn12"><a href="{{url_for('achats')}}" style="text-decoration:none;
+            <div><button class="btn12"><a href="{{url_for('gestion_achat')}}" style="text-decoration:none;
     color: #fff;">Retour</a></button>
                 <button type="submit">Valider</button>
             </div>
@@ -314,7 +305,7 @@
                  <p style="color:orange;">.....................................................................................................................................................................</p><br>
                  <p style="color:orange; text-align:center;">Facturation de la TVA non autorisée</p>
             </form>
-            <div><button class="btn12"><a href="{{url_for('achats')}}" style="text-decoration:none;
+            <div><button class="btn12"><a href="{{url_for('gestion_achat')}}" style="text-decoration:none;
     color: #fff;">Retour</a></button>
                 <button id="btn11" onclick="printSection('popup12')">Imprimer</button>
             </div><br>

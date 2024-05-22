@@ -81,18 +81,17 @@
         <a href="#">Voir plus</a>
       </div>
     </div>
+
     <div class="top-sales box">
       <div class="title">Meilleur produits</div>
       <ul class="top-sales-details">
-        {%for row in meilleurs %}
+        {%for product in products%}
         <li>
-
           <a href="#">
-            <img src="{{row[0]}}" alt="" />
-            <span class="product">{{row[1]}}</span>
+            <img src="{{ url_for('static', filename='image/upload/' ~ product.image) }}" alt="{{ product.nom_produit }}">
+            <span class="product">{{ product.nom_produit }}</span>
           </a>
-          <span class="price">{{row[2]}}</span>
-
+          <span class="price">{{ product.total_quantite }}</span>
         </li>
         {%endfor%}
       </ul>
