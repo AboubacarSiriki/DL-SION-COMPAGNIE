@@ -148,7 +148,7 @@
             deleteIcons.forEach(icon => {
                 icon.addEventListener('click', function() {
                     const id = this.getAttribute('data-id');
-                    deleteForm.action = `/supprimer_fournisseur/${id}`;
+                    deleteForm.action = `/admin/supprimer_fournisseur/${id}`;
                     popup.style.display = 'flex';
                 });
             });

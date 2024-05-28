@@ -279,7 +279,7 @@
             deleteIcons.forEach(icon => {
                 icon.addEventListener('click', function() {
                     const id = this.getAttribute('data-id');
-                    deleteForm.action = `/supprimer_stock/${id}`;
+                    deleteForm.action = `/admin/supprimer_stock/${id}`;
                     popup.style.display = 'flex';
                 });
             });

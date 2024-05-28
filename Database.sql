@@ -234,6 +234,8 @@ ALTER TABLE `entree`
 
  ALTER TABLE commande DROP FOREIGN KEY fk_commande_produit;
 
+ ALTER TABLE `client` ADD `statut` VARCHAR(250) NOT NULL AFTER `adresse`;
+
 --
 -- Contraintes pour la table `stock`
 --

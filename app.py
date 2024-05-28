@@ -154,7 +154,7 @@ def base():
             products.append({'image': image, 'nom_produit': nom_produit, 'total_quantite': total_quantite})
 
         cursor=conn.cursor()
-        cursor.execute(''' SELECT date_vente, client.nom_prenoms,statut,montant,id_vente FROM vente JOIN client ON vente.id_client = client.id_client ORDER BY date_vente DESC;
+        cursor.execute(''' SELECT date_vente, client.nom_prenoms,vente.statut,montant,id_vente FROM vente JOIN client ON vente.id_client = client.id_client ORDER BY date_vente DESC;
 ''')
         dash=cursor.fetchall()
         conn.commit()
@@ -952,33 +952,34 @@ def gestion_client():
         telephone = request.form['tel']
         email = request.form['email']
         adresse = request.form['adresse']
+        statut = request.form['statut']
 
         # Ajout automatique du préfixe +225 si nécessaire et validation du numéro
         telephone = '+225' + telephone.lstrip('+225')
         if len(telephone) != 14 or not telephone[4:].isdigit() or not (telephone[4:6] in ['07', '05', '01']):
             flash('Le numéro de téléphone doit être valide et contenir 14 chiffres y compris le préfixe +225.', 'danger')
-            return redirect(url_for("vendeur_client"))
+            return redirect(url_for("gestion_client"))
 
         # Vérifier si le numéro de téléphone est unique
         cursor = conn.cursor()
         cursor.execute('SELECT * FROM client WHERE telephone = %s', (telephone,))
         if cursor.fetchone():
             flash('Ce numéro de téléphone est déjà utilisé.', 'danger')
-            return redirect(url_for("vendeur_client"))
+            return redirect(url_for("gestion_client"))
 
         # Vérification de l'unicité de l'email
         cursor.execute("SELECT * FROM client WHERE email = %s AND id_client != %s", (email, id))
         if cursor.fetchone():
             flash('Cet email est déjà utilisé par un autre client.', 'danger')
-            return redirect(url_for("vendeur_client"))
+            return redirect(url_for("gestion_client"))
 
         # Insérer le nouveau client
-        cursor.execute('INSERT INTO client (nom_prenoms,telephone,email,adresse) VALUES (%s, %s, %s, %s)',
-                       (nom, telephone, email, adresse))
+        cursor.execute('INSERT INTO client (nom_prenoms,telephone,email,adresse,statut) VALUES (%s, %s, %s, %s, %s)',
+                       (nom, telephone, email, adresse,statut))
         conn.commit()
         cursor.close()
         flash('Client ajouté avec succès', 'success')
-        return redirect(url_for("vendeur_client"))  # Redirection vers la même page clients après ajout
+        return redirect(url_for("gestion_client"))  # Redirection vers la même page clients après ajout
     else:
         # Récupération des éléments de la table client
         curso = conn.cursor()
@@ -1066,7 +1067,7 @@ def gestion_commande():
 
     curso = conn.cursor()
     curso.execute(
-        "select id_commande,date_commande,statut,client.nom_prenoms,produit.nom_produit from commande,client,produit where commande.id_client = client.id_client and commande.id_produit=produit.id_produit ")
+        "select id_commande,date_commande,commande.statut,client.nom_prenoms,produit.nom_produit from commande,client,produit where commande.id_client = client.id_client and commande.id_produit=produit.id_produit ")
     resultat = curso.fetchall()
     curso.close()
 
@@ -1139,7 +1140,7 @@ def gestion_ventes():
 
     curso = conn.cursor()
     curso.execute(
-        "select id_vente,date_vente,client.nom_prenoms,produit.nom_produit,statut from vente,client,produit where vente.id_client = client.id_client and vente.id_produit=produit.id_produit ")
+        "select id_vente,date_vente,client.nom_prenoms,produit.nom_produit,vente.statut from vente,client,produit where vente.id_client = client.id_client and vente.id_produit=produit.id_produit ")
     resultat = curso.fetchall()
     curso.close()
 
@@ -1263,7 +1264,7 @@ def userDashboard():
 #     # Rendre le template index.html
 #     return render_template('index.html')
 
-@app.route('/Produit/', methods=["post", "get"])
+@app.route('/admin/Produit/', methods=["post", "get"])
 def Produit():
     if request.method == 'POST':
         nom = request.form['nom']
@@ -1301,13 +1302,14 @@ def Produit():
 
         return render_template("Produit.html", resultat=resultat,filename=filename)
 
-@app.route('/clients/', methods=["post", "get"])
+@app.route('/admin/clients/', methods=["post", "get"])
 def clients():
     if request.method == 'POST':
         nom = request.form['nom']
         telephone = request.form['tel']
         email = request.form['email']
         adresse = request.form['adresse']
+        statut = request.form['statut']
 
         # Ajout automatique du préfixe +225 si nécessaire et validation du numéro
         telephone = '+225' + telephone.lstrip('+225')
@@ -1329,8 +1331,8 @@ def clients():
             return redirect(url_for("clients"))
 
         # Insérer le nouveau client
-        cursor.execute('INSERT INTO client (nom_prenoms,telephone,email,adresse) VALUES (%s, %s, %s, %s)',
-                       (nom, telephone, email, adresse))
+        cursor.execute('INSERT INTO client (nom_prenoms,telephone,email,adresse,statut) VALUES (%s, %s, %s, %s, %s)',
+                       (nom, telephone, email, adresse,statut))
         conn.commit()
         cursor.close()
         flash('Client ajouté avec succès', 'success')
@@ -1361,6 +1363,7 @@ def vente_clients():
         tel = data['tel']
         email = data['email']
         adresse = data['adresse']
+        statut = data['statut']
 
         # Ajout automatique du préfixe +225 si nécessaire et validation du numéro
         telephone = '+225' + tel.lstrip('+225')
@@ -1379,7 +1382,7 @@ def vente_clients():
             return jsonify({'message': 'Cet email est déjà utilisé par un autre client!'}), 200
 
         cursor = conn.cursor()
-        cursor.execute('INSERT INTO client (nom_prenoms, telephone, email, adresse) VALUES (%s, %s, %s, %s)', (nom, tel, email, adresse))
+        cursor.execute('INSERT INTO client (nom_prenoms, telephone, email, adresse, statut) VALUES (%s, %s, %s, %s, %s)', (nom, tel, email, adresse, statut))
         conn.commit()
         cursor.close()
 
@@ -1428,7 +1431,7 @@ def submit_vente_client():
     return jsonify(response_data), 200
 
 
-@app.route('/profil/')
+@app.route('/admin/profil/')
 def profil():
     # Vérifier si l'administrateur est connecté
     if 'admin_id' not in session:
@@ -1451,7 +1454,7 @@ def profil():
 
     return render_template('profil.html', infos_admin=infos_admin,filename=filename)
 
-@app.route('/profil_base/')
+@app.route('/admin/profil_base/')
 def profil_base():
     # Vérifier si l'administrateur est connecté
     if 'admin_id' not in session:
@@ -1472,7 +1475,7 @@ def profil_base():
     return render_template('base.html', infos_admin=infos_admin,filename=filename)
 
 
-@app.route('/fournisseurs/', methods=["post", "get"])
+@app.route('/admin/fournisseurs/', methods=["post", "get"])
 def fournisseurs():
     if request.method == 'POST':
         nom = request.form['nom']
@@ -1527,7 +1530,7 @@ def fournisseurs():
         return render_template("fournisseurs.html", resultat=resultat,filename=filename)
 
 
-@app.route('/ventes/', methods=["POST", "GET"])
+@app.route('/admin/ventes/', methods=["POST", "GET"])
 def ventes():
     with conn.cursor() as cursor:
         cursor.execute("SELECT id_produit, nom_produit, categorie, prix FROM produit")
@@ -1584,7 +1587,7 @@ def ventes():
 
     curso = conn.cursor()
     curso.execute(
-        "select id_vente,date_vente,client.nom_prenoms,produit.nom_produit,statut from vente,client,produit where vente.id_client = client.id_client and vente.id_produit=produit.id_produit ")
+        "select id_vente,date_vente,client.nom_prenoms,produit.nom_produit,vente.statut from vente,client,produit where vente.id_client = client.id_client and vente.id_produit=produit.id_produit ")
     resultat = curso.fetchall()
     curso.close()
 
@@ -1597,7 +1600,7 @@ def ventes():
 
     return render_template("ventes.html", produits=produits, clients=clients,resultat=resultat,filename=filename)
 
-@app.route('/modifier_vente/<int:id_vente>', methods=['GET', 'POST'])
+@app.route('/admin/modifier_vente/<int:id_vente>', methods=['GET', 'POST'])
 def modifier_vente(id_vente):
     admin_id = session['admin_id']
     cursor = conn.cursor()
@@ -1781,7 +1784,7 @@ def donnee_vente(ligne_id):
 
     return jsonify(data)
 
-@app.route('/achats/', methods=["POST", "GET"])
+@app.route('/admin/achats/', methods=["POST", "GET"])
 def achats():
     cursor = conn.cursor()
     cursor.execute("SELECT id_produit, nom_produit, categorie, prix FROM produit")
@@ -1832,7 +1835,7 @@ def achats():
 
     return render_template("achats.html", produits=produits, fournisseurs=fournisseurs,resultat=resultat,filename=filename)
 
-@app.route('/modifier_achat/<int:id_entree>', methods=['GET', 'POST'])
+@app.route('/admin/modifier_achat/<int:id_entree>', methods=['GET', 'POST'])
 def modifier_achat(id_entree):
     admin_id = session['admin_id']
     cursor = conn.cursor()
@@ -1968,7 +1971,7 @@ def get_client(client_id):
         # Si le produit n'est pas trouvé, retournez un message d'erreur
         return jsonify({'error': 'Client non trouvé'}), 404
 
-@app.route('/stock/', methods=["POST", "GET"])
+@app.route('/admin/stock/', methods=["POST", "GET"])
 def stock():
     cursor = conn.cursor()
     cursor.execute("SELECT id_produit, nom_produit,categorie,prix FROM produit")
@@ -2017,7 +2020,7 @@ def stock():
 
     return render_template("stock.html", produits=produits,resultat=resultat,resultat1=resultat1,filename=filename)
 
-@app.route('/modifier_stock/<int:id_stock>', methods=['GET', 'POST'])
+@app.route('/admin/modifier_stock/<int:id_stock>', methods=['GET', 'POST'])
 def modifier_stock(id_stock):
     admin_id = session['admin_id']
     cursor = conn.cursor()
@@ -2104,7 +2107,7 @@ def submit_stock():
 
     return jsonify(response_data), 200
 
-@app.route('/commandes/', methods=["POST", "GET"])
+@app.route('/admin/commandes/', methods=["POST", "GET"])
 def commandes():
     cursor = conn.cursor()
     cursor.execute("SELECT id_produit, nom_produit, categorie, prix FROM produit")
@@ -2136,7 +2139,7 @@ def commandes():
 
     curso = conn.cursor()
     curso.execute(
-        "select id_commande,date_commande,statut,client.nom_prenoms,produit.nom_produit from commande,client,produit where commande.id_client = client.id_client and commande.id_produit=produit.id_produit ")
+        "select id_commande,date_commande,commande.statut,client.nom_prenoms,produit.nom_produit from commande,client,produit where commande.id_client = client.id_client and commande.id_produit=produit.id_produit ")
     resultat = curso.fetchall()
     curso.close()
 
@@ -2150,7 +2153,7 @@ def commandes():
     return render_template('commandes.html', produits=produits, clients=clients,resultat=resultat,filename=filename)
 
 
-@app.route('/modifier_commande/<int:id_commande>', methods=['GET', 'POST'])
+@app.route('/admin/modifier_commande/<int:id_commande>', methods=['GET', 'POST'])
 def modifier_commande(id_commande):
     # Récupérer les informations actuelles de la commande
     cursor = conn.cursor()
@@ -2266,7 +2269,7 @@ def donnee_commande(ligne_id):
 
     return jsonify(data)
 
-@app.route('/modifier_produit/<int:id>',methods=['POST','GET'])
+@app.route('/admin/modifier_produit/<int:id>',methods=['POST','GET'])
 def modifier_produit(id):
     admin_id = session['admin_id']
     cursor = conn.cursor()
@@ -2301,7 +2304,7 @@ def modifier_produit(id):
         return redirect(url_for('Produit'))
     return render_template("modifier_produit.html",resultat=resultat,filename=filename,image_actuel=image_actuel)
 
-@app.route('/modifier_client/<int:id>', methods=['POST', 'GET'])
+@app.route('/admin/modifier_client/<int:id>', methods=['POST', 'GET'])
 def modifier_client(id):
     admin_id = session['admin_id']
     cursor = conn.cursor()
@@ -2349,7 +2352,7 @@ def modifier_client(id):
 
     return render_template('modifier_client.html', resultat=client_actuel, filename=filename)
 
-@app.route('/modifier_fournisseur/<int:id>',methods=['POST','GET'])
+@app.route('/admin/modifier_fournisseur/<int:id>',methods=['POST','GET'])
 def modifier_fournisseur(id):
     admin_id = session['admin_id']
     cursor = conn.cursor()
@@ -2381,7 +2384,7 @@ def modifier_fournisseur(id):
 
     return render_template('modifier_fournisseur.html', resultat=resultat ,filename=filename )
 
-@app.route('/supprimer_stock/<int:id>', methods=['GET', 'POST'])
+@app.route('/admin/supprimer_stock/<int:id>', methods=['GET', 'POST'])
 def supprimer_stock(id):
     if 'admin_id' not in session:
         return redirect(url_for('login'))  # Rediriger si l'administrateur n'est pas connecté
@@ -2409,7 +2412,7 @@ def supprimer_stock(id):
 
     # supprimer membre
 
-@app.route('/supprimer_membre/<int:id>', methods=['GET', 'POST'])
+@app.route('/admin/supprimer_membre/<int:id>', methods=['GET', 'POST'])
 def supprimer_membre(id):
     if 'admin_id' not in session:
          return redirect(url_for('login'))  # Rediriger si l'administrateur n'est pas connecté
@@ -2436,7 +2439,7 @@ def supprimer_membre(id):
 
 # supprimer produit  
 
-@app.route('/supprimer_produit/<int:id>', methods=['GET', 'POST'])
+@app.route('/admin/supprimer_produit/<int:id>', methods=['GET', 'POST'])
 def supprimer_produit(id):
     if 'admin_id' not in session:
          return redirect(url_for('login'))  # Rediriger si l'administrateur n'est pas connecté
@@ -2462,8 +2465,25 @@ def supprimer_produit(id):
     return render_template('Produit.html',resultat =resultat)
 
 
+@app.route('/status_client/<entry_id>', methods=['POST'])
+def status_client(entry_id):
+    if request.method == 'POST':
+        # Récupérer le nouveau statut envoyé depuis le formulaire
+        new_status = request.form.get('status')
 
-@app.route('/supprimer_client/<int:id>', methods=['GET', 'POST'])
+        # Mettre à jour le statut dans la base de données
+        cursor = conn.cursor()
+        cursor.execute("UPDATE client SET statut = %s WHERE id_client = %s", (new_status, entry_id))
+        conn.commit()
+        cursor.close()
+
+        # Rediriger vers la page d'achats après la mise à jour du statut
+        return redirect(url_for('clients'))
+    else:
+        # Si la méthode de la requête n'est pas POST, retourner une erreur 405 (Méthode non autorisée)
+        return jsonify({'error': 'Method Not Allowed'}), 405
+
+@app.route('/admin/supprimer_client/<int:id>', methods=['GET', 'POST'])
 def supprimer_client(id):
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM client WHERE id_client = %s", (id,))
@@ -2485,7 +2505,7 @@ def supprimer_client(id):
     # Si vous voulez afficher une page de confirmation via une route GET, vous pouvez inclure cela :
     return render_template('clients.html', client=resultat)
 
-@app.route('/supprimer_fournisseur/<int:id>', methods=['GET', 'POST'])
+@app.route('/admin/supprimer_fournisseur/<int:id>', methods=['GET', 'POST'])
 def supprimer_fournisseur(id):
     if 'admin_id' not in session:
         return redirect(url_for('login'))  # Rediriger si l'administrateur n'est pas connecté
@@ -2511,7 +2531,7 @@ def supprimer_fournisseur(id):
     return render_template('fournisseurs.html', fournisseur=resultat)
 
 
-@app.route('/supprimer_vente/<int:id>', methods=['GET', 'POST'])
+@app.route('/admin/supprimer_vente/<int:id>', methods=['GET', 'POST'])
 def supprimer_vente(id):
     if 'admin_id' not in session:
         return redirect(url_for('login'))  # Rediriger si l'administrateur n'est pas connecté
@@ -2536,7 +2556,7 @@ def supprimer_vente(id):
     # Si vous voulez afficher une page de confirmation via une route GET, vous pouvez inclure cela :
     return render_template('ventes.html', vente=resultat)
 
-@app.route('/supprimer_commande/<int:id>', methods=['GET', 'POST'])
+@app.route('/admin/supprimer_commande/<int:id>', methods=['GET', 'POST'])
 def supprimer_commande(id):
     if 'admin_id' not in session:
         return redirect(url_for('login'))  # Rediriger si l'administrateur n'est pas connecté
@@ -2561,7 +2581,7 @@ def supprimer_commande(id):
     # Si vous voulez afficher une page de confirmation via une route GET, vous pouvez inclure cela :
     return render_template('commandes.html', commande=resultat)
 
-@app.route('/supprimer_achat/<int:id>', methods=['GET', 'POST'])
+@app.route('/admin/supprimer_achat/<int:id>', methods=['GET', 'POST'])
 def supprimer_achat(id):
     if 'admin_id' not in session:
         return redirect(url_for('login'))  # Rediriger si l'administrateur n'est pas connecté
@@ -2600,7 +2620,7 @@ def emailing():
     return render_template('emailing.html',filename=filename)
 
 
-@app.route('/envoyer_sms', methods=['POST'])
+@app.route('/admin/envoyer_sms', methods=['POST'])
 def envoyer_sms():
     message = request.form['message']
     sender = "InnovTech"  # Changez cette valeur pour votre nom d'expéditeur souhaité

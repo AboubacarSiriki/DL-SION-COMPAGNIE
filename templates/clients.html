@@ -37,6 +37,34 @@
           </div>
         </div>
 
+    <div class="overview-boxes">
+     <div class="box2">
+      <div class="right-side">
+        <div class="box-topic">Client</div>
+      </div>
+    </div>
+        <div class="box2">
+      <div class="right-side">
+        <div class="box-topic">Niche</div>
+      </div>
+    </div>
+          <div class="box2">
+      <div class="right-side">
+        <div class="box-topic">Prospect</div>
+      </div>
+    </div>
+          <div class="box2">
+      <div class="right-side">
+        <div class="box-topic">VIP</div>
+      </div>
+    </div>
+          <div class="box2">
+      <div class="right-side">
+        <div class="box-topic">Ambassadeur</div>
+      </div>
+    </div>
+  </div>
+
         <div class="sales-boxes">
           <div class="recent-sales box">
             <div class="title">
@@ -81,6 +109,24 @@
                 <li><a href="#">{{row[4]}}</a></li>
                 {% endfor %}
               </ul>
+               <ul class="details">
+                  <li class="topic">Statut</li>
+                  {% for row in resultat %}
+                  <li>
+                    <a href="#" onclick="toggleDropdown(this, '{{ row[5] }}')">{{ row[5] }}</a>
+                    <form action="/status_client/{{ row[0] }}" method="POST" class="select-wrapper">
+                      <select class="select" name="status" onchange="hideDropdownAndSubmit(this.form, '{{ row[5] }}')">
+                        <option disabled selected>Choisissez un statut</option>
+                        <option value="Client">Client</option>
+                        <option value="Niche">Niche</option>
+                        <option value="Prospect">Prospect</option>
+                          <option value="VIP">VIP</option>
+                          <option value="Ambassadeur">Ambassadeur</option>
+                      </select>
+                    </form>
+                  </li>
+                  {% endfor %}
+                </ul>
               <ul class="details">
                 <li class="topic">Action</li>
                 {% for row in resultat %}
@@ -115,6 +161,17 @@
 
                   <label for="adresse">Adresse</label>
                   <input type="text" id="adresse" name="adresse" required>
+
+                  <label for="statut">Choisissez un statut pour ce client</label>
+                      <select id="statut" name="statut" required>
+                        <option value="" disabled selected>Sélectionnez un statut</option>
+                        <option >Client</option>
+                        <option >Niche</option>
+                        <option >Prospect</option>
+                        <option >VIP</option>
+                        <option >Ambassadeur</option>
+                        <!-- Ajoutez d'autres options selon vos besoins -->
+                      </select><br>
 
                   <button type="submit">Ajouter</button>
             </form>
@@ -168,7 +225,7 @@
             deleteIcons.forEach(icon => {
                 icon.addEventListener('click', function() {
                     const id = this.getAttribute('data-id');
-                    deleteForm.action = `/supprimer_client/${id}`;
+                    deleteForm.action = `/admin/supprimer_client/${id}`;
                     popup.style.display = 'flex';
                 });
             });
@@ -178,4 +235,21 @@
             document.getElementById('confirmationPopup').style.display = 'none';
         }
     </script>
+
+<script>
+    // Fonction pour afficher ou masquer la liste déroulante
+function toggleDropdown(link, color) {
+    var select = link.nextElementSibling.querySelector('.select');
+    select.classList.toggle('active');
+    link.style.color = getColor(color); // Mettre à jour la couleur du texte
+
+}
+
+// Fonction pour masquer la liste déroulante et soumettre le formulaire
+function hideDropdownAndSubmit(form, color) {
+    var select = form.querySelector('.select');
+    select.classList.remove('active'); // Masquer la liste déroulante
+    form.submit(); // Soumettre le formulaire
+}
+</script>
 {% endblock %}

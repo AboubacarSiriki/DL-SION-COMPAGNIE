@@ -64,7 +64,7 @@
           <li>
             <a href="#" onclick="toggleDropdown(this, '{{ row[4] }}')">{{ row[4] }}</a>
             <form action="/status_vente/{{ row[0] }}" method="POST" class="select-wrapper">
-              <select class="select" name="status" onchange="hideDropdownAndSubmit(this.form, '{{ row[2] }}')">
+              <select class="select" name="status" onchange="hideDropdownAndSubmit(this.form, '{{ row[4] }}')">
                 <option disabled selected>Choisissez un statut</option>
                 <option value="Vendu">Vendu</option>
                 <option value="Retourné">Retourné</option>
@@ -574,7 +574,7 @@ function getColor(status) {
             deleteIcons.forEach(icon => {
                 icon.addEventListener('click', function() {
                     const id = this.getAttribute('data-id');
-                    deleteForm.action = `/supprimer_vente/${id}`;
+                    deleteForm.action = `/admin/supprimer_vente/${id}`;
                     popup.style.display = 'flex';
                 });
             });

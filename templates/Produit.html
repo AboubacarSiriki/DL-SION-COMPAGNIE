@@ -37,6 +37,29 @@
     </div>
   </div>
 
+<div class="overview-boxes">
+   <div class="box1">
+      <div class="right-side">
+        <div class="box-topic">Filtre des produits par catégories</div>
+        <select id="categoriefiltre" name="categoriecategoriefiltre" required>
+        <option value="" disabled selected>Sélectionnez une catégorie</option>
+        <option >Ordinateurs portables</option>
+        <option >Ordinateurs bureaux</option>
+        <option >Accessoires Ordinateurs</option>
+        <option >Accessoires portable </option>
+        <option >Portable</option>
+        <option >Accessoires technologie </option>
+        <option >Imprimante</option>
+        <option >Accessoires imprimante</option>
+        <option >Onduleur</option>
+        <option >Extra</option>
+        <!-- Ajoutez d'autres options selon vos besoins -->
+      </select>
+      </div>
+
+    </div>
+  </div>
+
   <div class="sales-boxes">
     <div class="recent-sales box">
       <div class="title">
@@ -120,10 +143,22 @@
       <label for="nom">Nom du produit</label>
       <input type="text" id="nom" name="nom" required>
 
-      <label for="categorie">Categorie</label>
-      <input type="text" id="categorie" name="categorie" required>
-      <!-- Ajoutez d'autres options selon vos besoins -->
+      <label for="categorie">Catégories</label>
+      <select id="categorie" name="categorie" required>
+        <option value="" disabled selected>Sélectionnez une catégorie</option>
+        <option >Ordinateurs portables</option>
+        <option >Ordinateurs bureaux</option>
+        <option >Accessoires Ordinateurs</option>
+        <option >Accessoires portable </option>
+        <option >Portable</option>
+        <option >Accessoires technologie </option>
+        <option >Imprimante</option>
+        <option >Accessoires imprimante</option>
+        <option >Onduleur</option>
+        <option >Extra</option>
+        <!-- Ajoutez d'autres options selon vos besoins -->
       </select>
+
       <label for="prix">Prix d'achat</label>
       <input type="number" id="prix" name="prix" required>
 
@@ -133,7 +168,7 @@
       <label for="stock">Ajouter un stock initial</label>
       <input type="number" id="stock" name="stock" required>
 
-      <label for="description">Description</label>
+      <label for="description">Désignation</label>
       <textarea id="description" name="description" required></textarea>
 
       <label for="image">Image</label>
@@ -164,7 +199,7 @@
       deleteIcons.forEach(icon => {
           icon.addEventListener('click', function() {
               const id = this.getAttribute('data-id');
-              deleteForm.action = `/supprimer_produit/${id}`;
+              deleteForm.action = `/admin/supprimer_produit/${id}`;
               popup.style.display = 'flex';
           });
       });

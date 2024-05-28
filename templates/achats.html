@@ -542,7 +542,7 @@ function getColor(status) {
             deleteIcons.forEach(icon => {
                 icon.addEventListener('click', function() {
                     const id = this.getAttribute('data-id');
-                    deleteForm.action = `/supprimer_achat/${id}`;
+                    deleteForm.action = `/admin/supprimer_achat/${id}`;
                     popup.style.display = 'flex';
                 });
             });
