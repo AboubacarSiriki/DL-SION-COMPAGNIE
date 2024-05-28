@@ -121,8 +121,7 @@
                     {% for row in resultat %}
                     <li data-category="{{ row[2] }}">
                         <div class="icon">
-                            <a href="{{ url_for('modifier_produit', id=row[0]) }}"><i class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i></a>
-                            <i class='bx bx-trash delete-icon' data-id="{{ row[0] }}" style='font-size: 30px; color: red;'></i>
+                            <a href="{{ url_for('gestion_modifier_produit', id=row[0]) }}"><i class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i></a>
                         </div>
                     </li>
                     {% endfor %}

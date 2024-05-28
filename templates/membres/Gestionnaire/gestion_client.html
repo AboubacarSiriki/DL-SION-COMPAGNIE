@@ -127,17 +127,6 @@
               </li>
             {% endfor %}
           </ul>
-          <ul class="details">
-            <li class="topic">Action</li>
-            {% for row in resultat %}
-              <div class="icon" data-status="{{ row[5] }}">
-                <a href="{{ url_for('modifier_client', id=row[0]) }}">
-                  <i class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i>
-                </a>
-                <i class='bx bx-trash delete-icon' data-id="{{ row[0] }}" style='font-size: 30px; color: red;'></i>
-              </div>
-            {% endfor %}
-          </ul>
         </div>
         <div class="button">
           <a href="#">Voir plus</a>
