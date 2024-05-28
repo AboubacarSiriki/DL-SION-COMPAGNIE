@@ -566,7 +566,7 @@ def dashboard_vendeur():
 
 
         cursor=conn.cursor()
-        cursor.execute(''' SELECT date_vente, client.nom_prenoms,statut,montant,id_vente FROM vente JOIN client ON vente.id_client = client.id_client ORDER BY date_vente DESC;
+        cursor.execute(''' SELECT date_vente, client.nom_prenoms,vente.statut,montant,id_vente FROM vente JOIN client ON vente.id_client = client.id_client ORDER BY date_vente DESC;
     ''')
         dash=cursor.fetchall()
         conn.commit()
@@ -686,7 +686,7 @@ def vendeur_ventes():
 
     curso = conn.cursor()
     curso.execute(
-        "select id_vente,date_vente,client.nom_prenoms,produit.nom_produit,statut from vente,client,produit where vente.id_client = client.id_client and vente.id_produit=produit.id_produit ")
+        "select id_vente,date_vente,client.nom_prenoms,produit.nom_produit,vente.statut from vente,client,produit where vente.id_client = client.id_client and vente.id_produit=produit.id_produit ")
     resultat = curso.fetchall()
     curso.close()
 
@@ -734,7 +734,7 @@ def vendeur_commande():
 
     curso = conn.cursor()
     curso.execute(
-        "select id_commande,date_commande,statut,client.nom_prenoms,produit.nom_produit from commande,client,produit where commande.id_client = client.id_client and commande.id_produit=produit.id_produit ")
+        "select id_commande,date_commande,commande.statut,client.nom_prenoms,produit.nom_produit from commande,client,produit where commande.id_client = client.id_client and commande.id_produit=produit.id_produit ")
     resultat = curso.fetchall()
     curso.close()
 
