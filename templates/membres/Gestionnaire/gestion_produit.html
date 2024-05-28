@@ -97,8 +97,7 @@
           <li class="topic">Action</li>
           {% for row in resultat %}
           <div class="icon">
-            <a href="{{ url_for('modifier_produit', id=row[0]) }}"><i class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i></a>
-            <i class='bx bx-trash delete-icon' style='font-size: 30px; color: red;'></i>
+            <a href="{{ url_for('gestion_modifier_produit', id=row[0]) }}"><i class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i></a>
           </div>
           {% endfor %}
         </ul>
@@ -129,6 +128,9 @@
 
       <label for="nombre">Ajouter un stock minimum</label>
       <input type="number" id="nombre" name="nombre" required>
+
+      <label for="stock">Ajouter un stock initial</label>
+      <input type="number" id="stock" name="stock" required>
 
       <label for="description">Description</label>
       <textarea id="description" name="description" required></textarea>

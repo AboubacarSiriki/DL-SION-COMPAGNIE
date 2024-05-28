@@ -945,8 +945,8 @@ def dashboard_gestionnaire():
 
     return render_template('membres/Gestionnaire/dashboard_gestionnaire.html', produits=produits,resultat=resultat,resultat1=resultat1,filename=filename)
 
-@app.route('/gestionnaire/fournisseurs/', methods=["post", "get"])
-def gestion_fournisseur():
+@app.route('/gestionnaire/client/', methods=["post", "get"])
+def gestion_client():
     if request.method == 'POST':
         nom = request.form['nom']
         telephone = request.form['tel']
@@ -956,50 +956,46 @@ def gestion_fournisseur():
         # Ajout automatique du préfixe +225 si nécessaire et validation du numéro
         telephone = '+225' + telephone.lstrip('+225')
         if len(telephone) != 14 or not telephone[4:].isdigit() or not (telephone[4:6] in ['07', '05', '01']):
-            flash('Le numéro de téléphone doit être valide et contenir 14 chiffres y compris le préfixe +225.',
-                  'danger')
-            return redirect(url_for("gestion_fournisseur"))
+            flash('Le numéro de téléphone doit être valide et contenir 14 chiffres y compris le préfixe +225.', 'danger')
+            return redirect(url_for("vendeur_client"))
 
         # Vérifier si le numéro de téléphone est unique
         cursor = conn.cursor()
-        cursor.execute('SELECT * FROM fournisseur WHERE telephone = %s', (telephone,))
+        cursor.execute('SELECT * FROM client WHERE telephone = %s', (telephone,))
         if cursor.fetchone():
             flash('Ce numéro de téléphone est déjà utilisé.', 'danger')
-            return redirect(url_for("gestion_fournisseur"))
+            return redirect(url_for("vendeur_client"))
 
         # Vérification de l'unicité de l'email
-        cursor.execute("SELECT * FROM fournisseur WHERE email = %s AND id_fournisseur != %s", (email, id))
+        cursor.execute("SELECT * FROM client WHERE email = %s AND id_client != %s", (email, id))
         if cursor.fetchone():
-            flash('Cet email est déjà utilisé par un autre fournisseur.', 'danger')
-            return redirect(url_for("gestion_fournisseur"))
+            flash('Cet email est déjà utilisé par un autre client.', 'danger')
+            return redirect(url_for("vendeur_client"))
 
-        curso = conn.cursor()
-        curso.execute('INSERT INTO fournisseur (nom_prenoms,telephone,email,adresse) VALUES (%s, %s, %s, %s)',
-                      (nom,telephone,email,adresse))
+        # Insérer le nouveau client
+        cursor.execute('INSERT INTO client (nom_prenoms,telephone,email,adresse) VALUES (%s, %s, %s, %s)',
+                       (nom, telephone, email, adresse))
         conn.commit()
-        curso.close()
-        flash('Fournisseur ajouté avec succès', 'success')
-        return redirect(url_for("gestion_fournisseur"))
+        cursor.close()
+        flash('Client ajouté avec succès', 'success')
+        return redirect(url_for("vendeur_client"))  # Redirection vers la même page clients après ajout
     else:
-        # Récupération des éléments de la table fournisseur
+        # Récupération des éléments de la table client
         curso = conn.cursor()
-        curso.execute("SELECT * FROM fournisseur")
+        curso.execute("SELECT * FROM client")
         resultat = curso.fetchall()
         curso.close()
-
-        # Récupérer l'ID de l'administrateur depuis la session
         utilisateur_id = session['utilisateur_id']
 
         cursor = conn.cursor()
         # Récupérer les informations de l'administrateur en utilisant son ID
-        cursor.execute('SELECT * FROM utilisateur WHERE  id_utilisateur = %s',
-                       (utilisateur_id,))
+        cursor.execute('SELECT * FROM utilisateur WHERE id_utilisateur = %s', (utilisateur_id,))
         infos_membre = cursor.fetchone()
         filename = infos_membre[8].decode('utf-8')  # Convertir bytes en str
         conn.commit()
         cursor.close()
+        return render_template("membres/gestionnaire/gestion_client.html", resultat=resultat,filename=filename)
 
-        return render_template("/membres/Gestionnaire/gestion_fournisseur.html", resultat=resultat,filename=filename)
 
 @app.route('/gestionnaire/Produit/', methods=["post", "get"])
 def gestion_produit():
@@ -1010,7 +1006,7 @@ def gestion_produit():
         prix = request.form['prix']
         image = request.files['image']
         stock_min= request.form['nombre']
-        stock=0
+        stock=request.form['stock']
 
         filename = secure_filename(image.filename)
         image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
@@ -1038,57 +1034,127 @@ def gestion_produit():
         filename = infos_admin[8].decode('utf-8')
 
         return render_template("membres/Gestionnaire/gestion_produit.html", resultat=resultat,filename=filename)
-
-@app.route('/gestionnaire/achats/', methods=["POST", "GET"])
-def gestion_achat():
+@app.route('/gestionnaire/commande/', methods=["POST", "GET"])
+def gestion_commande():
     cursor = conn.cursor()
     cursor.execute("SELECT id_produit, nom_produit, categorie, prix FROM produit")
     produits = cursor.fetchall()
     cursor.close()
 
     cursor = conn.cursor()
-    cursor.execute("SELECT id_fournisseur, nom_prenoms FROM fournisseur")
-    fournisseurs = cursor.fetchall()
+    cursor.execute("SELECT id_client, nom_prenoms FROM client")
+    clients = cursor.fetchall()
     cursor.close()
-
     if request.method == 'POST':
         produit_id = request.form["produit"]
         quantite = int(request.form["nombre"])  # Convertir en entier pour la manipulation
-        fournisseur_id = request.form["fournisseur"]
+        id_client = request.form["client"]
+        prix_vente = int(request.form["prix"])
 
-        montant = 0
+        montant = quantite*prix_vente
         date_aujourdhui = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
         cursor = conn.cursor()
         # Enregistrement de l'achat dans la base de données avec la date d'aujourd'hui
         cursor.execute(
-            'INSERT INTO entree (ID_fournisseur, id_produit, Quantite, prix, date_entree, statut) VALUES (%s, %s, %s, %s, %s, %s)',
-            (fournisseur_id, produit_id, quantite, montant, date_aujourdhui, "En cours"))
+            'INSERT INTO commande (id_client, id_produit, Quantite, prix_vente,Montant, date_commande, statut) VALUES (%s, %s, %s, %s, %s, %s, %s)',
+            (id_client, produit_id, quantite, prix_vente,montant, date_aujourdhui, "En cours"))
         conn.commit()
         cursor.close()
         flash('Achat ajouté avec succès', 'success')
-        return redirect(url_for('gestion_achat'))
-
-    cursor = conn.cursor()
-    cursor.execute(
-        'UPDATE entree JOIN produit ON entree.id_produit = produit.id_produit SET entree.prix = produit.prix * entree.quantite')
-    conn.commit()
-    cursor.close()
+        return redirect(url_for('vendeur_commande'))
 
     curso = conn.cursor()
     curso.execute(
-        "select id_entree,date_entree,statut,fournisseur.nom_prenoms,produit.nom_produit from entree,fournisseur,produit where entree.id_fournisseur = fournisseur.id_fournisseur and entree.id_produit=produit.id_produit ")
-    resultat1 = curso.fetchall()
+        "select id_commande,date_commande,statut,client.nom_prenoms,produit.nom_produit from commande,client,produit where commande.id_client = client.id_client and commande.id_produit=produit.id_produit ")
+    resultat = curso.fetchall()
     curso.close()
 
     utilisateur_id = session['utilisateur_id']
+
     cursor = conn.cursor()
     # Récupérer les informations de l'administrateur en utilisant son ID
-    cursor.execute('SELECT * FROM utilisateur WHERE  id_utilisateur = %s', (utilisateur_id,))
-    infos_admin = cursor.fetchone()
-    filename = infos_admin[8].decode('utf-8')
+    cursor.execute('SELECT * FROM utilisateur WHERE id_utilisateur = %s', (utilisateur_id,))
+    infos_membre = cursor.fetchone()
+    filename = infos_membre[8].decode('utf-8')  # Convertir bytes en str
+    conn.commit()
+    cursor.close()
 
-    return render_template("membres/Gestionnaire/gestion_achat.html", produits=produits, fournisseurs=fournisseurs, resultat=resultat1,filename=filename)
+    return render_template('membres/gestionnaire/gestion_commande.html', produits=produits, clients=clients,resultat=resultat,filename=filename)
+
+@app.route('/gestionnaire/ventes/', methods=["POST", "GET"])
+def gestion_ventes():
+    with conn.cursor() as cursor:
+        cursor.execute("SELECT id_produit, nom_produit, categorie, prix FROM produit")
+        produits = cursor.fetchall()
+
+        cursor.execute("SELECT id_client, nom_prenoms FROM client")
+        clients = cursor.fetchall()
+
+    if request.method == 'POST':
+        client_id = request.form.get("client")
+        produit_id = request.form.get("produit")
+        quantite = request.form.get("nombre")
+        prix_vente = request.form.get("prix_vente")  # Récupérer le prix de vente du formulaire
+
+        # Vérifier la quantité en stock avant de procéder à la vente
+        cursor = conn.cursor()
+        cursor.execute("SELECT stock FROM produit WHERE id_produit = %s", (produit_id,))
+        quantite_en_stock = cursor.fetchone()[0]
+
+        if quantite > quantite_en_stock:
+            flash('Quantité demandée excède le stock disponible. Vente annulée.', 'danger')
+            return redirect(url_for('gestion_ventes'))
+
+        if not client_id:  # Si aucun client_id n'est fourni, créez un nouveau client
+            nom = request.form.get("nom")
+            tel = request.form.get("tel")
+            email = request.form.get("email")
+            adresse = request.form.get("adresse")
+            with conn.cursor() as cursor:
+                cursor.execute(
+                    'INSERT INTO client (nom_prenoms, telephone, email, adresse) VALUES (%s, %s, %s, %s)',
+                    (nom, tel, email, adresse))
+                conn.commit()
+                client_id = cursor.lastrowid
+
+        if produit_id and quantite and prix_vente:
+            quantite = int(quantite)  # Convertir en entier pour la manipulation
+            prix_vente = int(prix_vente)
+            montant = prix_vente * quantite
+            date_aujourdhui = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            with conn.cursor() as cursor:
+                cursor.execute(
+                    'INSERT INTO vente (id_client, id_produit, quantite, montant, prix_vente, date_vente,statut) VALUES (%s, %s, %s, %s, %s, %s,%s)',
+                    (client_id, produit_id, quantite, montant, prix_vente, date_aujourdhui, "Vendu"))
+                conn.commit()
+                cursor.execute(
+                    'UPDATE produit SET stock = stock - %s WHERE id_produit = %s',
+                    (quantite, produit_id))
+                conn.commit()
+                cursor.close()
+                flash('Vente ajoutée avec succès', 'success')
+        else:
+            flash('Informations de vente manquantes ou incorrectes', 'danger')
+
+    curso = conn.cursor()
+    curso.execute(
+        "select id_vente,date_vente,client.nom_prenoms,produit.nom_produit,statut from vente,client,produit where vente.id_client = client.id_client and vente.id_produit=produit.id_produit ")
+    resultat = curso.fetchall()
+    curso.close()
+
+    utilisateur_id = session['utilisateur_id']
+
+    cursor = conn.cursor()
+    # Récupérer les informations de l'administrateur en utilisant son ID
+    cursor.execute('SELECT * FROM utilisateur WHERE id_utilisateur = %s', (utilisateur_id,))
+    infos_membre = cursor.fetchone()
+    filename = infos_membre[8].decode('utf-8')  # Convertir bytes en str
+    conn.commit()
+    cursor.close()
+
+    return render_template("membres/gestionnaire/gestion_ventes.html", produits=produits, clients=clients, resultat=resultat,
+                           filename=filename)
 
 @app.route('/gestionnaire/stock/', methods=["POST", "GET"])
 def gestion_stock():
@@ -1139,6 +1205,41 @@ def gestion_stock():
 
     return render_template("membres/Gestionnaire/gestion_stock.html", produits=produits,resultat=resultat,resultat1=resultat1,filename=filename)
 
+@app.route('/gestionnaire/modifier_produit/<int:id>',methods=['POST','GET'])
+def gestion_modifier_produit(id):
+    utilisateur_id = session['utilisateur_id']
+    cursor = conn.cursor()
+    # Récupérer les informations de l'administrateur en utilisant son ID
+    cursor.execute('SELECT * FROM utilisateur WHERE id_utilisateur = %s', (utilisateur_id,))
+    infos_admin = cursor.fetchone()
+    filename = infos_admin[8].decode('utf-8')
+
+    curso = conn.cursor()
+    curso.execute("SELECT * from produit where id_produit=%s",(id,))
+    resultat = curso.fetchone()
+    image_actuel = resultat[7].decode('utf-8')
+    curso.close()
+    if request.method == 'POST':
+        nom = request.form['nom']
+        categorie = request.form['categorie']
+        designation = request.form['description']
+        prix = request.form['prix']
+        stock_min = request.form['nombre']
+        image= request.files['image']
+
+        filename = secure_filename(image.filename)
+        image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        image.save(image_path)
+
+        curso = conn.cursor()
+        curso.execute("UPDATE produit SET   nom_produit = %s, categorie = %s, prix = %s, stock_min = %s, designation = %s, image = %s WHERE id_produit = %s",
+            ( nom, categorie,prix,stock_min,designation,filename, id))
+        conn.commit()
+        curso.close()
+        flash('produit modifié avec succès', 'success')
+        return redirect(url_for('gestion_produit'))
+    return render_template("membres/Gestionnaire/gestion_modifier_produit.html",resultat=resultat,filename=filename,image_actuel=image_actuel)
+
 #Session Gestionnaire###############################################
 
 @app.route('/user/dashboard')
@@ -1171,7 +1272,7 @@ def Produit():
         prix = request.form['prix']
         image = request.files['image']
         stock_min= request.form['nombre']
-        stock=0
+        stock=request.form['stock']
 
         filename = secure_filename(image.filename)
         image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
