@@ -1302,3 +1302,7 @@ nav .profile-details i{
   .select2-container .select2-selection--single .select2-selection__arrow {
     height: 100px; /* Doit correspondre à la hauteur pour centrer la flèche */
   }
+
+.details li {
+            display: list-item; /* Par défaut, afficher les éléments comme des listes */
+        }
