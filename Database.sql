@@ -82,6 +82,15 @@ CREATE TABLE IF NOT EXISTS `commande` (
   `statut` varchar(255) NOT NULL,
   PRIMARY KEY (`id_commande`)
 ) ENGINE=InnoDB;
+ALTER TABLE commande
+ADD COLUMN id_vendeur INT(11);
+
+ALTER TABLE commande
+ADD CONSTRAINT fk_commmande_vendeur
+FOREIGN KEY (id_vendeur)
+REFERENCES utilisateur(id_utilisateur)
+ON DELETE CASCADE;
+
 
 DROP TABLE IF EXISTS `entree`;
 CREATE TABLE IF NOT EXISTS `entree` (
@@ -213,6 +222,13 @@ CREATE TABLE IF NOT EXISTS `vente` (
 
 ALTER TABLE `vente` ADD `prix_vente` INT NOT NULL AFTER `montant`;
 ALTER TABLE `vente` ADD `statut` VARCHAR(250) NOT NULL AFTER `date_vente`;
+ALTER TABLE vente
+ADD COLUMN id_vendeur INT(11);
+ALTER TABLE vente
+ADD CONSTRAINT fk_id_vendeur
+FOREIGN KEY (id_vendeur)
+REFERENCES utilisateur(id_utilisateur)
+ON DELETE CASCADE;
 --
 -- Contraintes pour les tables déchargées
 --

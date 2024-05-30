@@ -488,10 +488,9 @@ def userLogin():
 
 @app.route('/userlogout')
 def userLogout():
-    if 'logged_in' in session:
-        session.clear()  # Effacer toutes les informations de session
-        # flash('Vous êtes déconnecté.', 'success')
+    session.clear()  # Nettoyez la session pour déconnecter l'utilisateur
     return redirect(url_for('userLogin'))
+
 
 
 #Ssession vendeur###############################################
@@ -517,45 +516,34 @@ def profil_vendeur():
 
 @app.route('/dashboard/vendeur')
 def dashboard_vendeur():
-    if 'utilisateur_id' in session:  # Vérifie si l'administrateur est connecté
+    if 'utilisateur_id' in session and session.get('poste') == 'vendeur':  # Vérifiez que l'utilisateur est un vendeur
         utilisateur_id = session['utilisateur_id']
         cursor = conn.cursor()
-        # Récupérer les informations de l'administrateur en utilisant son ID
-        cursor.execute('SELECT * FROM utilisateur WHERE  id_utilisateur = %s', (utilisateur_id,))
-        infos_admin = cursor.fetchone()
-        filename = infos_admin[8].decode('utf-8')
 
-        cursor=conn.cursor()
-        cursor.execute('''
-            SELECT count(*) from vente''')
-        total_ventes = cursor.fetchone()
-        conn.commit()
-        cursor.close()
+        # Récupérer les informations du vendeur connecté
+        cursor.execute('SELECT * FROM utilisateur WHERE id_utilisateur = %s', (utilisateur_id,))
+        infos_membre = cursor.fetchone()
+        filename = infos_membre[8].decode('utf-8')
 
-        cursor=conn.cursor()
-        cursor.execute(''' select count(*) from commande ''')
-        total_commande = cursor.fetchone()
-        conn.commit()
-        cursor.close()
+        # Total des ventes
+        cursor.execute('SELECT count(*) FROM vente WHERE id_utilisateur = %s', (utilisateur_id,))
+        total_ventes = cursor.fetchone()[0]
 
-        cursor=conn.cursor()
-        cursor.execute(''' select count(*) from client ''')
-        total_client = cursor.fetchone()
-        conn.commit()
-        cursor.close()
+        # Total des commandes
+        cursor.execute('SELECT count(*) FROM commande WHERE id_utilisateur = %s', (utilisateur_id,))
+        total_commande = cursor.fetchone()[0]
 
-        cursor=conn.cursor()
-        cursor.execute(''' select count(*) from vente where statut="Retourné" ''')
-        retourne = cursor.fetchone()
-        conn.commit()
-        cursor.close()
+        # Total des clients
+        cursor.execute('SELECT count(*) FROM client WHERE id_utilisateur = %s', (utilisateur_id,))
+        total_client = cursor.fetchone()[0]
 
-        cursor=conn.cursor()
-        cursor.execute('''SELECT produit.image , produit.nom_produit, SUM(vente.quantite) AS total_quantite FROM vente INNER JOIN produit ON produit.id_produit = vente.id_produit GROUP BY produit.nom_produit ORDER BY total_quantite DESC LIMIT 10
-     ''')
-        meilleurs=cursor.fetchall()
-        conn.commit()
-        cursor.close()
+        # Nombre de ventes retournées
+        cursor.execute('SELECT count(*) FROM vente WHERE statut = "Retourné" AND id_utilisateur = %s', (utilisateur_id,))
+        retourne = cursor.fetchone()[0]
+
+        # Meilleurs produits
+        cursor.execute('SELECT produit.image, produit.nom_produit, SUM(vente.quantite) AS total_quantite FROM vente INNER JOIN produit ON produit.id_produit = vente.id_produit WHERE id_utilisateur = %s GROUP BY produit.nom_produit ORDER BY total_quantite DESC LIMIT 10', (utilisateur_id,))
+        meilleurs = cursor.fetchall()
 
         products = []
         for produit in meilleurs:
@@ -564,17 +552,16 @@ def dashboard_vendeur():
             total_quantite = produit[2]
             products.append({'image': image, 'nom_produit': nom_produit, 'total_quantite': total_quantite})
 
+        # Dernières ventes
+        cursor.execute('SELECT date_vente, client.nom_prenoms, statut, montant, id_vente FROM vente JOIN client ON vente.id_client = client.id_client WHERE vente.id_utilisateur = %s ORDER BY date_vente DESC', (utilisateur_id,))
+        dash = cursor.fetchall()
 
-        cursor=conn.cursor()
-        cursor.execute(''' SELECT date_vente, client.nom_prenoms,statut,montant,id_vente FROM vente JOIN client ON vente.id_client = client.id_client ORDER BY date_vente DESC;
-    ''')
-        dash=cursor.fetchall()
-        conn.commit()
+        # Fermer le curseur et la connexion après avoir terminé toutes les opérations
         cursor.close()
 
-        return render_template('membres/vendeur/dashboard_vendeur.html', total_ventes=total_ventes , total_commande=total_commande , total_client=total_client , retourne=retourne , products=products , dash = dash,filename=filename)
+        return render_template('membres/vendeur/dashboard_vendeur.html', total_ventes=total_ventes, total_commande=total_commande, total_client=total_client, retourne=retourne, products=products, dash=dash, filename=filename)
     else:
-        flash('Please login first', 'danger')
+        flash('Veuillez vous connecter d\'abord.', 'danger')
         return redirect('/userlogin')
 
 
@@ -631,76 +618,77 @@ def vendeur_client():
 
 @app.route('/vendeur/ventes/', methods=["POST", "GET"])
 def vendeur_ventes():
-    with conn.cursor() as cursor:
+    if 'utilisateur_id' in session and session.get('poste') == 'vendeur':  # Vérifiez que l'utilisateur est un vendeur
+        utilisateur_id = session['utilisateur_id']  # Utilisez 'utilisateur_id' au lieu de 'id_utilisateur'
+        print(f"ID utilisateur récupéré : {utilisateur_id}")
+        cursor = conn.cursor()
+
+        # Récupérer les informations du vendeur connecté
+        cursor.execute('SELECT * FROM utilisateur WHERE id_utilisateur = %s', (utilisateur_id,))
+        infos_membre = cursor.fetchone()
+        filename = infos_membre[8].decode('utf-8')
+
+        # Récupérer les produits et les clients
         cursor.execute("SELECT id_produit, nom_produit, categorie, prix FROM produit")
         produits = cursor.fetchall()
 
         cursor.execute("SELECT id_client, nom_prenoms FROM client")
         clients = cursor.fetchall()
 
-    if request.method == 'POST':
-        client_id = request.form.get("client")
-        produit_id = request.form.get("produit")
-        quantite = request.form.get("nombre")
-        prix_vente = request.form.get("prix_vente")  # Récupérer le prix de vente du formulaire
+        if request.method == 'POST':
+            client_id = request.form.get("client")
+            produit_id = request.form.get("produit")
+            quantite = int(request.form.get("nombre"))
+            prix_vente = int(request.form.get("prix_vente"))
 
-        # Vérifier la quantité en stock avant de procéder à la vente
-        cursor = conn.cursor()
-        cursor.execute("SELECT stock FROM produit WHERE id_produit = %s", (produit_id,))
-        quantite_en_stock = cursor.fetchone()[0]
+            cursor.execute("SELECT stock FROM produit WHERE id_produit = %s", (produit_id,))
+            quantite_en_stock = cursor.fetchone()[0]
 
-        if quantite > quantite_en_stock:
-            flash('Quantité demandée excède le stock disponible. Vente annulée.', 'danger')
-            return redirect(url_for('vendeur_ventes'))
+            if quantite > quantite_en_stock:
+                flash('Quantité demandée excède le stock disponible. Vente annulée.', 'danger')
+                return redirect(url_for('vendeur_ventes'))
 
-        if not client_id:  # Si aucun client_id n'est fourni, créez un nouveau client
-            nom = request.form.get("nom")
-            tel = request.form.get("tel")
-            email = request.form.get("email")
-            adresse = request.form.get("adresse")
-            with conn.cursor() as cursor:
+            if not client_id:
+                nom = request.form.get("nom")
+                tel = request.form.get("tel")
+                email = request.form.get("email")
+                adresse = request.form.get("adresse")
                 cursor.execute(
-                    'INSERT INTO client (nom_prenoms, telephone, email, adresse) VALUES (%s, %s, %s, %s)',
-                    (nom, tel, email, adresse))
+                    'INSERT INTO client (nom_prenoms, telephone, email, adresse, id_utilisateur) VALUES (%s, %s, %s, %s, %s)',
+                    (nom, tel, email, adresse, utilisateur_id))
                 conn.commit()
                 client_id = cursor.lastrowid
 
-        if produit_id and quantite and prix_vente:
-            quantite = int(quantite)  # Convertir en entier pour la manipulation
-            prix_vente = int(prix_vente) 
-            montant = prix_vente * quantite
-            date_aujourdhui = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            with conn.cursor() as cursor:
+            if produit_id and quantite and prix_vente:
+                montant = prix_vente * quantite
+                date_aujourdhui = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 cursor.execute(
-                    'INSERT INTO vente (id_client, id_produit, quantite, montant, prix_vente, date_vente,statut) VALUES (%s, %s, %s, %s, %s, %s,%s)',
-                    (client_id, produit_id, quantite, montant, prix_vente, date_aujourdhui,"Vendu"))
+                    'INSERT INTO vente (id_client, id_produit, quantite, montant, prix_vente, date_vente, statut, id_utilisateur) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)',
+                    (client_id, produit_id, quantite, montant, prix_vente, date_aujourdhui, "Vendu", utilisateur_id))
                 conn.commit()
                 cursor.execute(
                     'UPDATE produit SET stock = stock - %s WHERE id_produit = %s',
                     (quantite, produit_id))
                 conn.commit()
-                cursor.close()
                 flash('Vente ajoutée avec succès', 'success')
-        else:
-            flash('Informations de vente manquantes ou incorrectes', 'danger')
+            else:
+                flash('Informations de vente manquantes ou incorrectes', 'danger')
 
-    curso = conn.cursor()
-    curso.execute(
-        "select id_vente,date_vente,client.nom_prenoms,produit.nom_produit,statut from vente,client,produit where vente.id_client = client.id_client and vente.id_produit=produit.id_produit ")
-    resultat = curso.fetchall()
-    curso.close()
+        # Récupérer les ventes du vendeur connecté
+        cursor.execute(
+            "SELECT id_vente, date_vente, client.nom_prenoms, produit.nom_produit, statut FROM vente JOIN client ON vente.id_client = client.id_client JOIN produit ON vente.id_produit = produit.id_produit WHERE vente.id_utilisateur = %s ORDER BY date_vente DESC",
+            (utilisateur_id,))
+        resultat = cursor.fetchall()
 
-    utilisateur_id = session['utilisateur_id']
+        # Fermer le curseur et la connexion après avoir terminé toutes les opérations
+        cursor.close()
 
-    cursor = conn.cursor()
-    # Récupérer les informations de l'administrateur en utilisant son ID
-    cursor.execute('SELECT * FROM utilisateur WHERE id_utilisateur = %s', (utilisateur_id,))
-    infos_membre = cursor.fetchone()
-    filename = infos_membre[8].decode('utf-8')  # Convertir bytes en str
-    conn.commit()
-    cursor.close()
+        return render_template("membres/vendeur/vendeur_vente.html", produits=produits, clients=clients,
+                               resultat=resultat, filename=filename)
+    else:
+        flash('Veuillez vous connecter en tant que vendeur.', 'danger')
+        return redirect('/userlogin')
 
-    return render_template("membres/vendeur/vendeur_vente.html", produits=produits, clients=clients,resultat=resultat,filename=filename)
 
 @app.route('/vendeur/commande/', methods=["POST", "GET"])
 def vendeur_commande():
@@ -895,55 +883,45 @@ def modifier_profil_gestion():
 
     return render_template('/membres/Gestionnaire/profil_vendeur.html', membre_info=membre_info)
 
-@app.route('/dashboard/gestionnaire')
+@app.route('/dashboard/gestionnaire', methods=['GET', 'POST'])
 def dashboard_gestionnaire():
-    cursor = conn.cursor()
-    cursor.execute("SELECT id_produit, nom_produit,categorie,prix FROM produit")
-    produits = cursor.fetchall()
-    cursor.close()
-
-    if request.method == 'POST':
-        produit_id = request.form["produit"]
-        quantite = int(request.form["nombre"])  # Convertir en entier pour la manipulation
-        # Obtenir la date d'aujourd'hui
-        date_aujourdhui = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-
+    if 'utilisateur_id' in session and session.get('poste') == 'gestionnaire':  # Vérifiez que l'utilisateur est un gestionnaire
+        utilisateur_id = session['utilisateur_id']
         cursor = conn.cursor()
-
-        # Enregistrement de la vente dans la base de données avec la date d'aujourd'hui
-        cursor.execute(
-            'INSERT INTO stock (ID_Produit, Quantite, date) VALUES (%s, %s, %s)',
-            (produit_id, quantite, date_aujourdhui))
-
-        cursor.execute(
-            'UPDATE produit SET stock = stock + %s WHERE id_produit = %s',
-            (quantite, produit_id))
-        conn.commit()
+        cursor.execute("SELECT id_produit, nom_produit, categorie, prix FROM produit")
+        produits = cursor.fetchall()
         cursor.close()
 
-        flash('Stock ajouté avec succès', 'success')
-        return redirect(url_for('gestion_stock'))
+        if request.method == 'POST':
+            produit_id = request.form["produit"]
+            quantite = int(request.form["nombre"])
+            date_aujourdhui = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-    curso = conn.cursor()
-    curso.execute(
-        "select produit.nom_produit,produit.categorie,quantite,date,id_stock FROM stock join produit on stock.id_produit=produit.id_produit WHERE stock.id_produit = produit.id_produit")
-    resultat = curso.fetchall()
-    curso.close()
+            cursor = conn.cursor()
+            cursor.execute('INSERT INTO stock (ID_Produit, Quantite, date, id_gestionnaire) VALUES (%s, %s, %s, %s)', (produit_id, quantite, date_aujourdhui, utilisateur_id))
+            cursor.execute('UPDATE produit SET stock = stock + %s WHERE id_produit = %s', (quantite, produit_id))
+            conn.commit()
+            cursor.close()
 
-    curso = conn.cursor()
-    curso.execute(
-        "select nom_produit,categorie,stock,stock_min FROM produit")
-    resultat1 = curso.fetchall()
-    curso.close()
+            flash('Stock ajouté avec succès', 'success')
+            return redirect(url_for('dashboard_gestionnaire'))
 
-    utilisateur_id = session['utilisateur_id']
-    cursor = conn.cursor()
-    # Récupérer les informations de l'administrateur en utilisant son ID
-    cursor.execute('SELECT * FROM utilisateur WHERE  id_utilisateur = %s', (utilisateur_id,))
-    infos_membre = cursor.fetchone()
-    filename = infos_membre[8].decode('utf-8')
+        cursor.execute("select produit.nom_produit, produit.categorie, quantite, date, id_stock FROM stock join produit on stock.id_produit = produit.id_produit WHERE stock.id_gestionnaire = %s", (utilisateur_id,))
+        resultat = cursor.fetchall()
+        cursor.close()
 
-    return render_template('membres/Gestionnaire/dashboard_gestionnaire.html', produits=produits,resultat=resultat,resultat1=resultat1,filename=filename)
+        cursor.execute("select nom_produit, categorie, stock, stock_min FROM produit")
+        resultat1 = cursor.fetchall()
+        cursor.close()
+
+        cursor.execute('SELECT * FROM utilisateur WHERE id_utilisateur = %s', (utilisateur_id,))
+        infos_membre = cursor.fetchone()
+        filename = infos_membre[8].decode('utf-8')
+
+        return render_template('membres/gestionnaire/dashboard_gestionnaire.html', produits=produits, resultat=resultat, resultat1=resultat1, filename=filename)
+    else:
+        flash('Please login first', 'danger')
+        return redirect('/userlogin')
 
 @app.route('/gestionnaire/fournisseurs/', methods=["post", "get"])
 def gestion_fournisseur():
@@ -1590,48 +1568,73 @@ def status_vente(entry_id):
         # Si la méthode de la requête n'est pas POST, retourner une erreur 405 (Méthode non autorisée)
         return jsonify({'error': 'Method Not Allowed'}), 405
 
+from flask import request, jsonify, flash
+from datetime import datetime
+
 @app.route('/submit_vente', methods=['POST'])
 def submit_vente():
-    # Récupérer les données de la commande à partir du corps de la requête
+    if 'utilisateur_id' not in session or session.get('poste') != 'vendeur':
+        flash('Veuillez vous connecter en tant que vendeur.', 'danger')
+        return jsonify({'error': 'Non autorisé'}), 403
+    
+    utilisateur_id = session['utilisateur_id']
+
+    # Récupérer les données de la vente à partir du corps de la requête
     order_data = request.get_json()
 
-    # Valider les données de la commande (vérifier les valeurs manquantes ou invalides)
+    if not order_data:
+        return jsonify({'error': 'Aucune donnée reçue'}), 400
 
-    # Traiter les données de la commande
+    # Traiter les données de la vente
     for item in order_data:
-        product_id = item['produit_id']
-        quantity = item['nombre']
-        prix_vente = item['prix_vente']
-        id_client = item['id_client']
-        montant = item['montant']
-        # Insérer l'élément de commande dans la base de données
+        product_id = item.get('produit_id')
+        quantity = item.get('nombre')
+        prix_vente = item.get('prix_vente')
+        id_client = item.get('id_client')
+        montant = item.get('montant')
+
+        if not all([product_id, quantity, prix_vente, id_client, montant]):
+            return jsonify({'error': 'Données de vente incomplètes'}), 400
 
         cursor = conn.cursor()
-        cursor.execute(
-            """INSERT INTO vente (id_client, id_produit, Quantite, prix_vente, Montant, date_vente, statut) VALUES (%s, %s, %s, %s, %s, %s, %s)""",
-            (id_client, product_id, quantity, prix_vente, montant, datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'Vendu')
-        )
-        conn.commit()
-        cursor.close()
-        flash('Vente ajoutée avec succès', 'success')
+        try:
+            # Insérer l'élément de vente dans la base de données
+            cursor.execute(
+                """INSERT INTO vente (id_client, id_produit, Quantite, prix_vente, Montant, date_vente, statut, id_utilisateur)
+                   VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
+                (id_client, product_id, quantity, prix_vente, montant, datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'Vendu', utilisateur_id)
+            )
+            conn.commit()
 
-        cursor = conn.cursor()
-        cursor.execute(
-            'UPDATE produit SET stock = stock - %s WHERE id_produit = %s',
-            (quantity, product_id))
-        conn.commit()
-        cursor.close()
-
-        # Calculer le prix total (si nécessaire)
+            # Mettre à jour le stock du produit
+            cursor.execute(
+                'UPDATE produit SET stock = stock - %s WHERE id_produit = %s',
+                (quantity, product_id)
+            )
+            conn.commit()
+            
+            flash('Vente ajoutée avec succès', 'success')
+        except Exception as e:
+            conn.rollback()
+            return jsonify({'error': str(e)}), 500
+        finally:
+            cursor.close()
 
     # Préparer la réponse
     response_data = {
+        'message': 'Ventes ajoutées avec succès'
     }
 
     return jsonify(response_data), 200
 
+
 @app.route('/submit_order', methods=['POST'])
 def submit_order():
+    if 'utilisateur_id' not in session or session.get('poste') != 'vendeur':
+        flash('Veuillez vous connecter en tant que vendeur.', 'danger')
+        return jsonify({'error': 'Non autorisé'}), 403
+    
+    utilisateur_id = session['utilisateur_id']
     # Récupérer les données de la commande à partir du corps de la requête
     order_data = request.get_json()
 
@@ -1646,8 +1649,8 @@ def submit_order():
         # Insérer l'élément de commande dans la base de données
         cursor = conn.cursor()
         cursor.execute(
-            """INSERT INTO entree (ID_fournisseur, id_produit, Quantite, prix, date_entree, statut) VALUES (%s, %s, %s, %s, %s, %s)""",
-            (fournisseur_id, product_id, quantity, unit_price,datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'En cours')  # Remplacer 1 par l'ID du fournisseur réel
+            """INSERT INTO entree (ID_fournisseur, id_produit, Quantite, prix, date_entree, statut, id_utilisateur) VALUES (%s, %s, %s, %s, %s, %s, %s)""",
+            (fournisseur_id, product_id, quantity, unit_price,datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'En cours', utilisateur_id)  # Remplacer 1 par l'ID du fournisseur réel
         )
         conn.commit()
         cursor.close()
