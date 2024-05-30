@@ -1738,10 +1738,10 @@ def submit_vente():
 
 @app.route('/submit_order', methods=['POST'])
 def submit_order():
-    if 'utilisateur_id' not in session or session.get('poste') != 'vendeur':
-        flash('Veuillez vous connecter en tant que vendeur.', 'danger')
+    if 'utilisateur_id' not in session or session.get('poste') != 'gestionnaire':
+        flash('Veuillez vous connecter en tant que gestionnaire.', 'danger')
         return jsonify({'error': 'Non autorisé'}), 403
-    
+
     utilisateur_id = session['utilisateur_id']
     # Récupérer les données de la commande à partir du corps de la requête
     order_data = request.get_json()
@@ -1771,6 +1771,7 @@ def submit_order():
     }
 
     return jsonify(response_data), 200
+
 
 @app.route('/donnee_vente/<int:ligne_id>', methods=['GET'])
 def donnee_vente(ligne_id):
@@ -2228,6 +2229,11 @@ def status_commande(entry_id):
 
 @app.route('/submit_commande', methods=['POST'])
 def submit_commande():
+    if 'utilisateur_id' not in session or session.get('poste') != 'vendeur':
+        flash('Veuillez vous connecter en tant que vendeur.', 'danger')
+        return jsonify({'error': 'Non autorisé'}), 403
+
+    utilisateur_id = session['utilisateur_id']
     # Récupérer les données de la commande à partir du corps de la requête
     order_data = request.get_json()
 
@@ -2243,8 +2249,8 @@ def submit_commande():
         # Insérer l'élément de commande dans la base de données
         cursor = conn.cursor()
         cursor.execute(
-            """INSERT INTO commande (id_client, id_produit, Quantite, prix_vente,Montant, date_commande, statut) VALUES (%s, %s, %s, %s, %s, %s, %s)""",
-            (id_client, product_id, quantity, prix_vente,montant,datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'En cours')  # Remplacer 1 par l'ID du fournisseur réel
+            """INSERT INTO commande (id_client, id_produit, Quantite, prix_vente,Montant, date_commande, statut,id_utilisateur) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
+            (id_client, product_id, quantity, prix_vente,montant,datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'En cours',utilisateur_id)  # Remplacer 1 par l'ID du fournisseur réel
         )
         conn.commit()
         cursor.close()

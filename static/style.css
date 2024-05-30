@@ -1326,3 +1326,8 @@ nav .profile-details i{
         .password-text {
             display: none;
         }
+
+        .delete-icon {
+            cursor: pointer;
+            color: red;
+        }
