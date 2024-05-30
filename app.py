@@ -618,9 +618,17 @@ def vendeur_client():
 
 @app.route('/vendeur/ventes/', methods=["POST", "GET"])
 def vendeur_ventes():
-    if 'utilisateur_id' in session and session.get('poste') == 'vendeur':  # Vérifiez que l'utilisateur est un vendeur
-        utilisateur_id = session['utilisateur_id']  # Utilisez 'utilisateur_id' au lieu de 'id_utilisateur'
-        print(f"ID utilisateur récupéré : {utilisateur_id}")
+    # Vérifiez si l'utilisateur est connecté et s'il est un vendeur ou un administrateur
+    if ('utilisateur_id' in session and session.get('poste') == 'vendeur') or ('admin_id' in session):
+        # Déterminez si l'utilisateur est un vendeur ou un administrateur
+        if 'utilisateur_id' in session:
+            utilisateur_id = session['utilisateur_id']
+            role = 'vendeur'
+        else:
+            utilisateur_id = session['admin_id']
+            role = 'admin'
+
+        print(f"ID {role} récupéré : {utilisateur_id}")
         cursor = conn.cursor()
 
         # Récupérer les informations du vendeur connecté
@@ -662,13 +670,15 @@ def vendeur_ventes():
             if produit_id and quantite and prix_vente:
                 montant = prix_vente * quantite
                 date_aujourdhui = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                cursor.execute(
-                    'INSERT INTO vente (id_client, id_produit, quantite, montant, prix_vente, date_vente, statut, id_utilisateur) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)',
-                    (client_id, produit_id, quantite, montant, prix_vente, date_aujourdhui, "Vendu", utilisateur_id))
-                conn.commit()
-                cursor.execute(
-                    'UPDATE produit SET stock = stock - %s WHERE id_produit = %s',
-                    (quantite, produit_id))
+                # Vérifiez si l'utilisateur est un admin pour utiliser l'id_admin
+                if role == 'admin':
+                    cursor.execute(
+                        'INSERT INTO vente (id_client, id_produit, quantite, montant, prix_vente, date_vente, statut, id_admin) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)',
+                        (client_id, produit_id, quantite, montant, prix_vente, date_aujourdhui, "Vendu", utilisateur_id))
+                else:
+                    cursor.execute(
+                        'INSERT INTO vente (id_client, id_produit, quantite, montant, prix_vente, date_vente, statut, id_utilisateur) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)',
+                        (client_id, produit_id, quantite, montant, prix_vente, date_aujourdhui, "Vendu", utilisateur_id))
                 conn.commit()
                 flash('Vente ajoutée avec succès', 'success')
             else:
@@ -686,7 +696,7 @@ def vendeur_ventes():
         return render_template("membres/vendeur/vendeur_vente.html", produits=produits, clients=clients,
                                resultat=resultat, filename=filename)
     else:
-        flash('Veuillez vous connecter en tant que vendeur.', 'danger')
+        flash('Veuillez vous connecter en tant que vendeur ou administrateur.', 'danger')
         return redirect('/userlogin')
 
 
@@ -1677,11 +1687,16 @@ from datetime import datetime
 
 @app.route('/submit_vente', methods=['POST'])
 def submit_vente():
-    if 'utilisateur_id' not in session or session.get('poste') != 'vendeur':
-        flash('Veuillez vous connecter en tant que vendeur.', 'danger')
+    # Vérifiez si l'utilisateur est connecté en tant que vendeur ou administrateur
+    if 'utilisateur_id' in session and session.get('poste') == 'vendeur':
+        utilisateur_id = session['utilisateur_id']
+        role = 'vendeur'
+    elif 'admin_id' in session:
+        utilisateur_id = session['admin_id']
+        role = 'admin'
+    else:
+        flash('Veuillez vous connecter en tant que vendeur ou administrateur.', 'danger')
         return jsonify({'error': 'Non autorisé'}), 403
-    
-    utilisateur_id = session['utilisateur_id']
 
     # Récupérer les données de la vente à partir du corps de la requête
     order_data = request.get_json()
@@ -1703,11 +1718,18 @@ def submit_vente():
         cursor = conn.cursor()
         try:
             # Insérer l'élément de vente dans la base de données
-            cursor.execute(
-                """INSERT INTO vente (id_client, id_produit, Quantite, prix_vente, Montant, date_vente, statut, id_utilisateur)
-                   VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
-                (id_client, product_id, quantity, prix_vente, montant, datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'Vendu', utilisateur_id)
-            )
+            if role == 'admin':
+                cursor.execute(
+                    """INSERT INTO vente (id_client, id_produit, Quantite, prix_vente, Montant, date_vente, statut, id_admin)
+                       VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
+                    (id_client, product_id, quantity, prix_vente, montant, datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'Vendu', utilisateur_id)
+                )
+            else:
+                cursor.execute(
+                    """INSERT INTO vente (id_client, id_produit, Quantite, prix_vente, Montant, date_vente, statut, id_utilisateur)
+                       VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
+                    (id_client, product_id, quantity, prix_vente, montant, datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'Vendu', utilisateur_id)
+                )
             conn.commit()
 
             # Mettre à jour le stock du produit
