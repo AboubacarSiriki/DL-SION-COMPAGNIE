@@ -363,13 +363,14 @@ def ajouter_membre():
             flash('Les mots de passe ne correspondent pas.', 'danger')
             return redirect(url_for('ajouter_membre'))
 
+        mot_pass_clair = mot_pass
         mot_pass = bcrypt.generate_password_hash(mot_pass).decode('utf-8')
 
         filename = secure_filename(photo.filename)
         photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
-        cursor.execute("INSERT INTO utilisateur (nom, prenom,poste,telephone, email, login, mot_pass,image) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
-                       (nom, prenom, poste,telephone,email,login, mot_pass, filename))
+        cursor.execute("INSERT INTO utilisateur (nom, prenom,poste,telephone, email, login, mot_pass,image,mot_pass_clair) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                       (nom, prenom, poste,telephone,email,login, mot_pass, filename,mot_pass_clair))
         conn.commit()
 
         cursor.execute("SELECT * FROM utilisateur WHERE email = %s", (email,))
@@ -442,6 +443,7 @@ def modifier_membre(id_utilisateur):
             flash('Les mots de passe ne correspondent pas.', 'danger')
             return redirect(url_for('modifier_membre', id_utilisateur=id_utilisateur))
 
+        mot_pass_clair = mot_pass
         mot_pass = bcrypt.generate_password_hash(mot_pass).decode('utf-8')
 
         if photo and photo.filename != '':
@@ -451,8 +453,8 @@ def modifier_membre(id_utilisateur):
             filename = image_actuelle
 
         cursor = conn.cursor()
-        cursor.execute("UPDATE utilisateur SET nom = %s, prenom = %s, poste = %s, telephone = %s, email = %s, login = %s, mot_pass = %s, image = %s WHERE id_utilisateur = %s",
-                       (nom, prenom, poste, telephone, email, login, mot_pass, filename, id_utilisateur))
+        cursor.execute("UPDATE utilisateur SET nom = %s, prenom = %s, poste = %s, telephone = %s, email = %s, login = %s, mot_pass = %s, image = %s, mot_pass_clair = %s WHERE id_utilisateur = %s",
+                       (nom, prenom, poste, telephone, email, login, mot_pass, filename,mot_pass_clair, id_utilisateur))
         conn.commit()
         cursor.close()
         flash('Informations du membre mises à jour avec succès.', 'success')
@@ -542,7 +544,7 @@ def dashboard_vendeur():
         retourne = cursor.fetchone()[0]
 
         # Meilleurs produits
-        cursor.execute('SELECT produit.image, produit.nom_produit, SUM(vente.quantite) AS total_quantite FROM vente INNER JOIN produit ON produit.id_produit = vente.id_produit WHERE id_utilisateur = %s GROUP BY produit.nom_produit ORDER BY total_quantite DESC LIMIT 10', (utilisateur_id,))
+        cursor.execute('SELECT produit.image, produit.nom_produit, SUM(vente.quantite) AS total_quantite FROM vente INNER JOIN produit ON produit.id_produit = vente.id_produit WHERE vente.id_utilisateur = %s GROUP BY produit.nom_produit ORDER BY total_quantite DESC LIMIT 10', (utilisateur_id,))
         meilleurs = cursor.fetchall()
 
         products = []
@@ -553,7 +555,7 @@ def dashboard_vendeur():
             products.append({'image': image, 'nom_produit': nom_produit, 'total_quantite': total_quantite})
 
         # Dernières ventes
-        cursor.execute('SELECT date_vente, client.nom_prenoms, statut, montant, id_vente FROM vente JOIN client ON vente.id_client = client.id_client WHERE vente.id_utilisateur = %s ORDER BY date_vente DESC', (utilisateur_id,))
+        cursor.execute('SELECT date_vente, client.nom_prenoms, vente.statut, montant, id_vente FROM vente JOIN client ON vente.id_client = client.id_client WHERE vente.id_utilisateur = %s ORDER BY date_vente DESC', (utilisateur_id,))
         dash = cursor.fetchall()
 
         # Fermer le curseur et la connexion après avoir terminé toutes les opérations
@@ -676,7 +678,7 @@ def vendeur_ventes():
 
         # Récupérer les ventes du vendeur connecté
         cursor.execute(
-            "SELECT id_vente, date_vente, client.nom_prenoms, produit.nom_produit, statut FROM vente JOIN client ON vente.id_client = client.id_client JOIN produit ON vente.id_produit = produit.id_produit WHERE vente.id_utilisateur = %s ORDER BY date_vente DESC",
+            "SELECT id_vente, date_vente, client.nom_prenoms, produit.nom_produit, vente.statut FROM vente JOIN client ON vente.id_client = client.id_client JOIN produit ON vente.id_produit = produit.id_produit WHERE vente.id_utilisateur = %s ORDER BY date_vente DESC",
             (utilisateur_id,))
         resultat = cursor.fetchall()
 
@@ -905,15 +907,17 @@ def dashboard_gestionnaire():
 
             flash('Stock ajouté avec succès', 'success')
             return redirect(url_for('dashboard_gestionnaire'))
-
-        cursor.execute("select produit.nom_produit, produit.categorie, quantite, date, id_stock FROM stock join produit on stock.id_produit = produit.id_produit WHERE stock.id_gestionnaire = %s", (utilisateur_id,))
+        cursor = conn.cursor()
+        cursor.execute("select produit.nom_produit, produit.categorie, quantite, date, id_stock FROM stock join produit on stock.id_produit = produit.id_produit WHERE stock.id_utilisateur = %s", (utilisateur_id,))
         resultat = cursor.fetchall()
         cursor.close()
 
+        cursor = conn.cursor()
         cursor.execute("select nom_produit, categorie, stock, stock_min FROM produit")
         resultat1 = cursor.fetchall()
         cursor.close()
 
+        cursor = conn.cursor()
         cursor.execute('SELECT * FROM utilisateur WHERE id_utilisateur = %s', (utilisateur_id,))
         infos_membre = cursor.fetchone()
         filename = infos_membre[8].decode('utf-8')
