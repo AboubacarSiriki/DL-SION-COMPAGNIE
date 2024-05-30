@@ -1,43 +1,43 @@
-{% extends "base.html"%}
+{% extends "membres/gestionnaire/base_gestion.html"%}
 {% block centre%}
 <div class="home-content">
         <div class="overview-boxes">
           <div class="box">
             <div class="right-side">
-              <div class="box-topic">Total Clients</div>
+              <div class="box-topic">Clients</div>
               <div class="number">60</div>
               <div class="indicator">
                 <i class="bx bx-up-arrow-alt"></i>
-                <span class="text">Aujourd'hui</span>
+                <span class="text">Cumulés</span>
               </div>
             </div>
             <i class="bx bx-cart-alt cart"></i>
           </div>
           <div class="box">
             <div class="right-side">
-              <div class="box-topic">Total vente</div>
-              <div class="number">50</div>
+              <div class="box-topic">Fidelité</div>
+              <div class="number">10%</div>
               <div class="indicator">
                 <i class="bx bx-up-arrow-alt"></i>
-                <span class="text">Aujourd'hui</span>
+                <span class="text">Cumulés</span>
               </div>
             </div>
             <i class="bx bxs-cart-add cart two"></i>
           </div>
           <div class="box">
             <div class="right-side">
-              <div class="box-topic">Cout total</div>
+              <div class="box-topic">Critique</div>
               <div class="number">11</div>
               <div class="indicator">
                 <i class="bx bx-down-arrow-alt down"></i>
-                <span class="text">Hier</span>
+                <span class="text">Cumulés</span>
               </div>
             </div>
             <i class="bx bxs-cart-download cart four"></i>
           </div>
         </div>
 
-        <div class="overview-boxes">
+       <div class="overview-boxes">
   <div class="box2" onclick="filterClients('Client')">
     <div class="right-side">
       <div class="box-topic">Client</div>
@@ -127,17 +127,6 @@
               </li>
             {% endfor %}
           </ul>
-          <ul class="details">
-            <li class="topic">Action</li>
-            {% for row in resultat %}
-              <div class="icon" data-status="{{ row[5] }}">
-                <a href="{{ url_for('modifier_client', id=row[0]) }}">
-                  <i class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i>
-                </a>
-                <i class='bx bx-trash delete-icon' data-id="{{ row[0] }}" style='font-size: 30px; color: red;'></i>
-              </div>
-            {% endfor %}
-          </ul>
         </div>
         <div class="button">
           <a href="#">Voir plus</a>
@@ -145,13 +134,13 @@
       </div>
     </div>
 
-      </div>
+</div>
 
       <div id="popup" class="popup">
         <div class="popup-content">
             <span class="close" id="close-popup">&times;</span>
           <h2>Ajout d'un nouveau Client</h2><br>
-          <form method="post" action="{{url_for('clients')}}">
+          <form method="post" action="{{url_for('gestion_client')}}">
 
             <label for="nom">Nom et prénoms</label>
                   <input type="text" id="nom" name="nom" required>
@@ -165,17 +154,6 @@
                   <label for="adresse">Adresse</label>
                   <input type="text" id="adresse" name="adresse" required>
 
-                  <label for="statut">Choisissez un statut pour ce client</label>
-                      <select id="statut" name="statut" required>
-                        <option value="" disabled selected>Sélectionnez un statut</option>
-                        <option >Client</option>
-                        <option >Niche</option>
-                        <option >Prospect</option>
-                        <option >VIP</option>
-                        <option >Ambassadeur</option>
-                        <!-- Ajoutez d'autres options selon vos besoins -->
-                      </select><br>
-
                   <button type="submit">Ajouter</button>
             </form>
         </div>
@@ -185,7 +163,7 @@
         <div class="popup-content">
             <span class="close" id="close-popup1">&times;</span>
           <h2>Modification Client</h2><br>
-          <form method="post" action="{{url_for('clients')}}">
+          <form method="post" action="{{url_for('gestion_client')}}">
 
             <label for="nommodif">Nom et prénoms</label>
                   <input type="text" id="nommodif" name="nom" required>
@@ -202,7 +180,7 @@
                   <label for="adresse">Adresse</label>
                   <input type="text" id="adressemodif" name="adresse" required>
 
-                  <div><button class="btn12"><a href="{{url_for('ventes')}}">Retour</a></button>
+                  <div><button class="btn12"><a href="{{url_for('gestion_client')}}">Retour</a></button>
                 <button id="btn11">Valider</button>
             </div>
             </form>
@@ -211,7 +189,7 @@
 
 <div class="popup0" id="confirmationPopup">
         <div class="confirmation-container">
-            <h2>Êtes-vous sûr de vouloir supprimer ce client  ?</h2>
+            <h2>Êtes-vous sûr de vouloir supprimer ce client ?</h2>
             <form id="deleteForm" method="POST">
                 <button type="submit" class="btn-confirm">Confirmer</button>
                 <button type="button" class="btn-cancel" onclick="closePopup()">Annuler</button>
@@ -228,7 +206,7 @@
             deleteIcons.forEach(icon => {
                 icon.addEventListener('click', function() {
                     const id = this.getAttribute('data-id');
-                    deleteForm.action = `/admin/supprimer_client/${id}`;
+                    deleteForm.action = `/supprimer_client/${id}`;
                     popup.style.display = 'flex';
                 });
             });
@@ -238,23 +216,6 @@
             document.getElementById('confirmationPopup').style.display = 'none';
         }
     </script>
-
-<script>
-    // Fonction pour afficher ou masquer la liste déroulante
-function toggleDropdown(link, color) {
-    var select = link.nextElementSibling.querySelector('.select');
-    select.classList.toggle('active');
-    link.style.color = getColor(color); // Mettre à jour la couleur du texte
-
-}
-
-// Fonction pour masquer la liste déroulante et soumettre le formulaire
-function hideDropdownAndSubmit(form, color) {
-    var select = form.querySelector('.select');
-    select.classList.remove('active'); // Masquer la liste déroulante
-    form.submit(); // Soumettre le formulaire
-}
-</script>
 
 <script>
   function filterClients(status) {

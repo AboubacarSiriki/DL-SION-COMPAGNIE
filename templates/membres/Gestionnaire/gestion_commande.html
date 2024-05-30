@@ -4,22 +4,22 @@
         <div class="overview-boxes">
           <div class="box">
             <div class="right-side">
-              <div class="box-topic">Commande</div>
+              <div class="box-topic">Commandés</div>
               <div class="number">60</div>
               <div class="indicator">
                 <i class="bx bx-up-arrow-alt"></i>
-                <span class="text">Cumulées</span>
+                <span class="text">Aujourd'hui</span>
               </div>
             </div>
             <i class="bx bx-cart-alt cart"></i>
           </div>
           <div class="box">
             <div class="right-side">
-              <div class="box-topic">Reçus</div>
+              <div class="box-topic">Commandes</div>
               <div class="number">50</div>
               <div class="indicator">
                 <i class="bx bx-up-arrow-alt"></i>
-                <span class="text">Aujourd'hui</span>
+                <span class="text">Total</span>
               </div>
             </div>
             <i class="bx bxs-cart-add cart two"></i>
@@ -30,7 +30,7 @@
               <div class="number">11</div>
               <div class="indicator">
                 <i class="bx bx-down-arrow-alt down"></i>
-                <span class="text">Cumulés</span>
+                <span class="text">Hier</span>
               </div>
             </div>
             <i class="bx bxs-cart-download cart four"></i>
@@ -39,8 +39,8 @@
 
         <div class="sales-boxes">
           <div class="recent-sales box">
-            <div class="title">
-                <p>Liste des commandes</p>
+           <div class="title">
+                <p>Liste des commandes clients</p>
                 {% with messages = get_flashed_messages() %}
                   {% if messages %}
                     {% for message in messages %}
@@ -48,46 +48,46 @@
                     {% endfor %}
                   {% endif %}
                 {% endwith %}
-                <button id="open-popup">Passer une commande</button>
             </div>
-
             <div class="sales-details">
               <ul class="details">
-                <li class="topic">Date</li>
-                {% for row in resultat %}
+                <li class="topic">Date de la commande</li>
+               {% for row in resultat %}
                   <li><a href="#">{{ row[1] }}</a></li>
                   {% endfor %}
               </ul>
+
               <ul class="details">
                 <li class="topic">Statut</li>
                 {% for row in resultat %}
                 <li>
                     <a href="#" onclick="toggleDropdown(this, '{{ row[2] }}')">{{ row[2] }}</a>
-                    <form action="/status_achat/{{ row[0] }}" method="POST" class="select-wrapper">
+                    <form action="/status_commande/{{ row[0] }}" method="POST" class="select-wrapper">
                         <select class="select" name="status" onchange="hideDropdownAndSubmit(this.form, '{{ row[2] }}')">
                             <option disabled selected>Choisissez un statut</option>
                             <option value="En cours">En cours</option>
-                            <option value="Livré">Livré</option>
+                            <option value="Vendu">Vendu</option>
                             <option value="Annuler">Annuler</option>
                         </select>
                     </form>
                 </li>
                 {% endfor %}
             </ul>
+
                 <ul class="details">
-                <li class="topic">Produit</li>
-                {% for row in resultat %}
-                  <li><a href="#">{{ row[4] }}</a></li>
-                  {% endfor %}
+                    <li class="topic">Produit</li>
+                    {% for row in resultat %}
+                      <li><a href="#">{{ row[4] }}</a></li>
+                    {% endfor %}
               </ul>
               <ul class="details">
                 <li class="topic">details</li>
                   {% for row in resultat %}
-                    <li><button class="gauche voir-btn" data-id="{{ row[0] }}"><a href="#"><i class='bx bx-show eyes-icon' style='font-size: 22px; color:white;'></i></a></button></li>
+                    <li><button class="gauche voir-btn1" data-id="{{ row[0] }}"><a href="#"><i class='bx bx-show eyes-icon' style='font-size: 22px; color:white;'></i></a></button></li>
                   {% endfor %}
               </ul>
               <ul class="details">
-                <li class="topic">Fournisseur</li>
+                <li class="topic">Nom clients</li>
                 {% for row in resultat %}
                   <li><a href="#">{{ row[3] }}</a></li>
                   {% endfor %}
@@ -173,25 +173,23 @@
                  <p style="color:orange;">.....................................................................................................................................................................</p><br>
                  <p style="color:orange; text-align:center;">Facturation de la TVA non autorisée</p>
             </form>
-            <div><button class="btn12"><a href="{{url_for('gestion_achat')}}" style="text-decoration:none;
+            <div><button class="btn12"><a href="{{url_for('gestion_commande')}}" style="text-decoration:none;
     color: #fff;">Retour</a></button>
                 <button id="btn111" onclick="printSection('popup121')">Imprimer</button>
             </div><br>
         </div>
 </div>
 
-
       <div id="popup" class="popup">
         <div class="popup-content">
             <span class="close" id="close-popup">&times;</span>
           <h2>Ajout d'une nouvelle commande</h2><br>
-
-            <form id="stock-form" method="post" action="{{url_for('gestion_achat')}}">
-                 <label for="fournisseur">Fournisseur</label>
-                  <select id="fournisseur" name="fournisseur" required>
-                      <option value="" disabled selected>Sélectionnez un fournisseur</option>
-                      {% for fournisseur in fournisseurs %}
-                        <option value="{{fournisseur[0] }}">{{ fournisseur[1] }}</option>
+            <form method="post" action="{{url_for('gestion_commande')}}" id="stock-form">
+                 <label for="client">Client</label>
+                  <select id="client" name="client" required>
+                      <option value="" disabled selected>Sélectionnez le client</option>
+                      {% for client in clients %}
+                        <option value="{{client[0] }}">{{ client[1] }}</option>
                       {% endfor %}
                       <!-- Ajoutez d'autres options selon vos besoins -->
                   </select>
@@ -204,34 +202,32 @@
                       {% endfor %}
                       <!-- Ajoutez d'autres options selon vos besoins -->
                   </select>
-
                   <label for="nombre">Nombre</label>
                   <input type="number" id="nombre" name="nombre" required>
+
+                  <label for="prix">Prix de vente</label>
+                  <input type="number" id="prix" name="prix" required>
 
                   <button type="#" id="add-button">Ajouter</button>
 
               <table id="stock-table">
-                <thead>
-                    <tr>
-                        <td>Id</td>
-                        <td>Nom</td>
-                        <td>Quantité</td>
-                        <td>Prix</td>
-                        <td>Désignation</td>
-                    </tr>
-                </thead>
-                <tbody>
+                        <thead>
+                            <tr>
+                                <td>Id</td>
+                                <td>Designation</td>
+                                <td>Quantité</td>
+                                <td>Prix</td>
+                                <td>Montant</td>
+                            </tr>
+                        </thead>
+                        <tbody>
 
-                </tbody>
+                        </tbody>
             </table>
-
-            <div><button class="btn12"><a href="{{url_for('gestion_achat')}}" style="text-decoration:none;
-    color: #fff;">Retour</a></button>
-                <button type="submit">Valider</button>
-            </div>
+              <button type="submit">Valider la commande</button>
             </form>
+
         </div>
-      </div>
     </div>
 
 <div id="popup12" class="popup12">
@@ -305,7 +301,7 @@
                  <p style="color:orange;">.....................................................................................................................................................................</p><br>
                  <p style="color:orange; text-align:center;">Facturation de la TVA non autorisée</p>
             </form>
-            <div><button class="btn12"><a href="{{url_for('gestion_achat')}}" style="text-decoration:none;
+            <div><button class="btn12"><a href="{{url_for('gestion_commande')}}" style="text-decoration:none;
     color: #fff;">Retour</a></button>
                 <button id="btn11" onclick="printSection('popup12')">Imprimer</button>
             </div><br>
@@ -314,7 +310,7 @@
 
 <div class="popup0" id="confirmationPopup">
         <div class="confirmation-container">
-            <h2>Êtes-vous sûr de vouloir supprimer cet achat ?</h2>
+            <h2>Êtes-vous sûr de vouloir supprimer cette commande ?</h2>
             <form id="deleteForm" method="POST">
                 <button type="submit" class="btn-confirm">Confirmer</button>
                 <button type="button" class="btn-cancel" onclick="closePopup()">Annuler</button>
@@ -335,25 +331,26 @@
 
     var produitId = document.querySelector('#produit').value;
     var nombre = document.querySelector('#nombre').value;
-    var fournisseurId = document.querySelector('#fournisseur').value; // Assuming supplier ID selector
+    var prix_vente = document.querySelector('#prix').value;
+    var id_client = document.querySelector('#client').value; // Assuming supplier ID selector
 
     fetch('/get_product_info/' + produitId)
       .then(response => response.json())
       .then(data => {
         var newRow = document.createElement('tr');
         newRow.innerHTML = '<td>' + produitId + '</td>' +
-                            '<td>' + data.nom + '</td>' +
-                            '<td>' + nombre + '</td>' +
-                            '<td>' + data.prix + '</td>' +
                             '<td>' + data.designation + '</td>' +
-                            '<td>' + fournisseurId + '</td>'; // Add supplier ID cell
+                            '<td>' + nombre + '</td>' +
+                            '<td>' + prix_vente + '</td>' +
+                            '<td>' + (nombre * prix_vente) + '</td>' +
+                            '<td>' + id_client + '</td>'; // Add supplier ID cell
 
         var newRow1 = document.createElement('tr');
         newRow1.innerHTML = '<td>' + rowNum + '</td>' +
                             '<td>' + data.designation + '</td>' +
                             '<td>' + nombre + '</td>' +
-                            '<td>' + data.prix + '</td>' +
-                            '<td>' + (nombre * data.prix) + '</td>'; // Add supplier ID cell
+                            '<td>' + prix_vente + '</td>' +
+                            '<td>' + (nombre * prix_vente) + '</td>'; // Add supplier ID cell
 
         stockTable.appendChild(newRow);
         stockTable1.appendChild(newRow1);
@@ -396,15 +393,16 @@ function updateTotal() {
       var rowData = {
         produit_id: parseInt(rows[i].cells[0].textContent),
         nombre: parseInt(rows[i].cells[2].textContent),
-        prix_unitaire: parseFloat(rows[i].cells[3].textContent),
-        fournisseur_id: parseInt(rows[i].cells[5].textContent), // Supplier ID from cell 5
+        prix_vente: parseFloat(rows[i].cells[3].textContent),
+        montant: parseFloat(rows[i].cells[4].textContent),
+        id_client: parseInt(rows[i].cells[5].textContent), // Supplier ID from cell 5
       };
 
       orderData.push(rowData);
     }
 
     // Send the order data to the server using fetch
-    fetch('/submit_order', {
+    fetch('/submit_commande', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -480,10 +478,23 @@ function getColor(status) {
 }
 </script>
 
+<script>
+function printSection(sectionId) {
+    var printContents = document.getElementById(sectionId).innerHTML;
+    var originalContents = document.body.innerHTML;
+
+    document.body.innerHTML = printContents;
+
+    window.print();
+
+    document.body.innerHTML = originalContents;
+}
+</script>
+
 
 <script>
     // Sélectionnez tous les boutons "Voir"
-    var voirButtons = document.querySelectorAll(".voir-btn");
+    var voirButtons = document.querySelectorAll(".voir-btn1");
 
     // Ajoutez un écouteur d'événements à chaque bouton "Voir"
     voirButtons.forEach(function(button) {
@@ -493,7 +504,7 @@ function getColor(status) {
             var rowNum = 1;
 
             // Faire une requête AJAX pour récupérer les données associées à cette ligne
-            fetch('/get_row_data/' + rowId)
+            fetch('/donnee_commande/' + rowId)
                 .then(response => response.json())
                 .then(data => {
                     // Afficher les données dans le popup
@@ -503,12 +514,12 @@ function getColor(status) {
 
                     data.forEach(function(item) {
                         var tr = document.createElement('tr');
-                        tr.innerHTML = '<td>' + rowNum + '</td>' +
-                                       '<td>' + item.date_entree + '</td>'
+                        tr.innerHTML = '<td>' + item.date_commande + '</td>' +
                                        '<td>' + item.designation + '</td>' +
                                        '<td>' + item.quantite + '</td>' +
-                                       '<td>' + item.prix_produit + '</td>' +
-                                       '<td>' + item.prix_entree + '</td>' +;
+                                       '<td>' + item.prix_vente + '</td>' +
+                                       '<td>' + item.montant + '</td>';
+
                         tbody.appendChild(tr);
 
                         rowNum++;
@@ -533,7 +544,7 @@ function getColor(status) {
             deleteIcons.forEach(icon => {
                 icon.addEventListener('click', function() {
                     const id = this.getAttribute('data-id');
-                    deleteForm.action = `/supprimer_achat/${id}`;
+                    deleteForm.action = `/supprimer_commande/${id}`;
                     popup.style.display = 'flex';
                 });
             });
@@ -543,6 +554,5 @@ function getColor(status) {
             document.getElementById('confirmationPopup').style.display = 'none';
         }
 </script>
-
 
 {% endblock %}

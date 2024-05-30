@@ -1,4 +1,4 @@
-{% extends "base.html"%}
+{% extends "membres/gestionnaire/base_gestion.html"%}
 {% block centre%}
 <div class="home-content">
   <div class="overview-boxes">
@@ -48,7 +48,6 @@
             {% endfor %}
           {% endif %}
         {% endwith %}
-        <button id="open-popup">Ajouter une nouvelle vente</button>
       </div>
       <div class="sales-details">
         <ul class="details">
@@ -64,7 +63,7 @@
           <li>
             <a href="#" onclick="toggleDropdown(this, '{{ row[4] }}')">{{ row[4] }}</a>
             <form action="/status_vente/{{ row[0] }}" method="POST" class="select-wrapper">
-              <select class="select" name="status" onchange="hideDropdownAndSubmit(this.form, '{{ row[4] }}')">
+              <select class="select" name="status" onchange="hideDropdownAndSubmit(this.form, '{{ row[2] }}')">
                 <option disabled selected>Choisissez un statut</option>
                 <option value="Vendu">Vendu</option>
                 <option value="Retourné">Retourné</option>
@@ -92,15 +91,6 @@
           <li class="topic">Nom clients</li>
           {% for row in resultat %}
           <li><a href="#">{{ row[2] }}</a></li>
-          {% endfor %}
-        </ul>
-        <ul class="details">
-          <li class="topic">Action</li>
-          {% for row in resultat %}
-          <div class="icon">
-            <a href="{{url_for('modifier_vente', id_vente=row[0])}}"><i class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i></a>
-            <i class='bx bx-trash delete-icon' data-id="{{ row[0] }}" style='font-size: 30px; color: red;'></i>
-          </div>
           {% endfor %}
         </ul>
       </div>
@@ -183,7 +173,7 @@
                  <p style="color:orange;">.....................................................................................................................................................................</p><br>
                  <p style="color:orange; text-align:center;">Facturation de la TVA non autorisée</p>
             </form>
-            <div><button class="btn12"><a href="{{url_for('ventes')}}" style="text-decoration:none;
+            <div><button class="btn12"><a href="{{url_for('gestion_ventes')}}" style="text-decoration:none;
     color: #fff;">Retour</a></button>
                 <button id="btn111" onclick="printSection('popup121')">Imprimer</button>
             </div><br>
@@ -197,7 +187,7 @@
     <div><button id="btn1">Client existant</button>
       <button id="btn2">Nouveau client</button>
     </div><br>
-    <form class="form1" id="form1 stock-form" method="post" action="{{url_for('ventes')}}" >
+    <form class="form1" id="form1 stock-form" method="post" action="{{url_for('gestion_ventes')}}" >
 
       <label for="client">Client</label>
         <select id="client" name="client" required style="width:60%;">
@@ -246,7 +236,7 @@
       <button type="submit" id="submit-button">Valider la vente</button>
     </form>
 
-    <form class="form2" id="form2" method="post" action="{{url_for('vente_clients')}}">
+    <form class="form2" id="form2" method="post" action="{{url_for('gestion_ventes')}}">
         <div id="response-message"></div>
         {% with messages = get_flashed_messages() %}
           {% if messages %}
@@ -343,7 +333,7 @@
                  <p style="color:orange;">.....................................................................................................................................................................</p><br>
                  <p style="color:orange; text-align:center;">Facturation de la TVA non autorisée</p>
             </form>
-            <div><button class="btn12"><a href="{{url_for('ventes')}}" style="text-decoration:none;
+            <div><button class="btn12"><a href="{{url_for('gestion_ventes')}}" style="text-decoration:none;
     color: #fff;">Retour</a></button>
                 <button id="btn11" onclick="printSection('popup12')">Imprimer</button>
             </div><br>
@@ -574,7 +564,7 @@ function getColor(status) {
             deleteIcons.forEach(icon => {
                 icon.addEventListener('click', function() {
                     const id = this.getAttribute('data-id');
-                    deleteForm.action = `/admin/supprimer_vente/${id}`;
+                    deleteForm.action = `/supprimer_vente/${id}`;
                     popup.style.display = 'flex';
                 });
             });

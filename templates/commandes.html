@@ -554,7 +554,7 @@ function printSection(sectionId) {
             deleteIcons.forEach(icon => {
                 icon.addEventListener('click', function() {
                     const id = this.getAttribute('data-id');
-                    deleteForm.action = `/supprimer_commande/${id}`;
+                    deleteForm.action = `/admin/supprimer_commande/${id}`;
                     popup.style.display = 'flex';
                 });
             });
