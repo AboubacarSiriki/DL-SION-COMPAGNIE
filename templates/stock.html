@@ -188,87 +188,77 @@
         </div>
 </div>
 
-</div>
 
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var addButton = document.querySelector('#add-button');
-            var stockTable = document.querySelector('#stock-table tbody')
-            var submitButton = document.querySelector('button[type="submit"]'); // Get the submit button;
+    document.addEventListener('DOMContentLoaded', function() {
+        var addButton = document.querySelector('#add-button');
+        var stockTable = document.querySelector('#stock-table tbody');
+        var submitButton = document.querySelector('button[type="submit"]');
 
-            addButton.addEventListener('click', function(event) {
-                event.preventDefault();
+        addButton.addEventListener('click', function(event) {
+            event.preventDefault();
 
-                var produitId = document.querySelector('#produit').value;
-                var nombre = document.querySelector('#nombre').value;
+            var produitId = document.querySelector('#produit').value;
+            var nombre = document.querySelector('#nombre').value;
 
-                fetch('/get_product_info/' + produitId)
-                    .then(response => response.json())
-                    .then(data => {
-                        var newRow = document.createElement('tr');
-                        newRow.innerHTML = '<td>' + produitId + '</td>' +
-                                            '<td>' + data.nom + '</td>' +
-                                            '<td>' + nombre + '</td>' +
-                                            '<td>' + data.prix + '</td>' +
-                                            '<td>' + data.designation + '</td>';
+            fetch('/get_product_info/' + produitId)
+                .then(response => response.json())
+                .then(data => {
+                    var newRow = document.createElement('tr');
+                    newRow.innerHTML = '<td>' + produitId + '</td>' +
+                                        '<td>' + data.nom + '</td>' +
+                                        '<td>' + nombre + '</td>' +
+                                        '<td>' + data.prix + '</td>' +
+                                        '<td>' + data.designation + '</td>' +
+                                        '<td><span class="delete-icon">&times;</span></td>';
 
-                        stockTable.appendChild(newRow);
-                    })
-                    .catch(error => {
-                        console.error('Erreur lors de la récupération des informations du produit :', error);
+                    stockTable.appendChild(newRow);
+
+                    // Add event listener to the delete icon
+                    newRow.querySelector('.delete-icon').addEventListener('click', function() {
+                        stockTable.removeChild(newRow);
                     });
+                })
+                .catch(error => {
+                    console.error('Erreur lors de la récupération des informations du produit :', error);
+                });
+        });
+
+        submitButton.addEventListener('click', function(event) {
+            event.preventDefault();
+
+            var rows = stockTable.querySelectorAll('tr');
+            var orderData = [];
+
+            rows.forEach(row => {
+                var rowData = {
+                    produit_id: parseInt(row.cells[0].textContent),
+                    nombre: parseInt(row.cells[2].textContent),
+                };
+                orderData.push(rowData);
             });
 
-
-             submitButton.addEventListener('click', function(event) {
-    event.preventDefault(); // Prevent default form submission
-
-    // Get all rows from the stock table
-    var rows = stockTable.querySelectorAll('tr');
-
-    // Prepare an array to store order data
-    var orderData = [];
-
-    // Iterate over each row and extract data
-    for (var i = 0; i < rows.length; i++) { // Skip the first header row
-      var rowData = {
-        produit_id: parseInt(rows[i].cells[0].textContent),
-        nombre: parseInt(rows[i].cells[2].textContent),
-      };
-
-      orderData.push(rowData);
-    }
-
-    // Send the order data to the server using fetch
-    fetch('/submit_stock', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(orderData) // Convert order data to JSON
-    })
-      .then(response => response.json())
-      .then(data => {
-        // Handle successful submission response
-        console.log('Stock ajouté avec succès:', data);
-
-        // Clear the stock table
-        stockTable.innerHTML = '';
-
-        // Display a success message to the user
-        alert('Stock ajouté avec succès!');
-      })
-      .catch(error => {
-        // Handle submission error
-        console.error('Erreur lors de la soumission de la commande:', error);
-
-        // Display an error message to the user
-        alert('Erreur lors de la soumission de la commande.');
-      });
-  });
-     });
-    </script>
+            fetch('/submit_stock', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(orderData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Stock ajouté avec succès:', data);
+                stockTable.innerHTML = '';
+                alert('Stock ajouté avec succès!');
+            })
+            .catch(error => {
+                console.error('Erreur lors de la soumission de la commande:', error);
+                alert('Erreur lors de la soumission de la commande.');
+            });
+        });
+    });
+</script>
 
  <script>
         document.addEventListener('DOMContentLoaded', function() {

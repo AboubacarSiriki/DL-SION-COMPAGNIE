@@ -42,10 +42,13 @@
               {% endfor %}
             </ul>
             <ul class="details">
-              <li class="topic">Mot de passe</li>
-              {% for row in utilisateurs %}
-              <li><a href="#">**************</a></li>
-              {% endfor %}
+                <li class="topic">Mot de passe</li>
+                {% for row in utilisateurs %}
+                <li>
+                    <a href="#" id="password-text-{{ row[0] }}" class="password-text">{{ row[9] }}</a>
+                    <i class='bx bx-show eyes-icon' id="toggle-password-{{ row[0] }}" style='font-size: 22px; color:blue;'></i>
+                </li>
+                {% endfor %}
             </ul>
             <ul class="details">
               <li class="topic">Téléphone</li>
@@ -63,8 +66,8 @@
               <li class="topic">Action</li>
               {% for row in utilisateurs %}
               <div class="icon">
-                <a href="{{url_for('modifier_membre', id_utilisateur=row[0])}}"><i class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i></a>
-                <i class='bx bx-trash delete-icon' style='font-size: 30px; color: red;'></i>
+                <a href="{{url_for('modifier_membre', id_utilisateur=row[0])}}"><i class='bx bx-edit edit-icon' style='font-size: 27px; color: blue;'></i></a>
+                <i class='bx bx-trash delete-icon' style='font-size: 27px; color: red;'></i>
               </div>
               {% endfor %}
             </ul>
@@ -148,6 +151,29 @@
       document.getElementById('confirmationPopup').style.display = 'none';
   }
 </script>
+
+<script>
+        document.addEventListener('DOMContentLoaded', function() {
+            {% for row in utilisateurs %}
+            (function(rowId) {
+                const passwordText = document.getElementById('password-text-' + rowId);
+                const togglePassword = document.getElementById('toggle-password-' + rowId);
+                let isPasswordVisible = false;
+
+                togglePassword.addEventListener('click', function() {
+                    if (isPasswordVisible) {
+                        passwordText.style.display = 'none';
+                        togglePassword.className = 'bx bx-show eyes-icon';
+                    } else {
+                        passwordText.style.display = 'inline';
+                        togglePassword.className = 'bx bx-hide eyes-icon';
+                    }
+                    isPasswordVisible = !isPasswordVisible;
+                });
+            })({{ row[0] }});
+            {% endfor %}
+        });
+    </script>
 
 
 {% endblock %}

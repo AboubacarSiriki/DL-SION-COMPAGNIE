@@ -418,6 +418,7 @@ nav .profile-details i{
   justify-content: space-between;
   /* margin-bottom: 10px; */
 }
+
 .sales-boxes .box .title button {
   font-size: 15px;
   font-weight: 400;
@@ -1303,6 +1304,30 @@ nav .profile-details i{
     height: 100px; /* Doit correspondre à la hauteur pour centrer la flèche */
   }
 
-.details li {
+/* Ajoutez ici vos styles CSS si nécessaire */
+        .details li {
             display: list-item; /* Par défaut, afficher les éléments comme des listes */
+        }
+        .button a {
+            margin: 5px;
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 3px;
+        }
+        .button a.disabled {
+            background-color: #d3d3d3;
+        }
+
+        .eyes-icon {
+            cursor: pointer;
+        }
+        .password-text {
+            display: none;
+        }
+
+        .delete-icon {
+            cursor: pointer;
+            color: red;
         }

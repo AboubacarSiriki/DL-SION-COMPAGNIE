@@ -60,78 +60,80 @@
         </div>
     </div>
 
-  <div class="sales-boxes">
-        <div class="recent-sales box">
-            <div class="title">
-                <p>Liste des produits</p>
-                {% with messages = get_flashed_messages() %}
-                    {% if messages %}
-                        {% for message in messages %}
-                            <p class="alert" style="color:green;">{{ message }}</p><br>
-                        {% endfor %}
-                    {% endif %}
-                {% endwith %}
-                <button id="open-popup">Ajouter un produit</button>
-            </div>
-            <div class="sales-details" id="sales-details">
-                <ul class="details">
-                    <li class="topic">Réf</li>
-                    {% for row in resultat %}
-                    <li data-category="{{ row[2] }}"><a href="#">{{ row[0] }}</a></li>
+   <div class="sales-boxes">
+    <div class="recent-sales box">
+        <div class="title">
+            <p>Liste des produits</p>
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <p class="alert" style="color:green;">{{ message }}</p><br>
                     {% endfor %}
-                </ul>
-                <ul class="details">
-                    <li class="topic">Nom</li>
-                    {% for row in resultat %}
-                    <li data-category="{{ row[2] }}"><a href="#">{{ row[1] }}</a></li>
-                    {% endfor %}
-                </ul>
-                <ul class="details">
-                    <li class="topic">Catégorie</li>
-                    {% for row in resultat %}
-                    <li data-category="{{ row[2] }}"><a href="#">{{ row[2] }}</a></li>
-                    {% endfor %}
-                </ul>
-                <ul class="details">
-                    <li class="topic">Prix</li>
-                    {% for row in resultat %}
-                    <li data-category="{{ row[2] }}"><a href="#">{{ row[3] }}</a></li>
-                    {% endfor %}
-                </ul>
-                <ul class="details">
-                    <li class="topic">Stock</li>
-                    {% for row in resultat %}
-                    <li data-category="{{ row[2] }}"><a href="#">{{ row[4] }}</a></li>
-                    {% endfor %}
-                </ul>
-                <ul class="details">
-                    <li class="topic">Stock min</li>
-                    {% for row in resultat %}
-                    <li data-category="{{ row[2] }}"><a href="#">{{ row[5] }}</a></li>
-                    {% endfor %}
-                </ul>
-                <ul class="details">
-                    <li class="topic">Désignation</li>
-                    {% for row in resultat %}
-                    <li data-category="{{ row[2] }}"><a href="#">{{ row[6] }}</a></li>
-                    {% endfor %}
-                </ul>
-                <ul class="details">
-                    <li class="topic">Action</li>
-                    {% for row in resultat %}
-                    <li data-category="{{ row[2] }}">
-                        <div class="icon">
-                            <a href="{{ url_for('gestion_modifier_produit', id=row[0]) }}"><i class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i></a>
-                        </div>
-                    </li>
-                    {% endfor %}
-                </ul>
-            </div>
-          <div class="button">
-              <a href="#">Voir plus</a>
-            </div>
+                {% endif %}
+            {% endwith %}
+            <button id="open-popup">Ajouter un produit</button>
+        </div>
+        <div class="sales-details" id="sales-details">
+            <ul class="details" id="details-ref">
+                <li class="topic">Réf</li>
+                {% for row in resultat %}
+                <li data-category="{{ row[2] }}"><a href="#">{{ row[0] }}</a></li>
+                {% endfor %}
+            </ul>
+            <ul class="details" id="details-name">
+                <li class="topic">Nom</li>
+                {% for row in resultat %}
+                <li data-category="{{ row[2] }}"><a href="#">{{ row[1] }}</a></li>
+                {% endfor %}
+            </ul>
+            <ul class="details" id="details-category">
+                <li class="topic">Catégorie</li>
+                {% for row in resultat %}
+                <li data-category="{{ row[2] }}"><a href="#">{{ row[2] }}</a></li>
+                {% endfor %}
+            </ul>
+            <ul class="details" id="details-price">
+                <li class="topic">Prix</li>
+                {% for row in resultat %}
+                <li data-category="{{ row[2] }}"><a href="#">{{ row[3] }}</a></li>
+                {% endfor %}
+            </ul>
+            <ul class="details" id="details-stock">
+                <li class="topic">Stock</li>
+                {% for row in resultat %}
+                <li data-category="{{ row[2] }}"><a href="#">{{ row[4] }}</a></li>
+                {% endfor %}
+            </ul>
+            <ul class="details" id="details-stock-min">
+                <li class="topic">Stock min</li>
+                {% for row in resultat %}
+                <li data-category="{{ row[2] }}"><a href="#">{{ row[5] }}</a></li>
+                {% endfor %}
+            </ul>
+            <ul class="details" id="details-description">
+                <li class="topic">Désignation</li>
+                {% for row in resultat %}
+                <li data-category="{{ row[2] }}"><a href="#">{{ row[6] }}</a></li>
+                {% endfor %}
+            </ul>
+            <ul class="details" id="details-action">
+                <li class="topic">Action</li>
+                {% for row in resultat %}
+                <li data-category="{{ row[2] }}">
+                    <div class="icon">
+                        <a href="{{ url_for('gestion_modifier_produit', id=row[0]) }}"><i class='bx bx-edit edit-icon' style='font-size: 23px; color: blue;'></i></a>
+                       <i class='bx bx-trash delete-icon' data-id="{{ row[0] }}" style='font-size: 23px; color: red;'></i>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="button">
+            <a href="#" id="voir-plus">Voir plus</a>
+            <a href="#" id="precedent">Précédent</a>
         </div>
     </div>
+</div>
 </div>
 
 </div>
@@ -229,5 +231,53 @@
             });
         });
     </script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const itemsPerPage = 7;
+    let currentPage = 1;
+
+    const detailsSections = [
+        document.getElementById('details-ref'),
+        document.getElementById('details-name'),
+        document.getElementById('details-category'),
+        document.getElementById('details-price'),
+        document.getElementById('details-stock'),
+        document.getElementById('details-stock-min'),
+        document.getElementById('details-description'),
+        document.getElementById('details-action')
+    ];
+
+    function showPage(page) {
+        detailsSections.forEach(section => {
+            const items = section.querySelectorAll('li:not(.topic)');
+            items.forEach((item, index) => {
+                item.style.display = (index >= (page - 1) * itemsPerPage && index < page * itemsPerPage) ? '' : 'none';
+            });
+        });
+    }
+
+    document.getElementById('voir-plus').addEventListener('click', function(e) {
+        e.preventDefault();
+        const totalItems = detailsSections[0].querySelectorAll('li:not(.topic)').length;
+        const totalPages = Math.ceil(totalItems / itemsPerPage);
+        if (currentPage < totalPages) {
+            currentPage++;
+            showPage(currentPage);
+        }
+    });
+
+    document.getElementById('precedent').addEventListener('click', function(e) {
+        e.preventDefault();
+        if (currentPage > 1) {
+            currentPage--;
+            showPage(currentPage);
+        }
+    });
+
+    // Initialiser l'affichage de la première page
+    showPage(currentPage);
+});
+</script>
 
 {% endblock %}
