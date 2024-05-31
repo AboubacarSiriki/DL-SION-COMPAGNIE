@@ -62,7 +62,7 @@
           <li class="topic">Statut</li>
           {% for row in resultat %}
           <li>
-            <a href="#" onclick="toggleDropdown(this, '{{ row[4] }}')">{{ row[4] }}</a>
+            <a href="#" >{{ row[4] }}</a>
             <form action="/status_vente/{{ row[0] }}" method="POST" class="select-wrapper">
               <select class="select" name="status" onchange="hideDropdownAndSubmit(this.form, '{{ row[2] }}')">
                 <option disabled selected>Choisissez un statut</option>
@@ -352,120 +352,124 @@
 </div>
 
 
-   <script>
-   document.addEventListener('DOMContentLoaded', function() {
-  var addButton = document.querySelector('#add-button');
-  var ventTable = document.querySelector('#ventes-table tbody');
-  var stockTable1 = document.querySelector('#stock-table1 tbody');
-  var submitButton = document.querySelector('button[type="submit"]'); // Get the submit button
-  var rowNum = 1;
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var addButton = document.querySelector('#add-button');
+        var ventTable = document.querySelector('#ventes-table tbody');
+        var stockTable1 = document.querySelector('#stock-table1 tbody');
+        var submitButton = document.querySelector('button[type="submit"]');
+        var rowNum = 1;
 
-  addButton.addEventListener('click', function(event) {
-    event.preventDefault();
+        addButton.addEventListener('click', function(event) {
+            event.preventDefault();
 
-    var produitId = document.querySelector('#produit').value;
-    var nombre = document.querySelector('#nombre').value;
-    var id_client = document.querySelector('#client').value; // Assuming supplier ID selector
-    var prixVente = document.querySelector('#prix_vente').value;
-    var montantTTC = parseInt(nombre, 10) * parseFloat(prixVente);
+            var produitId = document.querySelector('#produit').value;
+            var nombre = document.querySelector('#nombre').value;
+            var id_client = document.querySelector('#client').value;
+            var prixVente = document.querySelector('#prix_vente').value;
+            var montantTTC = parseInt(nombre, 10) * parseFloat(prixVente);
 
-    fetch('/get_product_info/' + produitId)
-      .then(response => response.json())
-      .then(data => {
-        var newRow = document.createElement('tr');
-        newRow.innerHTML = '<td>' + produitId + '</td>' +
-                            '<td>' + data.designation + '</td>' +
-                            '<td>' + nombre + '</td>' +
-                            '<td>' + prixVente + '</td>' +
-                            '<td>' + montantTTC + '</td>' +
-                            '<td>' + id_client + '</td>'; // Add supplier ID cell
+            fetch('/get_product_info/' + produitId)
+                .then(response => response.json())
+                .then(data => {
+                    var newRow = document.createElement('tr');
+                    newRow.innerHTML = '<td>' + produitId + '</td>' +
+                                        '<td>' + data.designation + '</td>' +
+                                        '<td>' + nombre + '</td>' +
+                                        '<td>' + prixVente + '</td>' +
+                                        '<td>' + montantTTC + '</td>' +
+                                        '<td>' + id_client + '</td>' +
+                                        '<td><span class="delete-icon">&times;</span></td>';
 
-        var newRow1 = document.createElement('tr');
-        newRow1.innerHTML = '<td>' + rowNum + '</td>' +
-                            '<td>' + data.designation + '</td>' +
-                            '<td>' + nombre + '</td>' +
-                            '<td>' + prixVente + '</td>' +
-                            '<td>' + montantTTC + '</td>';
+                    var newRow1 = document.createElement('tr');
+                    newRow1.innerHTML = '<td>' + rowNum + '</td>' +
+                                        '<td>' + data.designation + '</td>' +
+                                        '<td>' + nombre + '</td>' +
+                                        '<td>' + prixVente + '</td>' +
+                                        '<td>' + montantTTC + '</td>';
 
-        ventTable.appendChild(newRow);
-        stockTable1.appendChild(newRow1);
+                    ventTable.appendChild(newRow);
+                    stockTable1.appendChild(newRow1);
 
-        rowNum++;
+                    // Add event listener to the delete icon
+                    newRow.querySelector('.delete-icon').addEventListener('click', function() {
+                        ventTable.removeChild(newRow);
+                        stockTable1.removeChild(newRow1);
+                        updateTotal();
+                    });
+                })
+                .catch(error => {
+                    console.error('Erreur lors de la récupération des informations du produit :', error);
+                });
+        });
 
-        updateTotal();
-      })
-      .catch(error => {
-        console.error('Erreur lors de la récupération des informations du produit :', error);
-      });
-  });
+        // Fonction pour mettre à jour le total
+        function updateTotal() {
+            var total = 0;
+            var rows = stockTable1.querySelectorAll('tr');
 
-  // Fonction pour mettre à jour le total
-function updateTotal() {
-    var total = 0;
-    var rows = stockTable1.querySelectorAll('tr');
+            // Calculer le total à partir des lignes du tableau 1
+            rows.forEach(row => {
+                var cellValue = row.querySelectorAll('td')[4].textContent;
+                total += parseInt(cellValue);
+            });
 
-    // Calculer le total à partir des lignes du tableau 1
-    for (var i = 0; i < rows.length; i++) {
-        var cellValue = rows[i].querySelectorAll('td')[4].textContent;
-        total += parseInt(cellValue);
-    }
+            // Mettre à jour le contenu de la balise div avec la classe "total"
+            document.querySelector('.total').textContent = total;
+        }
 
-    // Mettre à jour le contenu de la balise div avec la classe "total"
-    document.querySelector('.total').textContent = total;
-}
+        submitButton.addEventListener('click', function(event) {
+            event.preventDefault();
 
-  submitButton.addEventListener('click', function(event) {
-    event.preventDefault(); // Prevent default form submission
+            var rows = ventTable.querySelectorAll('tr');
+            var orderData = [];
 
-    // Get all rows from the stock table
-    var rows = ventTable.querySelectorAll('tr');
+            rows.forEach(row => {
+                var rowData = {
+                    produit_id: parseInt(row.cells[0].textContent),
+                    nombre: parseInt(row.cells[2].textContent),
+                    prix_vente: parseFloat(row.cells[3].textContent),
+                    montant: parseFloat(row.cells[4].textContent),
+                    id_client: parseInt(row.cells[5].textContent),
+                };
 
-    // Prepare an array to store order data
-    var orderData = [];
+                orderData.push(rowData);
+            });
 
-    // Iterate over each row and extract data
-    for (var i = 0; i < rows.length; i++) { // Skip the first header row
-      var rowData = {
-        produit_id: parseInt(rows[i].cells[0].textContent),
-        nombre: parseInt(rows[i].cells[2].textContent),
-        prix_vente: parseFloat(rows[i].cells[3].textContent),
-        montant: parseFloat(rows[i].cells[4].textContent),
-        id_client: parseInt(rows[i].cells[5].textContent), // Supplier ID from cell 5
-      };
+            fetch('/submit_vente', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(orderData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Commande soumise avec succès:', data);
 
-      orderData.push(rowData);
-    }
+                 var total = 0;
+            var rows = stockTable1.querySelectorAll('tr');
 
-    // Send the order data to the server using fetch
-    fetch('/submit_vente', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(orderData) // Convert order data to JSON
-    })
-      .then(response => response.json())
-      .then(data => {
-        // Handle successful submission response
-        console.log('Commande soumise avec succès:', data);
+            // Calculer le total à partir des lignes du tableau 1
+            rows.forEach(row => {
+                var cellValue = row.querySelectorAll('td')[4].textContent;
+                total += parseInt(cellValue);
+            });
 
-        // Clear the vente table
-        ventTable.innerHTML = '';
+            // Mettre à jour le contenu de la balise div avec la classe "total"
+            document.querySelector('.total').textContent = total;
 
-        // Display a success message to the user
-        alert('Vente soumise avec succès!');
-      })
-      .catch(error => {
-        // Handle submission error
-        console.error('Erreur lors de la soumission de la vente:', error);
+                ventTable.innerHTML = '';
+                alert('Vente soumise avec succès!');
+            })
+            .catch(error => {
+                console.error('Erreur lors de la soumission de la vente:', error);
+                alert('Erreur lors de la soumission de la vente.');
+            });
 
-        // Display an error message to the user
-        alert('Erreur lors de la soumission de la vente.');
-      });
-
-      document.querySelector(".popup12").style.display = "block";
-  });
-});
+            document.querySelector(".popup12").style.display = "block";
+        });
+    });
 </script>
 
 <script>
