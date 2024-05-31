@@ -1699,7 +1699,7 @@ def submit_vente():
         utilisateur_id = session['admin_id']
         role = 'admin'
     else:
-        flash('Veuillez vous connecter en tant que vendeur ou administrateur.', 'danger')
+        flash('Veuillez vous connecter en tant que vendeur ou administrateur .', 'danger')
         return jsonify({'error': 'Non autorisé'}), 403
 
     # Récupérer les données de la vente à partir du corps de la requête
