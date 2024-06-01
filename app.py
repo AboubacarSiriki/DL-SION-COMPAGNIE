@@ -385,19 +385,29 @@ def ajouter_membre():
 
 @app.route('/admin/equipe/')
 def equipe():
+    # Vérifiez si l'utilisateur est connecté en tant qu'administrateur
+    if 'admin_id' not in session:
+        flash('Veuillez vous connecter en tant qu\'administrateur.', 'danger')
+        return redirect(url_for('userLogin'))
+
+    admin_id = session['admin_id']
+
+    # Récupérer les informations des utilisateurs
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM utilisateur")
     utilisateurs = cursor.fetchall()
     cursor.close()
 
-    admin_id = session['admin_id']
-    cursor = conn.cursor()
     # Récupérer les informations de l'administrateur en utilisant son ID
+    cursor = conn.cursor()
     cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
     infos_admin = cursor.fetchone()
+    cursor.close()
+
     filename = infos_admin[7].decode('utf-8')
 
-    return render_template('membres/equipe.html', utilisateurs=utilisateurs,filename=filename)
+    return render_template('membres/equipe.html', utilisateurs=utilisateurs, filename=filename)
+
 
 @app.route('/modifier_membre/<int:id_utilisateur>', methods=['POST', 'GET'])
 def modifier_membre(id_utilisateur):
@@ -704,51 +714,70 @@ def vendeur_ventes():
 
 @app.route('/vendeur/commande/', methods=["POST", "GET"])
 def vendeur_commande():
+    # Vérifiez si l'utilisateur est connecté en tant que vendeur
+    if 'utilisateur_id' not in session or session.get('poste') != 'vendeur':
+        flash('Veuillez vous connecter en tant que vendeur.', 'danger')
+        return redirect(url_for('userLogin'))
+
+    utilisateur_id = session['utilisateur_id']
+
+    # Récupérer les produits disponibles
     cursor = conn.cursor()
     cursor.execute("SELECT id_produit, nom_produit, categorie, prix FROM produit")
     produits = cursor.fetchall()
     cursor.close()
 
+    # Récupérer les clients disponibles
     cursor = conn.cursor()
     cursor.execute("SELECT id_client, nom_prenoms FROM client")
     clients = cursor.fetchall()
     cursor.close()
+
     if request.method == 'POST':
         produit_id = request.form["produit"]
         quantite = int(request.form["nombre"])  # Convertir en entier pour la manipulation
         id_client = request.form["client"]
         prix_vente = int(request.form["prix"])
 
-        montant = quantite*prix_vente
+        montant = quantite * prix_vente
         date_aujourdhui = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
         cursor = conn.cursor()
-        # Enregistrement de l'achat dans la base de données avec la date d'aujourd'hui
-        cursor.execute(
-            'INSERT INTO commande (id_client, id_produit, Quantite, prix_vente,Montant, date_commande, statut) VALUES (%s, %s, %s, %s, %s, %s, %s)',
-            (id_client, produit_id, quantite, prix_vente,montant, date_aujourdhui, "En cours"))
-        conn.commit()
-        cursor.close()
-        flash('Achat ajouté avec succès', 'success')
+        try:
+            # Enregistrement de l'achat dans la base de données avec la date d'aujourd'hui
+            cursor.execute(
+                'INSERT INTO commande (id_client, id_produit, Quantite, prix_vente, Montant, date_commande, statut, id_utilisateur) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)',
+                (id_client, produit_id, quantite, prix_vente, montant, date_aujourdhui, "En cours", utilisateur_id)
+            )
+            conn.commit()
+            flash('Achat ajouté avec succès', 'success')
+        except Exception as e:
+            conn.rollback()
+            flash(f'Erreur lors de l\'ajout de l\'achat : {str(e)}', 'danger')
+        finally:
+            cursor.close()
         return redirect(url_for('vendeur_commande'))
 
-    curso = conn.cursor()
-    curso.execute(
-        "select id_commande,date_commande,commande.statut,client.nom_prenoms,produit.nom_produit from commande,client,produit where commande.id_client = client.id_client and commande.id_produit=produit.id_produit ")
-    resultat = curso.fetchall()
-    curso.close()
-
-    utilisateur_id = session['utilisateur_id']
-
+    # Récupérer les commandes de ce vendeur
     cursor = conn.cursor()
-    # Récupérer les informations de l'administrateur en utilisant son ID
+    cursor.execute(
+        "SELECT id_commande, date_commande, commande.statut, client.nom_prenoms, produit.nom_produit "
+        "FROM commande "
+        "JOIN client ON commande.id_client = client.id_client "
+        "JOIN produit ON commande.id_produit = produit.id_produit "
+        "WHERE commande.id_utilisateur = %s", (utilisateur_id,)
+    )
+    resultat = cursor.fetchall()
+    cursor.close()
+
+    # Récupérer les informations du vendeur connecté
+    cursor = conn.cursor()
     cursor.execute('SELECT * FROM utilisateur WHERE id_utilisateur = %s', (utilisateur_id,))
     infos_membre = cursor.fetchone()
     filename = infos_membre[8].decode('utf-8')  # Convertir bytes en str
-    conn.commit()
     cursor.close()
 
-    return render_template('membres/vendeur/vendeur_commande.html', produits=produits, clients=clients,resultat=resultat,filename=filename)
+    return render_template('membres/vendeur/vendeur_commande.html', produits=produits, clients=clients, resultat=resultat, filename=filename)
 
 @app.route('/vendeur/modifier_profil', methods=['GET', 'POST'])
 def modifier_profil_membre():
