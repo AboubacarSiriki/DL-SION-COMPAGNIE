@@ -2139,6 +2139,25 @@ def submit_stock():
 
 @app.route('/admin/commandes/', methods=["POST", "GET"])
 def commandes():
+    # Vérifiez si l'utilisateur est connecté en tant qu'administrateur
+    if 'admin_id' not in session:
+        flash('Veuillez vous connecter en tant qu\'administrateur.', 'danger')
+        return redirect(url_for('userLogin'))
+
+    admin_id = session['admin_id']
+
+    cursor = conn.cursor()
+    # Récupérer les informations de l'administrateur en utilisant son ID
+    cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
+    infos_admin = cursor.fetchone()
+    cursor.close()
+
+    if infos_admin is None:
+        flash('Informations de l\'administrateur non trouvées.', 'danger')
+        return redirect(url_for('userLogin'))
+
+    filename = infos_admin[7].decode('utf-8')
+
     cursor = conn.cursor()
     cursor.execute("SELECT id_produit, nom_produit, categorie, prix FROM produit")
     produits = cursor.fetchall()
@@ -2148,39 +2167,42 @@ def commandes():
     cursor.execute("SELECT id_client, nom_prenoms FROM client")
     clients = cursor.fetchall()
     cursor.close()
+
     if request.method == 'POST':
         produit_id = request.form["produit"]
         quantite = int(request.form["nombre"])  # Convertir en entier pour la manipulation
         id_client = request.form["client"]
         prix_vente = int(request.form["prix"])
 
-        montant = quantite*prix_vente
+        montant = quantite * prix_vente
         date_aujourdhui = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
         cursor = conn.cursor()
-        # Enregistrement de l'achat dans la base de données avec la date d'aujourd'hui
-        cursor.execute(
-            'INSERT INTO commande (id_client, id_produit, Quantite, prix_vente,Montant, date_commande, statut) VALUES (%s, %s, %s, %s, %s, %s, %s)',
-            (id_client, produit_id, quantite, prix_vente,montant, date_aujourdhui, "En cours"))
-        conn.commit()
-        cursor.close()
-        flash('Achat ajouté avec succès', 'success')
+        try:
+            # Enregistrement de l'achat dans la base de données avec la date d'aujourd'hui
+            cursor.execute(
+                'INSERT INTO commande (id_client, id_produit, Quantite, prix_vente, Montant, date_commande, statut, id_admin) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)',
+                (id_client, produit_id, quantite, prix_vente, montant, date_aujourdhui, "En cours", admin_id)
+            )
+            conn.commit()
+            flash('Achat ajouté avec succès', 'success')
+        except Exception as e:
+            conn.rollback()
+            flash(f'Erreur lors de l\'ajout de l\'achat : {str(e)}', 'danger')
+        finally:
+            cursor.close()
         return redirect(url_for('commandes'))
 
-    curso = conn.cursor()
-    curso.execute(
-        "select id_commande,date_commande,commande.statut,client.nom_prenoms,produit.nom_produit from commande,client,produit where commande.id_client = client.id_client and commande.id_produit=produit.id_produit ")
-    resultat = curso.fetchall()
-    curso.close()
-
-    admin_id = session['admin_id']
     cursor = conn.cursor()
-    # Récupérer les informations de l'administrateur en utilisant son ID
-    cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
-    infos_admin = cursor.fetchone()
-    filename = infos_admin[7].decode('utf-8')
+    cursor.execute(
+        "SELECT id_commande, date_commande, commande.statut, client.nom_prenoms, produit.nom_produit FROM commande "
+        "JOIN client ON commande.id_client = client.id_client "
+        "JOIN produit ON commande.id_produit = produit.id_produit"
+    )
+    resultat = cursor.fetchall()
+    cursor.close()
 
-    return render_template('commandes.html', produits=produits, clients=clients,resultat=resultat,filename=filename)
+    return render_template('commandes.html', produits=produits, clients=clients, resultat=resultat, filename=filename)
 
 
 @app.route('/admin/modifier_commande/<int:id_commande>', methods=['GET', 'POST'])
@@ -2251,39 +2273,73 @@ def status_commande(entry_id):
 
 @app.route('/submit_commande', methods=['POST'])
 def submit_commande():
-    if 'utilisateur_id' not in session or session.get('poste') != 'vendeur':
-        flash('Veuillez vous connecter en tant que vendeur.', 'danger')
+    # Vérifiez si l'utilisateur est connecté en tant que vendeur ou administrateur
+    if 'utilisateur_id' in session:
+        utilisateur_id = session['utilisateur_id']
+        role = session.get('poste')
+    elif 'admin_id' in session:
+        utilisateur_id = session['admin_id']
+        role = 'admin'
+    else:
+        flash('Veuillez vous connecter en tant que vendeur ou administrateur.', 'danger')
         return jsonify({'error': 'Non autorisé'}), 403
 
-    utilisateur_id = session['utilisateur_id']
     # Récupérer les données de la commande à partir du corps de la requête
     order_data = request.get_json()
 
     # Valider les données de la commande (vérifier les valeurs manquantes ou invalides)
+    # Exemple de validation simple (à adapter selon vos besoins)
+    if not order_data:
+        return jsonify({'error': 'Aucune donnée de commande reçue'}), 400
 
     # Traiter les données de la commande
     for item in order_data:
-        product_id = item['produit_id']
-        quantity = item['nombre']
-        prix_vente = item['prix_vente']
-        id_client = item['id_client']
-        montant = item['montant']
+        product_id = item.get('produit_id')
+        quantity = item.get('nombre')
+        prix_vente = item.get('prix_vente')
+        id_client = item.get('id_client')
+        montant = item.get('montant')
+
+        if not all([product_id, quantity, prix_vente, id_client, montant]):
+            return jsonify({'error': 'Données de commande incomplètes'}), 400
+
         # Insérer l'élément de commande dans la base de données
         cursor = conn.cursor()
-        cursor.execute(
-            """INSERT INTO commande (id_client, id_produit, Quantite, prix_vente,Montant, date_commande, statut,id_utilisateur) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
-            (id_client, product_id, quantity, prix_vente,montant,datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'En cours',utilisateur_id)  # Remplacer 1 par l'ID du fournisseur réel
-        )
-        conn.commit()
-        cursor.close()
-        flash('commande ajoutée avec succès', 'success')
-        # Calculer le prix total (si nécessaire)
+        try:
+            # Insérer l'élément de commande dans la base de données
+            if role == 'admin':
+                cursor.execute(
+                    """INSERT INTO commande (id_client, id_produit, Quantite, prix_vente, Montant, date_commande, statut, id_admin)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
+                    (id_client, product_id, quantity, prix_vente, montant, datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'En cours', utilisateur_id)
+                )
+            else:
+                cursor.execute(
+                    """INSERT INTO commande (id_client, id_produit, Quantite, prix_vente, Montant, date_commande, statut, id_utilisateur)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
+                    (id_client, product_id, quantity, prix_vente, montant, datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'En cours', utilisateur_id)
+                )
+            conn.commit()
+            
+            # Mettre à jour le stock du produit
+            cursor.execute(
+                'UPDATE produit SET stock = stock - %s WHERE id_produit = %s',
+                (quantity, product_id)
+            )
+            conn.commit()
+            
+            flash('Commande ajoutée avec succès', 'success')
+        except Exception as e:
+            conn.rollback()
+            return jsonify({'error': str(e)}), 500
+        finally:
+            cursor.close()
 
     # Préparer la réponse
-    response_data = {
-    }
+    response_data = {'message': 'Commande traitée avec succès'}
 
     return jsonify(response_data), 200
+
 
 @app.route('/donnee_commande/<int:ligne_id>', methods=['GET'])
 def donnee_commande(ligne_id):
