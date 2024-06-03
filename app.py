@@ -1718,6 +1718,7 @@ def status_vente(entry_id):
 from flask import request, jsonify, flash
 from datetime import datetime
 
+
 @app.route('/submit_vente', methods=['POST'])
 def submit_vente():
     # Vérifiez si l'utilisateur est connecté en tant que vendeur ou administrateur
@@ -1755,13 +1756,15 @@ def submit_vente():
                 cursor.execute(
                     """INSERT INTO vente (id_client, id_produit, Quantite, prix_vente, Montant, date_vente, statut, id_admin)
                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
-                    (id_client, product_id, quantity, prix_vente, montant, datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'Vendu', utilisateur_id)
+                    (id_client, product_id, quantity, prix_vente, montant, datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                     'Vendu', utilisateur_id)
                 )
             else:
                 cursor.execute(
                     """INSERT INTO vente (id_client, id_produit, Quantite, prix_vente, Montant, date_vente, statut, id_utilisateur)
                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
-                    (id_client, product_id, quantity, prix_vente, montant, datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'Vendu', utilisateur_id)
+                    (id_client, product_id, quantity, prix_vente, montant, datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                     'Vendu', utilisateur_id)
                 )
             conn.commit()
 
@@ -1771,7 +1774,7 @@ def submit_vente():
                 (quantity, product_id)
             )
             conn.commit()
-            
+
             flash('Vente ajoutée avec succès', 'success')
         except Exception as e:
             conn.rollback()
@@ -1789,11 +1792,10 @@ def submit_vente():
 
 @app.route('/submit_order', methods=['POST'])
 def submit_order():
-    if 'utilisateur_id' not in session or session.get('poste') != 'gestionnaire':
-        flash('Veuillez vous connecter en tant que gestionnaire.', 'danger')
+    if 'admin_id' not in session:
+        flash('Veuillez vous connecter en tant que administrateur', 'danger')
         return jsonify({'error': 'Non autorisé'}), 403
 
-    utilisateur_id = session['utilisateur_id']
     # Récupérer les données de la commande à partir du corps de la requête
     order_data = request.get_json()
 
@@ -1808,8 +1810,8 @@ def submit_order():
         # Insérer l'élément de commande dans la base de données
         cursor = conn.cursor()
         cursor.execute(
-            """INSERT INTO entree (ID_fournisseur, id_produit, Quantite, prix, date_entree, statut, id_utilisateur) VALUES (%s, %s, %s, %s, %s, %s, %s)""",
-            (fournisseur_id, product_id, quantity, unit_price,datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'En cours', utilisateur_id)  # Remplacer 1 par l'ID du fournisseur réel
+            """INSERT INTO entree (ID_fournisseur, id_produit, Quantite, prix, date_entree, statut) VALUES (%s, %s, %s, %s, %s, %s)""",
+            (fournisseur_id, product_id, quantity, unit_price,datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'En cours')  # Remplacer 1 par l'ID du fournisseur réel
         )
         conn.commit()
         cursor.close()

@@ -52,13 +52,13 @@
             </div>
 
             <div class="sales-details">
-              <ul class="details">
+              <ul class="details" id="details-date">
                 <li class="topic">Date</li>
                 {% for row in resultat %}
                   <li><a href="#">{{ row[1] }}</a></li>
                   {% endfor %}
               </ul>
-              <ul class="details">
+              <ul class="details" id="details-statut">
                 <li class="topic">Statut</li>
                 {% for row in resultat %}
                 <li>
@@ -74,36 +74,39 @@
                 </li>
                 {% endfor %}
             </ul>
-                <ul class="details">
+                <ul class="details" id="details-produit">
                 <li class="topic">Produit</li>
                 {% for row in resultat %}
                   <li><a href="#">{{ row[4] }}</a></li>
                   {% endfor %}
               </ul>
-              <ul class="details">
+              <ul class="details" id="details-details">
                 <li class="topic">details</li>
                   {% for row in resultat %}
                     <li><button class="gauche voir-btn" data-id="{{ row[0] }}"><a href="#"><i class='bx bx-show eyes-icon' style='font-size: 22px; color:white;'></i></a></button></li>
                   {% endfor %}
               </ul>
-              <ul class="details">
+              <ul class="details" id="details-fournisseur">
                 <li class="topic">Fournisseur</li>
                 {% for row in resultat %}
                   <li><a href="#">{{ row[3] }}</a></li>
                   {% endfor %}
               </ul>
-              <ul class="details">
+              <ul class="details" id="details-action">
                 <li class="topic">Action</li>
                   {% for row in resultat %}
+                  <li>
                     <div class="icon">
-                      <a href="{{url_for('modifier_achat', id_entree=row[0])}}"><i class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i></a>
-                     <i class='bx bx-trash delete-icon' data-id="{{ row[0] }}" style='font-size: 30px; color: red;'></i>
+                      <a href="{{url_for('modifier_achat', id_entree=row[0])}}"><i class='bx bx-edit edit-icon' style='font-size: 23px; color: blue;'></i></a>
+                     <i class='bx bx-trash delete-icon' data-id="{{ row[0] }}" style='font-size: 23px; color: red;'></i>
                     </div>
+                  </li>
                   {% endfor %}
               </ul>
             </div>
             <div class="button">
-              <a href="#">Voir plus</a>
+              <a href="#" id="precedent">Précédent</a>
+              <a href="#" id="voir-plus">Voir plus</a>
             </div>
           </div>
         </div>
@@ -553,5 +556,50 @@ function getColor(status) {
         }
 </script>
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const articlesParPage = 7;
+    let pageActuelle = 1;
+
+    const sectionsDetails = [
+        document.getElementById('details-date'),
+        document.getElementById('details-statut'),
+        document.getElementById('details-produit'),
+        document.getElementById('details-details'),
+        document.getElementById('details-client'),
+        document.getElementById('details-action')
+    ];
+
+    function afficherPage(page) {
+        sectionsDetails.forEach(section => {
+            const articles = section.querySelectorAll('li:not(.topic)');
+            articles.forEach((article, index) => {
+                article.style.display = (index >= (page - 1) * articlesParPage && index < page * articlesParPage) ? '' : 'none';
+            });
+        });
+    }
+
+    document.getElementById('voir-plus').addEventListener('click', function(e) {
+        e.preventDefault();
+        const totalArticles = sectionsDetails[0].querySelectorAll('li:not(.topic)').length;
+        const totalPages = Math.ceil(totalArticles / articlesParPage);
+        if (pageActuelle < totalPages) {
+            pageActuelle++;
+            afficherPage(pageActuelle);
+        }
+    });
+
+    document.getElementById('precedent').addEventListener('click', function(e) {
+        e.preventDefault();
+        if (pageActuelle > 1) {
+            pageActuelle--;
+            afficherPage(pageActuelle);
+        }
+    });
+
+    // Initialiser l'affichage de la première page
+    afficherPage(pageActuelle);
+});
+</script>
 
 {% endblock %}

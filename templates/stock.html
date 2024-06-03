@@ -51,25 +51,25 @@
                 <button id="open-popup">Faire une mise à jour</button>
             </div>
               <div class="sales-details">
-        <ul class="details">
+        <ul class="details" id="details-produit">
           <li class="topic">Nom</li>
           {% for row in resultat1 %}
           <li><a href="#">{{ row[0] }}</a></li>
           {% endfor %}
         </ul>
-                  <ul class="details">
+                  <ul class="details" id="details-stock">
           <li class="topic">Stock</li>
           {% for row in resultat1 %}
           <li><a href="#">{{ row[2] }}</a></li>
           {% endfor %}
         </ul>
-        <ul class="details">
+        <ul class="details" id="details-categorie">
           <li class="topic">Catégorie</li>
           {% for row in resultat1 %}
           <li><a href="#">{{ row[1] }}</a></li>
           {% endfor %}
         </ul>
-        <ul class="details">
+        <ul class="details" id="details-etat">
             <li class="topic">Etat</li>
             {% for row in resultat1 %}
                 {% if row[3] > row[2] %}
@@ -84,7 +84,8 @@
         </ul>
       </div>
             <div class="button">
-              <a href="#">Voir plus</a>
+              <a href="#" id="moins">Précédent</a>
+              <a href="#" id="plus">Voir plus</a>
             </div>
           </div>
 
@@ -103,36 +104,39 @@
                 {% endwith %}
             </div>
             <div class="sales-details">
-              <ul class="details">
-                <li class="topic">Date </li>
+              <ul class="details" id="details-date">
+                <li class="topic">Date</li>
                 {% for row in resultat %}
                   <li><a href="#">{{ row[3] }}</a></li>
                   {% endfor %}
               </ul>
-              <ul class="details">
+              <ul class="details" id="details-nom">
                   <li class="topic">Produit</li>
                   {% for row in resultat %}
                   <li><a href="#">{{ row[0] }}</a></li>
                   {% endfor %}
               </ul>
-              <ul class="details">
+              <ul class="details" id="details-quantite">
                   <li class="topic">Quantité ajouté</li>
                   {% for row in resultat %}
                   <li><a href="#">{{ row[2] }}</a></li>
                   {% endfor %}
               </ul>
-                <ul class="details">
+                <ul class="details" id="details-action">
                     <li class="topic">Action</li>
                     {% for row in resultat %}
+                    <li>
                     <div class="icon">
-                        <a href="{{ url_for('modifier_stock', id_stock=row[4]) }}"><i class='bx bx-edit edit-icon' style='font-size: 30px; color: blue;'></i></a>
-                        <i class='bx bx-trash delete-icon' data-id="{{ row[4] }}" style='font-size: 30px; color: red;'></i>
+                        <a href="{{ url_for('modifier_stock', id_stock=row[4]) }}"><i class='bx bx-edit edit-icon' style='font-size: 23px; color: blue;'></i></a>
+                        <i class='bx bx-trash delete-icon' data-id="{{ row[4] }}" style='font-size: 23px; color: red;'></i>
                     </div>
+                    </li>
                     {% endfor %}
                  </ul>
             </div>
             <div class="button">
-              <a href="#">Voir plus</a>
+              <a href="#" id="precedent">Précédent</a>
+              <a href="#" id="voir-plus">Voir plus</a>
             </div>
           </div>
         </div><br>
@@ -187,8 +191,6 @@
             </form>
         </div>
 </div>
-
-
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -279,5 +281,93 @@
             document.getElementById('confirmationPopup').style.display = 'none';
         }
     </script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const articlesParPage = 7;
+    let pageActuelle = 1;
+
+    const sectionsDetails = [
+        document.getElementById('details-produit'),
+        document.getElementById('details-stock'),
+        document.getElementById('details-categorie'),
+        document.getElementById('details-etat')
+    ];
+
+    function afficherPage(page) {
+        sectionsDetails.forEach(section => {
+            const articles = section.querySelectorAll('li:not(.topic)');
+            articles.forEach((article, index) => {
+                article.style.display = (index >= (page - 1) * articlesParPage && index < page * articlesParPage) ? '' : 'none';
+            });
+        });
+    }
+
+    document.getElementById('plus').addEventListener('click', function(e) {
+        e.preventDefault();
+        const totalArticles = sectionsDetails[0].querySelectorAll('li:not(.topic)').length;
+        const totalPages = Math.ceil(totalArticles / articlesParPage);
+        if (pageActuelle < totalPages) {
+            pageActuelle++;
+            afficherPage(pageActuelle);
+        }
+    });
+
+    document.getElementById('moins').addEventListener('click', function(e) {
+        e.preventDefault();
+        if (pageActuelle > 1) {
+            pageActuelle--;
+            afficherPage(pageActuelle);
+        }
+    });
+
+    // Initialiser l'affichage de la première page
+    afficherPage(pageActuelle);
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const articlesParPage = 7;
+    let pageActuelle = 1;
+
+    const sectionsDetails = [
+        document.getElementById('details-date'),
+        document.getElementById('details-nom'),
+        document.getElementById('details-quantite'),
+        document.getElementById('details-action')
+    ];
+
+    function afficherPage(page) {
+        sectionsDetails.forEach(section => {
+            const articles = section.querySelectorAll('li:not(.topic)');
+            articles.forEach((article, index) => {
+                article.style.display = (index >= (page - 1) * articlesParPage && index < page * articlesParPage) ? '' : 'none';
+            });
+        });
+    }
+
+    document.getElementById('voir-plus').addEventListener('click', function(e) {
+        e.preventDefault();
+        const totalArticles = sectionsDetails[0].querySelectorAll('li:not(.topic)').length;
+        const totalPages = Math.ceil(totalArticles / articlesParPage);
+        if (pageActuelle < totalPages) {
+            pageActuelle++;
+            afficherPage(pageActuelle);
+        }
+    });
+
+    document.getElementById('precedent').addEventListener('click', function(e) {
+        e.preventDefault();
+        if (pageActuelle > 1) {
+            pageActuelle--;
+            afficherPage(pageActuelle);
+        }
+    });
+
+    // Initialiser l'affichage de la première page
+    afficherPage(pageActuelle);
+});
+</script>
 
 {% endblock %}
