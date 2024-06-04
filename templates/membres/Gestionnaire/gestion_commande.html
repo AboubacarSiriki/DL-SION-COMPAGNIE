@@ -50,14 +50,14 @@
                 {% endwith %}
             </div>
             <div class="sales-details">
-              <ul class="details">
+              <ul class="details" id="details-date">
                 <li class="topic">Date de la commande</li>
                {% for row in resultat %}
                   <li><a href="#">{{ row[1] }}</a></li>
                   {% endfor %}
               </ul>
 
-              <ul class="details">
+              <ul class="details" id="details-statut">
                 <li class="topic">Statut</li>
                 {% for row in resultat %}
                 <li>
@@ -74,19 +74,19 @@
                 {% endfor %}
             </ul>
 
-                <ul class="details">
+                <ul class="details" id="details-produit">
                     <li class="topic">Produit</li>
                     {% for row in resultat %}
                       <li><a href="#">{{ row[4] }}</a></li>
                     {% endfor %}
               </ul>
-              <ul class="details">
+              <ul class="details" id="details-details">
                 <li class="topic">details</li>
                   {% for row in resultat %}
                     <li><button class="gauche voir-btn1" data-id="{{ row[0] }}"><a href="#"><i class='bx bx-show eyes-icon' style='font-size: 22px; color:white;'></i></a></button></li>
                   {% endfor %}
               </ul>
-              <ul class="details">
+              <ul class="details" id="details-client">
                 <li class="topic">Nom clients</li>
                 {% for row in resultat %}
                   <li><a href="#">{{ row[3] }}</a></li>
@@ -94,7 +94,8 @@
               </ul>
             </div>
             <div class="button">
-              <a href="#">Voir plus</a>
+              <a href="#" id="precedent">Précédent</a>
+              <a href="#" id="voir-plus">Voir plus</a>
             </div>
           </div>
         </div>
@@ -554,5 +555,51 @@ function printSection(sectionId) {
             document.getElementById('confirmationPopup').style.display = 'none';
         }
 </script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const articlesParPage = 7;
+    let pageActuelle = 1;
+
+    const sectionsDetails = [
+        document.getElementById('details-date'),
+        document.getElementById('details-statut'),
+        document.getElementById('details-produit'),
+        document.getElementById('details-details'),
+        document.getElementById('details-client')
+    ];
+
+    function afficherPage(page) {
+        sectionsDetails.forEach(section => {
+            const articles = section.querySelectorAll('li:not(.topic)');
+            articles.forEach((article, index) => {
+                article.style.display = (index >= (page - 1) * articlesParPage && index < page * articlesParPage) ? '' : 'none';
+            });
+        });
+    }
+
+    document.getElementById('voir-plus').addEventListener('click', function(e) {
+        e.preventDefault();
+        const totalArticles = sectionsDetails[0].querySelectorAll('li:not(.topic)').length;
+        const totalPages = Math.ceil(totalArticles / articlesParPage);
+        if (pageActuelle < totalPages) {
+            pageActuelle++;
+            afficherPage(pageActuelle);
+        }
+    });
+
+    document.getElementById('precedent').addEventListener('click', function(e) {
+        e.preventDefault();
+        if (pageActuelle > 1) {
+            pageActuelle--;
+            afficherPage(pageActuelle);
+        }
+    });
+
+    // Initialiser l'affichage de la première page
+    afficherPage(pageActuelle);
+});
+</script>
+
 
 {% endblock %}

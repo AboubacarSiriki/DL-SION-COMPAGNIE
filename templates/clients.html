@@ -130,7 +130,7 @@
           <ul class="details" id="details-action">
             <li class="topic">Action</li>
             {% for row in resultat %}
-              <li>
+              <li data-status="{{ row[5] }}">
               <div class="icon" data-status="{{ row[5] }}">
                 <a href="{{ url_for('modifier_client', id=row[0]) }}">
                   <i class='bx bx-edit edit-icon' style='font-size: 23px; color: blue;'></i>

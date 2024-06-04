@@ -79,37 +79,37 @@
                 <button id="open-popup">Ajoute un client</button>
             </div>
         <div class="sales-details">
-          <ul class="details">
+          <ul class="details" id="details-ref">
             <li class="topic">Ref</li>
             {% for row in resultat %}
               <li data-status="{{ row[5] }}"><a href="#">{{ row[0] }}</a></li>
             {% endfor %}
           </ul>
-          <ul class="details">
+          <ul class="details" id="details-client">
             <li class="topic">Nom et prénoms</li>
             {% for row in resultat %}
               <li data-status="{{ row[5] }}"><a href="#">{{ row[1] }}</a></li>
             {% endfor %}
           </ul>
-          <ul class="details">
+          <ul class="details" id="details-telephone">
             <li class="topic">Téléphone</li>
             {% for row in resultat %}
               <li data-status="{{ row[5] }}"><a href="#">{{ row[2] }}</a></li>
             {% endfor %}
           </ul>
-          <ul class="details">
+          <ul class="details" id="details-email">
             <li class="topic">Email</li>
             {% for row in resultat %}
               <li data-status="{{ row[5] }}"><a href="#">{{ row[3] }}</a></li>
             {% endfor %}
           </ul>
-          <ul class="details">
+          <ul class="details" id="details-adresse">
             <li class="topic">Adresse</li>
             {% for row in resultat %}
               <li data-status="{{ row[5] }}"><a href="#">{{ row[4] }}</a></li>
             {% endfor %}
           </ul>
-          <ul class="details">
+          <ul class="details" id="details-statut">
             <li class="topic">Statut</li>
             {% for row in resultat %}
               <li data-status="{{ row[5] }}">
@@ -127,19 +127,22 @@
               </li>
             {% endfor %}
           </ul>
-          <ul class="details">
+          <ul class="details" id="details-action">
             <li class="topic">Action</li>
             {% for row in resultat %}
+              <li data-status="{{ row[5] }}">
               <div class="icon" data-status="{{ row[5] }}">
                 <a href="{{ url_for('vendeur_modifier_client', id=row[0]) }}">
-                  <i class='bx bx-edit edit-icon' style='font-size: 27px; color: blue;'></i>
+                  <i class='bx bx-edit edit-icon' style='font-size: 23px; color: blue;'></i>
                 </a>
               </div>
+              </li>
             {% endfor %}
           </ul>
         </div>
         <div class="button">
-          <a href="#">Voir plus</a>
+         <a href="#" id="precedent">Précédent</a>
+            <a href="#" id="voir-plus">Voir plus</a>
         </div>
       </div>
     </div>
@@ -192,9 +195,6 @@
                   <label for="tel">Téléphone</label>
                   <input type="text" id="telmodif" name="tel" required>
 
-
-                        <!-- Ajoutez d'autres options selon vos besoins -->
-                    </select>
                   <label for="email">Email</label>
                   <input type="email" id="emailmodif" name="email" required>
 
@@ -256,4 +256,52 @@
     });
   }
 </script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const itemsPerPage = 7;
+    let currentPage = 1;
+
+    const detailsSections = [
+        document.getElementById('details-ref'),
+        document.getElementById('details-client'),
+        document.getElementById('details-telephone'),
+        document.getElementById('details-email'),
+        document.getElementById('details-adresse'),
+        document.getElementById('details-statut'),
+        document.getElementById('details-action')
+    ];
+
+    function showPage(page) {
+        detailsSections.forEach(section => {
+            const items = section.querySelectorAll('li:not(.topic)');
+            items.forEach((item, index) => {
+                item.style.display = (index >= (page - 1) * itemsPerPage && index < page * itemsPerPage) ? '' : 'none';
+            });
+        });
+    }
+
+    document.getElementById('voir-plus').addEventListener('click', function(e) {
+        e.preventDefault();
+        const totalItems = detailsSections[0].querySelectorAll('li:not(.topic)').length;
+        const totalPages = Math.ceil(totalItems / itemsPerPage);
+        if (currentPage < totalPages) {
+            currentPage++;
+            showPage(currentPage);
+        }
+    });
+
+    document.getElementById('precedent').addEventListener('click', function(e) {
+        e.preventDefault();
+        if (currentPage > 1) {
+            currentPage--;
+            showPage(currentPage);
+        }
+    });
+
+    // Initialiser l'affichage de la première page
+    showPage(currentPage);
+});
+</script>
+
 {% endblock %}

@@ -104,7 +104,7 @@
 .home-section nav .sidebar-button{
   display: flex;
   align-items: center;
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 500;
 }
 nav .sidebar-button i{
@@ -203,6 +203,7 @@ nav .profile-details i{
   border-radius: 12px;
   box-shadow: 0 5px 10px rgba(0,0,0,0.1);
 }
+
 
 .overview-boxes .box1 .right-side #categoriefiltre{
   width:100%;
@@ -1331,3 +1332,72 @@ nav .profile-details i{
             cursor: pointer;
             color: red;
         }
+
+/* Styles pour l'icone de notification */
+.notification-icon {
+    position: relative;
+    cursor: pointer;
+    margin-right: 20px;
+}
+
+.notification-icon i {
+    font-size: 30px;
+}
+
+/* Styles pour l'icone de notification */
+.notification-icon {
+    position: relative;
+    cursor: pointer;
+    margin-right: 20px;
+}
+
+.notification-icon i {
+    font-size: 30px;
+}
+
+.notification-count {
+    position: absolute;
+    top: -5px;
+    right: -10px;
+    background-color: red;
+    color: white;
+    border-radius: 50%;
+    padding: 5px 10px;
+    font-size: 8px;
+}
+
+/* Styles pour le popup de notification */
+.notification-popup {
+    position: fixed;
+    top: 0;
+    right: -300px;
+    width: 300px;
+    height: 100%;
+    background-color: white;
+    box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+    transition: right 0.3s ease;
+    z-index: 1000;
+    padding: 20px;
+}
+
+.notification-popup h3 {
+    margin: 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.notification-popup ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.notification-popup ul li {
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Classe pour afficher le popup */
+.notification-popup.show {
+    right: 0;
+}
