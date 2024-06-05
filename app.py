@@ -1271,6 +1271,62 @@ def gestion_modifier_produit(id):
         return redirect(url_for('gestion_produit'))
     return render_template("membres/Gestionnaire/gestion_modifier_produit.html",resultat=resultat,filename=filename,image_actuel=image_actuel)
 
+@app.route('/gestionnnaire/modifier_stock/<int:id_stock>', methods=['GET', 'POST'])
+def gestion_modifier_stock(id_stock):
+    if 'utilisateur_id' in session and session.get('poste') == 'gestionnaire':
+        utilisateur_id = session['utilisateur_id']
+
+    cursor = conn.cursor()
+    # Récupérer les informations de l'administrateur en utilisant son ID
+    cursor.execute('SELECT * FROM utilisateur WHERE id_utilisateur = %s', (utilisateur_id,))
+    infos_admin = cursor.fetchone()
+    filename = infos_admin[8].decode('utf-8')
+
+    # Récupérer les informations actuelles du stock
+    cursor.execute("SELECT * FROM stock WHERE id_stock = %s", (id_stock,))
+    stock_actuel = cursor.fetchone()
+
+    # Récupérer les informations des produits pour la liste déroulante
+    cursor.execute("SELECT id_produit, nom_produit FROM produit")
+    produits = cursor.fetchall()
+    cursor.close()
+
+    if request.method == 'POST':
+        id_produit = request.form['produit']
+        nouvelle_quantite = int(request.form['nombre'])
+
+        # Vérifier si le produit existe dans la table produit
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(1) FROM produit WHERE id_produit = %s", (id_produit,))
+        if cursor.fetchone()[0] == 0:
+            flash('Le produit sélectionné n\'existe pas.', 'danger')
+            return redirect(url_for('gestion_modifier_stock', id_stock=id_stock))
+
+# Récupérer la quantité originale du stock pour ce produit
+        cursor.execute("SELECT quantite FROM stock WHERE id_stock = %s", (id_stock,))
+        quantite_originale = cursor.fetchone()[0]
+
+        # Calculer la différence de quantité pour ajuster le stock dans la table produit
+        difference_quantite = nouvelle_quantite - quantite_originale
+
+        # Mise à jour du stock dans la table stock
+        cursor.execute("""
+            UPDATE stock SET id_produit = %s, quantite = %s WHERE id_stock = %s
+            """, (id_produit, nouvelle_quantite, id_stock))
+
+        # Mise à jour du stock dans la table produit
+        cursor.execute("""
+            UPDATE produit SET stock = stock + %s WHERE id_produit = %s
+            """, (difference_quantite, id_produit))
+
+        conn.commit()
+        cursor.close()
+
+        flash(' stock modifié avec succès.', 'success')
+        return redirect(url_for('gestion_stock'))
+
+    return render_template('membres/gestionnaire/gestion_modifier_stock.html', filename=filename, produits=produits, stock=stock_actuel)
+
 #Session Gestionnaire###############################################
 
 @app.route('/user/dashboard')
@@ -1648,6 +1704,17 @@ def ventes():
 
     return render_template("ventes.html", produits=produits, clients=clients,resultat=resultat,filename=filename)
 
+@app.route('/get_product_infos/<int:produit_id>', methods=['GET'])
+def get_product_infos(produit_id):
+    with conn.cursor() as cursor:
+        cursor.execute("SELECT nom_produit AS designation, stock FROM produit WHERE id_produit = %s", (produit_id,))
+        product = cursor.fetchone()
+        if product:
+            return jsonify(designation=product[0], stock=product[1])
+        else:
+            return jsonify(error="Produit non trouvé"), 404
+
+
 @app.route('/admin/modifier_vente/<int:id_vente>', methods=['GET', 'POST'])
 def modifier_vente(id_vente):
         # Vérifiez si l'utilisateur est connecté en tant qu'administrateur
@@ -1749,6 +1816,7 @@ def status_vente(entry_id):
 from flask import request, jsonify, flash
 from datetime import datetime
 
+
 @app.route('/submit_vente', methods=['POST'])
 def submit_vente():
     # Vérifiez si l'utilisateur est connecté en tant que vendeur ou administrateur
@@ -1786,13 +1854,15 @@ def submit_vente():
                 cursor.execute(
                     """INSERT INTO vente (id_client, id_produit, Quantite, prix_vente, Montant, date_vente, statut, id_admin)
                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
-                    (id_client, product_id, quantity, prix_vente, montant, datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'Vendu', utilisateur_id)
+                    (id_client, product_id, quantity, prix_vente, montant, datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                     'Vendu', utilisateur_id)
                 )
             else:
                 cursor.execute(
                     """INSERT INTO vente (id_client, id_produit, Quantite, prix_vente, Montant, date_vente, statut, id_utilisateur)
                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
-                    (id_client, product_id, quantity, prix_vente, montant, datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'Vendu', utilisateur_id)
+                    (id_client, product_id, quantity, prix_vente, montant, datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                     'Vendu', utilisateur_id)
                 )
             conn.commit()
 
@@ -1802,7 +1872,7 @@ def submit_vente():
                 (quantity, product_id)
             )
             conn.commit()
-            
+
             flash('Vente ajoutée avec succès', 'success')
         except Exception as e:
             conn.rollback()
@@ -1820,11 +1890,10 @@ def submit_vente():
 
 @app.route('/submit_order', methods=['POST'])
 def submit_order():
-    if 'utilisateur_id' not in session or session.get('poste') != 'gestionnaire':
-        flash('Veuillez vous connecter en tant que gestionnaire.', 'danger')
+    if 'admin_id' not in session:
+        flash('Veuillez vous connecter en tant que administrateur', 'danger')
         return jsonify({'error': 'Non autorisé'}), 403
 
-    utilisateur_id = session['utilisateur_id']
     # Récupérer les données de la commande à partir du corps de la requête
     order_data = request.get_json()
 
@@ -1839,8 +1908,8 @@ def submit_order():
         # Insérer l'élément de commande dans la base de données
         cursor = conn.cursor()
         cursor.execute(
-            """INSERT INTO entree (ID_fournisseur, id_produit, Quantite, prix, date_entree, statut, id_utilisateur) VALUES (%s, %s, %s, %s, %s, %s, %s)""",
-            (fournisseur_id, product_id, quantity, unit_price,datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'En cours', utilisateur_id)  # Remplacer 1 par l'ID du fournisseur réel
+            """INSERT INTO entree (ID_fournisseur, id_produit, Quantite, prix, date_entree, statut) VALUES (%s, %s, %s, %s, %s, %s)""",
+            (fournisseur_id, product_id, quantity, unit_price,datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'En cours')  # Remplacer 1 par l'ID du fournisseur réel
         )
         conn.commit()
         cursor.close()

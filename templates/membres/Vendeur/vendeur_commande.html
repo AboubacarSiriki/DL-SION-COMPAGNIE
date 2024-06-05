@@ -51,14 +51,14 @@
                 <button id="open-popup">Ajouter une commande</button>
             </div>
             <div class="sales-details">
-              <ul class="details">
+              <ul class="details" id="details-date">
                 <li class="topic">Date de la commande</li>
                {% for row in resultat %}
                   <li><a href="#">{{ row[1] }}</a></li>
                   {% endfor %}
               </ul>
 
-              <ul class="details">
+              <ul class="details" id="details-statut">
                 <li class="topic">Statut</li>
                 {% for row in resultat %}
                 <li>
@@ -75,19 +75,19 @@
                 {% endfor %}
             </ul>
 
-                <ul class="details">
+                <ul class="details" id="details-produit">
                     <li class="topic">Produit</li>
                     {% for row in resultat %}
                       <li><a href="#">{{ row[4] }}</a></li>
                     {% endfor %}
               </ul>
-              <ul class="details">
+              <ul class="details" id="details-details">
                 <li class="topic">details</li>
                   {% for row in resultat %}
                     <li><button class="gauche voir-btn1" data-id="{{ row[0] }}"><a href="#"><i class='bx bx-show eyes-icon' style='font-size: 22px; color:white;'></i></a></button></li>
                   {% endfor %}
               </ul>
-              <ul class="details">
+              <ul class="details" id="details-client">
                 <li class="topic">Nom clients</li>
                 {% for row in resultat %}
                   <li><a href="#">{{ row[3] }}</a></li>
@@ -95,7 +95,8 @@
               </ul>
             </div>
             <div class="button">
-              <a href="#">Voir plus</a>
+              <a href="#" id="precedent">Précédent</a>
+              <a href="#" id="voir-plus">Voir plus</a>
             </div>
           </div>
         </div>
@@ -320,118 +321,113 @@
 </div>
 
    <script>
-   document.addEventListener('DOMContentLoaded', function() {
-  var addButton = document.querySelector('#add-button');
-  var stockTable = document.querySelector('#stock-table tbody');
-  var stockTable1 = document.querySelector('#stock-table1 tbody');
-  var submitButton = document.querySelector('button[type="submit"]'); // Get the submit button
-  var rowNum = 1;
+    document.addEventListener('DOMContentLoaded', function() {
+        var addButton = document.querySelector('#add-button');
+        var stockTable = document.querySelector('#stock-table tbody');
+        var stockTable1 = document.querySelector('#stock-table1 tbody');
+        var submitButton = document.querySelector('button[type="submit"]');
+        var rowNum = 1;
 
-  addButton.addEventListener('click', function(event) {
-    event.preventDefault();
+        addButton.addEventListener('click', function(event) {
+            event.preventDefault();
 
-    var produitId = document.querySelector('#produit').value;
-    var nombre = document.querySelector('#nombre').value;
-    var prix_vente = document.querySelector('#prix').value;
-    var id_client = document.querySelector('#client').value; // Assuming supplier ID selector
+            var produitId = document.querySelector('#produit').value;
+            var nombre = document.querySelector('#nombre').value;
+            var prix_vente = document.querySelector('#prix').value;
+            var id_client = document.querySelector('#client').value;
 
-    fetch('/get_product_info/' + produitId)
-      .then(response => response.json())
-      .then(data => {
-        var newRow = document.createElement('tr');
-        newRow.innerHTML = '<td>' + produitId + '</td>' +
-                            '<td>' + data.designation + '</td>' +
-                            '<td>' + nombre + '</td>' +
-                            '<td>' + prix_vente + '</td>' +
-                            '<td>' + (nombre * prix_vente) + '</td>' +
-                            '<td>' + id_client + '</td>'; // Add supplier ID cell
+            fetch('/get_product_info/' + produitId)
+                .then(response => response.json())
+                .then(data => {
+                    var newRow = document.createElement('tr');
+                    newRow.innerHTML = '<td>' + produitId + '</td>' +
+                                        '<td>' + data.designation + '</td>' +
+                                        '<td>' + nombre + '</td>' +
+                                        '<td>' + prix_vente + '</td>' +
+                                        '<td>' + (nombre * prix_vente) + '</td>' +
+                                        '<td>' + id_client + '</td>' +
+                                        '<td><span class="delete-icon">&times;</span></td>';
 
-        var newRow1 = document.createElement('tr');
-        newRow1.innerHTML = '<td>' + rowNum + '</td>' +
-                            '<td>' + data.designation + '</td>' +
-                            '<td>' + nombre + '</td>' +
-                            '<td>' + prix_vente + '</td>' +
-                            '<td>' + (nombre * prix_vente) + '</td>'; // Add supplier ID cell
+                    var newRow1 = document.createElement('tr');
+                    newRow1.innerHTML = '<td>' + rowNum + '</td>' +
+                                        '<td>' + data.designation + '</td>' +
+                                        '<td>' + nombre + '</td>' +
+                                        '<td>' + prix_vente + '</td>' +
+                                        '<td>' + (nombre * prix_vente) + '</td>';
 
-        stockTable.appendChild(newRow);
-        stockTable1.appendChild(newRow1);
+                    stockTable.appendChild(newRow);
+                    stockTable1.appendChild(newRow1);
 
-        rowNum++;
+                    // Add event listener to the delete icon
+                    newRow.querySelector('.delete-icon').addEventListener('click', function() {
+                        stockTable.removeChild(newRow);
+                        stockTable1.removeChild(newRow1);
+                        updateTotal();
+                    });
 
-        updateTotal();
-      })
-      .catch(error => {
-        console.error('Erreur lors de la récupération des informations du produit :', error);
-      });
-  });
+                    rowNum++;
+                    updateTotal();
+                })
+                .catch(error => {
+                    console.error('Erreur lors de la récupération des informations du produit :', error);
+                });
+        });
 
-  // Fonction pour mettre à jour le total
-function updateTotal() {
-    var total = 0;
-    var rows = stockTable1.querySelectorAll('tr');
+        // Fonction pour mettre à jour le total
+        function updateTotal() {
+            var total = 0;
+            var rows = stockTable1.querySelectorAll('tr');
 
-    // Calculer le total à partir des lignes du tableau 1
-    for (var i = 0; i < rows.length; i++) {
-        var cellValue = rows[i].querySelectorAll('td')[4].textContent;
-        total += parseInt(cellValue);
-    }
+            // Calculer le total à partir des lignes du tableau 1
+            rows.forEach(row => {
+                var cellValue = row.querySelectorAll('td')[4].textContent;
+                total += parseInt(cellValue);
+            });
 
-    // Mettre à jour le contenu de la balise div avec la classe "total"
-    document.querySelector('.total').textContent = total;
-}
+            // Mettre à jour le contenu de la balise div avec la classe "total"
+            document.querySelector('.total').textContent = total;
+        }
 
-  submitButton.addEventListener('click', function(event) {
-    event.preventDefault(); // Prevent default form submission
+        submitButton.addEventListener('click', function(event) {
+            event.preventDefault();
 
-    // Get all rows from the stock table
-    var rows = stockTable.querySelectorAll('tr');
+            var rows = stockTable.querySelectorAll('tr');
+            var orderData = [];
 
-    // Prepare an array to store order data
-    var orderData = [];
+            rows.forEach(row => {
+                var rowData = {
+                    produit_id: parseInt(row.cells[0].textContent),
+                    nombre: parseInt(row.cells[2].textContent),
+                    prix_vente: parseFloat(row.cells[3].textContent),
+                    montant: parseFloat(row.cells[4].textContent),
+                    id_client: parseInt(row.cells[5].textContent),
+                };
 
-    // Iterate over each row and extract data
-    for (var i = 0; i < rows.length; i++) { // Skip the first header row
-      var rowData = {
-        produit_id: parseInt(rows[i].cells[0].textContent),
-        nombre: parseInt(rows[i].cells[2].textContent),
-        prix_vente: parseFloat(rows[i].cells[3].textContent),
-        montant: parseFloat(rows[i].cells[4].textContent),
-        id_client: parseInt(rows[i].cells[5].textContent), // Supplier ID from cell 5
-      };
+                orderData.push(rowData);
+            });
 
-      orderData.push(rowData);
-    }
+            fetch('/submit_commande', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(orderData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Commande soumise avec succès:', data);
 
-    // Send the order data to the server using fetch
-    fetch('/submit_commande', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(orderData) // Convert order data to JSON
-    })
-      .then(response => response.json())
-      .then(data => {
-        // Handle successful submission response
-        console.log('Commande soumise avec succès:', data);
+                stockTable.innerHTML = '';
+                alert('Commande soumise avec succès!');
+            })
+            .catch(error => {
+                console.error('Erreur lors de la soumission de la commande:', error);
+                alert('Erreur lors de la soumission de la commande.');
+            });
 
-        // Clear the stock table
-        stockTable.innerHTML = '';
-
-        // Display a success message to the user
-        alert('Commande soumise avec succès!');
-      })
-      .catch(error => {
-        // Handle submission error
-        console.error('Erreur lors de la soumission de la commande:', error);
-
-        // Display an error message to the user
-        alert('Erreur lors de la soumission de la commande.');
-      });
-
-      document.querySelector(".popup12").style.display = "block";
-  });
-});
+            document.querySelector(".popup12").style.display = "block";
+        });
+    });
 </script>
 
 <script>
@@ -554,6 +550,51 @@ function printSection(sectionId) {
         function closePopup() {
             document.getElementById('confirmationPopup').style.display = 'none';
         }
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const articlesParPage = 7;
+    let pageActuelle = 1;
+
+    const sectionsDetails = [
+        document.getElementById('details-date'),
+        document.getElementById('details-statut'),
+        document.getElementById('details-produit'),
+        document.getElementById('details-details'),
+        document.getElementById('details-client')
+    ];
+
+    function afficherPage(page) {
+        sectionsDetails.forEach(section => {
+            const articles = section.querySelectorAll('li:not(.topic)');
+            articles.forEach((article, index) => {
+                article.style.display = (index >= (page - 1) * articlesParPage && index < page * articlesParPage) ? '' : 'none';
+            });
+        });
+    }
+
+    document.getElementById('voir-plus').addEventListener('click', function(e) {
+        e.preventDefault();
+        const totalArticles = sectionsDetails[0].querySelectorAll('li:not(.topic)').length;
+        const totalPages = Math.ceil(totalArticles / articlesParPage);
+        if (pageActuelle < totalPages) {
+            pageActuelle++;
+            afficherPage(pageActuelle);
+        }
+    });
+
+    document.getElementById('precedent').addEventListener('click', function(e) {
+        e.preventDefault();
+        if (pageActuelle > 1) {
+            pageActuelle--;
+            afficherPage(pageActuelle);
+        }
+    });
+
+    // Initialiser l'affichage de la première page
+    afficherPage(pageActuelle);
+});
 </script>
 
 {% endblock %}

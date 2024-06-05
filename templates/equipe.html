@@ -47,23 +47,23 @@
       <div class="sales-details">
         {% if utilisateurs %}
           {% for utilisateur in utilisateurs %}
-            <ul class="details">
+            <ul class="details" id="details-nom">
               <li class="topic">Nom</li>
               <li><a href="#">{{ utilisateur['nom'] }}</a></li>
             </ul>
-            <ul class="details">
+            <ul class="details" id="details-prenom">
               <li class="topic">Prénom</li>
               <li><a href="#">{{ utilisateur['prenom'] }}</a></li>
             </ul>
-            <ul class="details">
+            <ul class="details" id="details-poste">
               <li class="topic">Poste</li>
               <li><a href="#">{{ utilisateur['poste'] }}</a></li>
             </ul>
-            <ul class="details">
+            <ul class="details" id="details-login">
               <li class="topic">Login</li>
               <li><a href="#">{{ utilisateur['login'] }}</a></li>
             </ul>
-            <ul class="details">
+            <ul class="details" id="details-membre">
               <li class="topic">Mot de passe</li>
               <li><a href="#">**************</a></li>
             </ul>
