@@ -500,8 +500,13 @@ def userLogin():
 
 @app.route('/userlogout')
 def userLogout():
-    session.clear()  # Nettoyez la session pour déconnecter l'utilisateur
+    session.pop('user_logged_in', None)
+    session.pop('utilisateur_id', None)
+    session.pop('user_email', None)
+    session.pop('user_nom', None)
+    session.pop('user_poste', None)
     return redirect(url_for('userLogin'))
+
 
 
 
@@ -579,6 +584,10 @@ def dashboard_vendeur():
 
 @app.route('/vendeur/client/', methods=["post", "get"])
 def vendeur_client():
+    # Vérifier si l'administrateur est connecté
+    if 'utilisateur_id' not in session:
+        flash('Veuillez vous connecter d\'abord.', 'danger')
+        return redirect(url_for('userLogin'))
     if request.method == 'POST':
         nom = request.form['nom']
         telephone = request.form['tel']
@@ -1287,6 +1296,12 @@ def userDashboard():
 
 @app.route('/admin/Produit/', methods=["post", "get"])
 def Produit():
+    # Vérifiez si l'utilisateur est connecté en tant qu'administrateur
+    if 'admin_id' not in session:
+        flash('Veuillez vous connecter en tant qu\'administrateur.', 'danger')
+        return redirect(url_for('userLogin'))
+
+    admin_id = session['admin_id']
     if request.method == 'POST':
         nom = request.form['nom']
         categorie = request.form['categorie']
@@ -1325,6 +1340,10 @@ def Produit():
 
 @app.route('/admin/clients/', methods=["post", "get"])
 def clients():
+    # Vérifiez si l'utilisateur est connecté en tant qu'administrateur
+    if 'admin_id' not in session:
+        flash('Veuillez vous connecter en tant qu\'administrateur.', 'danger')
+        return redirect(url_for('userLogin'))
     if request.method == 'POST':
         nom = request.form['nom']
         telephone = request.form['tel']
@@ -1498,6 +1517,10 @@ def profil_base():
 
 @app.route('/admin/fournisseurs/', methods=["post", "get"])
 def fournisseurs():
+    # Vérifiez si l'utilisateur est connecté en tant qu'administrateur
+    if 'admin_id' not in session:
+        flash('Veuillez vous connecter en tant qu\'administrateur.', 'danger')
+        return redirect(url_for('userLogin'))
     if request.method == 'POST':
         nom = request.form['nom']
         telephone = request.form['tel']
@@ -1553,6 +1576,10 @@ def fournisseurs():
 
 @app.route('/admin/ventes/', methods=["POST", "GET"])
 def ventes():
+    # Vérifiez si l'utilisateur est connecté en tant qu'administrateur
+    if 'admin_id' not in session:
+        flash('Veuillez vous connecter en tant qu\'administrateur.', 'danger')
+        return redirect(url_for('userLogin'))
     with conn.cursor() as cursor:
         cursor.execute("SELECT id_produit, nom_produit, categorie, prix FROM produit")
         produits = cursor.fetchall()
@@ -1623,6 +1650,10 @@ def ventes():
 
 @app.route('/admin/modifier_vente/<int:id_vente>', methods=['GET', 'POST'])
 def modifier_vente(id_vente):
+        # Vérifiez si l'utilisateur est connecté en tant qu'administrateur
+    if 'admin_id' not in session:
+        flash('Veuillez vous connecter en tant qu\'administrateur.', 'danger')
+        return redirect(url_for('userLogin'))
     admin_id = session['admin_id']
     cursor = conn.cursor()
     # Récupérer les informations de l'administrateur en utilisant son ID
@@ -1896,6 +1927,10 @@ def achats():
 
 @app.route('/admin/modifier_achat/<int:id_entree>', methods=['GET', 'POST'])
 def modifier_achat(id_entree):
+    # Vérifiez si l'utilisateur est connecté en tant qu'administrateur
+    if 'admin_id' not in session:
+        flash('Veuillez vous connecter en tant qu\'administrateur.', 'danger')
+        return redirect(url_for('userLogin'))
     admin_id = session['admin_id']
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
@@ -2032,6 +2067,10 @@ def get_client(client_id):
 
 @app.route('/admin/stock/', methods=["POST", "GET"])
 def stock():
+    # Vérifiez si l'utilisateur est connecté en tant qu'administrateur
+    if 'admin_id' not in session:
+        flash('Veuillez vous connecter en tant qu\'administrateur.', 'danger')
+        return redirect(url_for('userLogin'))
     cursor = conn.cursor()
     cursor.execute("SELECT id_produit, nom_produit,categorie,prix FROM produit")
     produits = cursor.fetchall()
@@ -2081,6 +2120,10 @@ def stock():
 
 @app.route('/admin/modifier_stock/<int:id_stock>', methods=['GET', 'POST'])
 def modifier_stock(id_stock):
+        # Vérifiez si l'utilisateur est connecté en tant qu'administrateur
+    if 'admin_id' not in session:
+        flash('Veuillez vous connecter en tant qu\'administrateur.', 'danger')
+        return redirect(url_for('userLogin'))
     admin_id = session['admin_id']
     cursor = conn.cursor()
     # Récupérer les informations de l'administrateur en utilisant son ID
@@ -2236,6 +2279,10 @@ def commandes():
 
 @app.route('/admin/modifier_commande/<int:id_commande>', methods=['GET', 'POST'])
 def modifier_commande(id_commande):
+        # Vérifiez si l'utilisateur est connecté en tant qu'administrateur
+    if 'admin_id' not in session:
+        flash('Veuillez vous connecter en tant qu\'administrateur.', 'danger')
+        return redirect(url_for('userLogin'))
     # Récupérer les informations actuelles de la commande
     cursor = conn.cursor()
     cursor.execute("SELECT id_commande,client.nom_prenoms,produit.nom_produit,quantite,prix_vente,commande.id_client,commande.id_produit FROM commande join produit on commande.id_produit=produit.id_produit join client on commande.id_client=client.id_client WHERE id_commande = %s", (id_commande,))
@@ -2391,6 +2438,10 @@ def donnee_commande(ligne_id):
 
 @app.route('/admin/modifier_produit/<int:id>',methods=['POST','GET'])
 def modifier_produit(id):
+        # Vérifiez si l'utilisateur est connecté en tant qu'administrateur
+    if 'admin_id' not in session:
+        flash('Veuillez vous connecter en tant qu\'administrateur.', 'danger')
+        return redirect(url_for('userLogin'))
     admin_id = session['admin_id']
     cursor = conn.cursor()
     # Récupérer les informations de l'administrateur en utilisant son ID
@@ -2426,6 +2477,11 @@ def modifier_produit(id):
 
 @app.route('/admin/modifier_client/<int:id>', methods=['POST', 'GET'])
 def modifier_client(id):
+        # Vérifiez si l'utilisateur est connecté en tant qu'administrateur
+    if 'admin_id' not in session:
+        flash('Veuillez vous connecter en tant qu\'administrateur.', 'danger')
+        return redirect(url_for('userLogin'))
+    
     admin_id = session['admin_id']
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
@@ -2474,6 +2530,11 @@ def modifier_client(id):
 
 @app.route('/admin/modifier_fournisseur/<int:id>',methods=['POST','GET'])
 def modifier_fournisseur(id):
+        # Vérifiez si l'utilisateur est connecté en tant qu'administrateur
+    if 'admin_id' not in session:
+        flash('Veuillez vous connecter en tant qu\'administrateur.', 'danger')
+        return redirect(url_for('userLogin'))
+    
     admin_id = session['admin_id']
     cursor = conn.cursor()
     # Récupérer les informations de l'administrateur en utilisant son ID
