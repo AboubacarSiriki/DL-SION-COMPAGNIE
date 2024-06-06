@@ -140,44 +140,29 @@ window.onclick = function (event) {
 })
     </script>
 
-     <script>
-    document.addEventListener("DOMContentLoaded", function() {
-    const notificationIcon = document.getElementById("notificationIcon");
-    const notificationPopup = document.getElementById("notificationPopup");
-    const notificationCount = document.getElementById("notificationCount");
-    const notificationList = document.getElementById("notificationList");
+    <script>
+     function addNotification(notificationDetails) {
+    count++;
+    notificationCount.textContent = count;
 
-    let count = 0;
+    const notificationItem = document.createElement("li");
+    notificationItem.innerHTML = `
+        <div>Date: ${notificationDetails.date}</div>
+        <div>Produit: ${notificationDetails.produit}</div>
+        <div>Client: ${notificationDetails.client}</div>
+        <div>Quantité: ${notificationDetails.quantite}</div>
+        <button class="mark-as-read">Lu</button>
+    `;
+    notificationList.appendChild(notificationItem);
 
-    notificationIcon.addEventListener("click", function() {
-        notificationPopup.classList.toggle("show");
-    });
-
-    // Fermer le popup lorsque l'on clique en dehors
-    window.addEventListener("click", function(event) {
-        if (!notificationPopup.contains(event.target) && !notificationIcon.contains(event.target)) {
-            notificationPopup.classList.remove("show");
-        }
-    });
-
-    // Fonction pour ajouter une notification
-    function addNotification(message) {
-        count++;
+    notificationItem.querySelector(".mark-as-read").addEventListener("click", function() {
+        notificationList.removeChild(notificationItem);
+        count--;
         notificationCount.textContent = count;
-
-        const notificationItem = document.createElement("li");
-        notificationItem.textContent = message;
-        notificationList.appendChild(notificationItem);
-    }
-
-    // Exemple d'ajout de notification
-    addNotification("Nouvelle notification 1");
-    addNotification("Nouvelle notification 2");
-});
+    });
+}
 
 </script>
-
-
 
   <script src="https://cdn.jsdelivr.net/npm/emoji-picker-element"></script>
   </body>

@@ -104,48 +104,59 @@ def adminIndex():
     else:
         return render_template('admin/login.html')
 
+
 @app.route('/admin/dashboard', methods=["POST", "GET"])
 def base():
     if 'admin_id' in session:  # Vérifie si l'administrateur est connecté
         admin_id = session['admin_id']
         cursor = conn.cursor()
+
         # Récupérer les informations de l'administrateur en utilisant son ID
         cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
         infos_admin = cursor.fetchone()
         filename = infos_admin[7].decode('utf-8')
-        
-        cursor=conn.cursor()
+
+        # Récupérer le nombre total de ventes actives
+        cursor.execute('SELECT count(*) FROM vente WHERE vente.is_active = TRUE')
+        total_ventes = cursor.fetchone()[0]
+
+        # Récupérer le montant total du stock
+        cursor.execute('SELECT SUM(stock * prix) FROM produit')
+        montantstock = cursor.fetchone()[0]
+
+        # Récupérer le nombre total de commandes en cours
+        cursor.execute('SELECT count(*) FROM commande WHERE statut = %s', ('En cours',))
+        total_commande = cursor.fetchone()[0]
+
+        # Récupérer le nombre total de clients
+        cursor.execute('SELECT count(*) FROM client')
+        total_client = cursor.fetchone()[0]
+
+        # Récupérer le nombre total de fournisseurs
+        cursor.execute('SELECT count(*) FROM fournisseur')
+        fournisseur = cursor.fetchone()[0]
+
+        # Récupérer le stock total
+        cursor.execute('SELECT SUM(stock) FROM produit')
+        stocktotal = cursor.fetchone()[0]
+
+        # Récupérer le chiffre d'affaires total des ventes actives
+        cursor.execute('SELECT SUM(montant) FROM vente WHERE vente.is_active = TRUE')
+        total_CA = cursor.fetchone()[0]
+
+        # Récupérer les meilleurs produits
         cursor.execute('''
-        SELECT count(*) from vente''')
-        total_ventes = cursor.fetchone()
-        conn.commit()
-        cursor.close()
+            SELECT produit.image, produit.nom_produit, SUM(vente.quantite) AS total_quantite 
+            FROM vente 
+            JOIN produit ON produit.id_produit = vente.id_produit 
+            WHERE vente.is_active = TRUE 
+            GROUP BY produit.nom_produit 
+            ORDER BY total_quantite DESC 
+            LIMIT 100
+        ''')
+        meilleurs = cursor.fetchall()
 
-        cursor=conn.cursor()
-        cursor.execute(''' select count(*) from commande ''')
-        total_commande = cursor.fetchone()
-        conn.commit()
-        cursor.close()
-
-        cursor=conn.cursor()
-        cursor.execute(''' select count(*) from client ''')
-        total_client = cursor.fetchone()
-        conn.commit()
-        cursor.close()
-
-        cursor=conn.cursor()
-        cursor.execute(''' select SUM(montant) as CA from vente ''')
-        total_CA=cursor.fetchone()
-        conn.commit()
-        cursor.close()
-
-        cursor=conn.cursor()
-        cursor.execute('''SELECT produit.image , produit.nom_produit, SUM(vente.quantite) AS total_quantite FROM vente INNER JOIN produit ON produit.id_produit = vente.id_produit GROUP BY produit.nom_produit ORDER BY total_quantite DESC LIMIT 10
- ''')
-        meilleurs=cursor.fetchall()
-        conn.commit()
-        cursor.close()
-
+        # Transformer les meilleurs produits en une liste de dictionnaires
         products = []
         for produit in meilleurs:
             image = produit[0].decode('utf-8') if isinstance(produit[0], bytes) else produit[0]
@@ -153,18 +164,31 @@ def base():
             total_quantite = produit[2]
             products.append({'image': image, 'nom_produit': nom_produit, 'total_quantite': total_quantite})
 
-        cursor=conn.cursor()
-        cursor.execute(''' SELECT date_vente, client.nom_prenoms,vente.statut,montant,id_vente FROM vente JOIN client ON vente.id_client = client.id_client ORDER BY date_vente DESC;
-''')
-        dash=cursor.fetchall()
-        conn.commit()
+        # Récupérer les détails des ventes pour le tableau de bord
+        cursor.execute('''
+            SELECT date_vente, client.nom_prenoms, vente.statut, montant, id_vente
+            FROM vente
+            JOIN client ON vente.id_client = client.id_client
+            ORDER BY date_vente DESC
+        ''')
+        dash = cursor.fetchall()
+
+        # Calculer le bénéfice
+        if montantstock and total_CA:
+            benefice = total_CA - montantstock
+        else:
+            benefice = 0
+
+        # Fermer le curseur
         cursor.close()
 
-
-
-        return render_template('admin/dashboard.html',filename=filename, total_ventes=total_ventes ,  total_commande= total_commande ,  total_client= total_client, total_CA= total_CA , products=products,dash=dash)
+        return render_template('admin/dashboard.html', filename=filename, total_ventes=total_ventes,
+                               total_commande=total_commande, total_client=total_client,
+                               total_CA=total_CA, products=products, dash=dash,
+                               montantstock=montantstock, fournisseur=fournisseur,
+                               stocktotal=stocktotal, benefice=benefice)
     else:
-        flash('Please login first', 'danger') 
+        flash('Please login first', 'danger')
         return redirect('/admin')
 
 
@@ -547,7 +571,7 @@ def dashboard_vendeur():
         total_commande = cursor.fetchone()[0]
 
         # Total des clients
-        cursor.execute('SELECT count(*) FROM client WHERE id_utilisateur = %s', (utilisateur_id,))
+        cursor.execute('SELECT count(*) FROM client')
         total_client = cursor.fetchone()[0]
 
         # Nombre de ventes retournées
@@ -1381,6 +1405,11 @@ def Produit():
         resultat = curso.fetchall()
         curso.close()
 
+        curso = conn.cursor()
+        curso.execute("SELECT COUNT(*) FROM produit")
+        nombreprod = curso.fetchone()
+        curso.close()
+
         admin_id = session['admin_id']
         cursor = conn.cursor()
         # Récupérer les informations de l'administrateur en utilisant son ID
@@ -1388,7 +1417,7 @@ def Produit():
         infos_admin = cursor.fetchone()
         filename = infos_admin[7].decode('utf-8')
 
-        return render_template("Produit.html", resultat=resultat,filename=filename)
+        return render_template("Produit.html", resultat=resultat,filename=filename,nombreprod=nombreprod)
 
 @app.route('/admin/clients/', methods=["post", "get"])
 def clients():
@@ -1749,21 +1778,27 @@ def status_vente(entry_id):
         # Récupérer le nouveau statut envoyé depuis le formulaire
         new_status = request.form.get('status')
 
-        # Mettre à jour le statut dans la base de données
         cursor = conn.cursor()
-        cursor.execute("UPDATE vente SET statut = %s WHERE id_vente = %s", (new_status, entry_id))
+
+        if new_status == "Retourné":
+            # Marquer la vente comme inactive
+            cursor.execute("UPDATE vente SET statut = %s, is_active = FALSE WHERE id_vente = %s", (new_status, entry_id))
+        else:
+            # Mettre à jour le statut dans la base de données
+            cursor.execute("UPDATE vente SET statut = %s, is_active = TRUE WHERE id_vente = %s", (new_status, entry_id))
+
         conn.commit()
         cursor.close()
 
-        # Rediriger vers la page d'achats après la mise à jour du statut
+        # Rediriger vers la page des ventes après la mise à jour du statut
         return redirect(url_for('ventes'))
     else:
         # Si la méthode de la requête n'est pas POST, retourner une erreur 405 (Méthode non autorisée)
         return jsonify({'error': 'Method Not Allowed'}), 405
 
+
 from flask import request, jsonify, flash
 from datetime import datetime
-
 
 @app.route('/submit_vente', methods=['POST'])
 def submit_vente():

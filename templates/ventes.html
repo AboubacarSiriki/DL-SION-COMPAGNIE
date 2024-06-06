@@ -60,21 +60,21 @@
         </ul>
 
         <ul class="details" id="details-statut">
-          <li class="topic">Statut</li>
-          {% for row in resultat %}
-          <li>
-            <a href="#" onclick="toggleDropdown(this, '{{ row[4] }}')">{{ row[4] }}</a>
-            <form action="/status_vente/{{ row[0] }}" method="POST" class="select-wrapper">
-              <select class="select" name="status" onchange="hideDropdownAndSubmit(this.form, '{{ row[4] }}')">
-                <option disabled selected>Choisissez un statut</option>
-                <option value="Vendu">Vendu</option>
-                <option value="Retourné">Retourné</option>
-                <option value="Annuler">Annuler</option>
-              </select>
-            </form>
-          </li>
-          {% endfor %}
+            <li class="topic">Statut</li>
+            {% for row in resultat %}
+            <li>
+                <a href="#" onclick="toggleDropdown(this, '{{ row[4] }}')">{{ row[4] }}</a>
+                <form action="/status_vente/{{ row[0] }}" method="POST" class="select-wrapper">
+                    <select class="select" name="status" onchange="hideDropdownAndSubmit(this.form, '{{ row[4] }}')">
+                        <option disabled selected>Choisissez un statut</option>
+                        <option value="Vendu">Vendu</option>
+                        <option value="Retourné">Retourné</option>
+                    </select>
+                </form>
+            </li>
+            {% endfor %}
         </ul>
+
         <ul class="details" id="details-produit">
           <li class="topic">Produit</li>
           {% for row in resultat %}
@@ -406,34 +406,40 @@ function printSection(sectionId) {
 
 <script>
     // Fonction pour afficher ou masquer la liste déroulante
-function toggleDropdown(link, color) {
-    var select = link.nextElementSibling.querySelector('.select');
-    select.classList.toggle('active');
-    link.style.color = getColor(color); // Mettre à jour la couleur du texte
-
-}
-
-// Fonction pour masquer la liste déroulante et soumettre le formulaire
-function hideDropdownAndSubmit(form, color) {
-    var select = form.querySelector('.select');
-    select.classList.remove('active'); // Masquer la liste déroulante
-    form.submit(); // Soumettre le formulaire
-    link.style.color = getColor(color); // Mettre à jour la couleur du texte
-}
-
-// Fonction pour obtenir la couleur en fonction du statut sélectionné
-function getColor(status) {
-    switch (status) {
-        case 'Vendu':
-            return 'green'; // Vert
-        case 'Retourné':
-            return 'blue'; // Bleu
-        case 'Annuler':
-            return 'red'; // Rouge
-        default:
-            return 'black'; // Noir par défaut
+    function toggleDropdown(link, color) {
+        var select = link.nextElementSibling.querySelector('.select');
+        select.classList.toggle('active');
+        link.style.color = getColor(color); // Mettre à jour la couleur du texte
     }
-}
+
+    // Fonction pour masquer la liste déroulante et soumettre le formulaire
+    function hideDropdownAndSubmit(form, color) {
+        var select = form.querySelector('.select');
+        var selectedValue = select.value;
+
+        if (selectedValue === 'Retourné') {
+            var confirmation = confirm('Changer le statut en "Retourné" entraînera la désactivation de cette vente. Voulez-vous continuer ?');
+            if (!confirmation) {
+                return; // Si l'utilisateur annule, ne pas soumettre le formulaire
+            }
+        }
+
+        select.classList.remove('active'); // Masquer la liste déroulante
+        form.submit(); // Soumettre le formulaire
+        link.style.color = getColor(color); // Mettre à jour la couleur du texte
+    }
+
+    // Fonction pour obtenir la couleur en fonction du statut sélectionné
+    function getColor(status) {
+        switch (status) {
+            case 'Vendu':
+                return 'green'; // Vert
+            case 'Retourné':
+                return 'red'; // Rouge
+            default:
+                return 'black'; // Noir par défaut
+        }
+    }
 </script>
 
 <script>
@@ -564,6 +570,72 @@ document.addEventListener('DOMContentLoaded', function() {
     var submitButton = document.querySelector('#submit-button');
     var submitButton1 = document.querySelector('#submit-button1');
     var rowNum = 1;
+
+    var notificationIcon = document.getElementById("notificationIcon");
+    var notificationPopup = document.getElementById("notificationPopup");
+    var notificationCount = document.getElementById("notificationCount");
+    var notificationList = document.getElementById("notificationList");
+
+    var count = 0;
+
+    // Charger les notifications depuis localStorage
+    function loadNotifications() {
+        const notifications = JSON.parse(localStorage.getItem('notifications')) || [];
+        notifications.forEach(notification => addNotification(notification, false));
+    }
+
+    // Enregistrer les notifications dans localStorage
+    function saveNotifications() {
+        const notifications = [];
+        notificationList.querySelectorAll('li').forEach(notificationItem => {
+            const notificationDetails = {
+                date: notificationItem.querySelector('.notification-date').textContent,
+                produit: notificationItem.querySelector('.notification-produit').textContent,
+                client: notificationItem.querySelector('.notification-client').textContent,
+                quantite: notificationItem.querySelector('.notification-quantite').textContent
+            };
+            notifications.push(notificationDetails);
+        });
+        localStorage.setItem('notifications', JSON.stringify(notifications));
+    }
+
+    notificationIcon.addEventListener("click", function() {
+        notificationPopup.classList.toggle("show");
+    });
+
+    window.addEventListener("click", function(event) {
+        if (!notificationPopup.contains(event.target) && !notificationIcon.contains(event.target)) {
+            notificationPopup.classList.remove("show");
+        }
+    });
+
+    function addNotification(notificationDetails, save = true) {
+        count++;
+        notificationCount.textContent = count;
+
+        const notificationItem = document.createElement("li");
+        notificationItem.innerHTML = `
+            <div class="notification-date">Date: ${notificationDetails.date}</div>
+            <div class="notification-produit">Produit: ${notificationDetails.produit}</div>
+            <div class="notification-client">Client: ${notificationDetails.client}</div>
+            <div class="notification-quantite">Quantité: ${notificationDetails.quantite}</div>
+            <button class="mark-as-read">Lu</button>
+        `;
+        notificationList.appendChild(notificationItem);
+
+        notificationItem.querySelector(".mark-as-read").addEventListener("click", function() {
+            notificationList.removeChild(notificationItem);
+            count--;
+            notificationCount.textContent = count;
+            saveNotifications();
+        });
+
+        if (save) {
+            saveNotifications();
+        }
+    }
+
+    loadNotifications();
 
     addButton.addEventListener('click', function(event) {
         event.preventDefault();
@@ -718,12 +790,21 @@ document.addEventListener('DOMContentLoaded', function() {
             ventTable.innerHTML = '';
             updateTotal();
             alert('Vente soumise avec succès!');
+
+            // Ajouter la notification
+            addNotification({
+                date: new Date().toLocaleString(),
+                produit: orderData[0].produit_id,
+                client: orderData[0].id_client,
+                quantite: orderData.reduce((sum, item) => sum + item.nombre, 0)
+            });
+
+            document.querySelector(".popup12").style.display = "block";
         })
         .catch(error => {
             console.error('Erreur lors de la soumission de la vente:', error);
             alert('Erreur lors de la soumission de la vente.');
         });
-        document.querySelector(".popup12").style.display = "block";
     });
 
     submitButton1.addEventListener('click', function(event) {
@@ -754,7 +835,7 @@ document.addEventListener('DOMContentLoaded', function() {
             order: orderData
         };
 
-        console.log('Données envoyées:', newClientData);  // Ajout de journalisation
+        console.log('Données envoyées:', newClientData);
 
         fetch('/submit_new_client_vente', {
             method: 'POST',
@@ -769,6 +850,15 @@ document.addEventListener('DOMContentLoaded', function() {
             ventTable1.innerHTML = '';
             updateTotal1();
             alert('Vente pour le nouveau client soumise avec succès!');
+
+            // Ajouter la notification
+            addNotification({
+                date: new Date().toLocaleString(),
+                produit: orderData[0].produit_id,
+                client: newClientData.client.nom,
+                quantite: orderData.reduce((sum, item) => sum + item.nombre, 0)
+            });
+
             document.querySelector(".popup12").style.display = "block";
         })
         .catch(error => {
