@@ -1486,46 +1486,6 @@ def vente_clients():
 
     return jsonify({'error': 'Invalid request method'}), 400
 
-@app.route('/submit_vente_client', methods=['POST'])
-def submit_vente_client():
-    # Récupérer les données de la commande à partir du corps de la requête
-    order_data = request.get_json()
-
-    # Valider les données de la commande (vérifier les valeurs manquantes ou invalides)
-
-    # Traiter les données de la commande
-    for item in order_data:
-        product_id = item['produit_id']
-        quantity = item['nombre']
-        prix_vente = item['prix_vente']
-        id_client = item['id_client']
-        montant = item['montant']
-        # Insérer l'élément de commande dans la base de données
-
-        cursor = conn.cursor()
-        cursor.execute(
-            """INSERT INTO vente (id_client, id_produit, Quantite, prix_vente, Montant, date_vente, statut) VALUES (%s, %s, %s, %s, %s, %s, %s)""",
-            (id_client, product_id, quantity, prix_vente, montant, datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'Vendu')
-        )
-        conn.commit()
-        cursor.close()
-        flash('Vente ajoutée avec succès', 'success')
-
-        cursor = conn.cursor()
-        cursor.execute(
-            'UPDATE produit SET stock = stock - %s WHERE id_produit = %s',
-            (quantity, product_id))
-        conn.commit()
-        cursor.close()
-
-        # Calculer le prix total (si nécessaire)
-
-    # Préparer la réponse
-    response_data = {
-    }
-
-    return jsonify(response_data), 200
-
 
 @app.route('/admin/profil/')
 def profil():
@@ -1649,24 +1609,16 @@ def ventes():
         quantite = request.form.get("nombre")
         prix_vente = request.form.get("prix_vente")  # Récupérer le prix de vente du formulaire
 
-        # Vérifier la quantité en stock avant de procéder à la vente
-        cursor = conn.cursor()
-        cursor.execute("SELECT stock FROM produit WHERE id_produit = %s", (produit_id,))
-        quantite_en_stock = cursor.fetchone()[0]
-
-        if quantite > quantite_en_stock:
-            flash('Quantité demandée excède le stock disponible. Vente annulée.', 'danger')
-            return redirect(url_for('ventes'))
-
         if not client_id:  # Si aucun client_id n'est fourni, créez un nouveau client
             nom = request.form.get("nom")
             tel = request.form.get("tel")
             email = request.form.get("email")
             adresse = request.form.get("adresse")
+            statut = request.form.get("statut")
             with conn.cursor() as cursor:
                 cursor.execute(
-                    'INSERT INTO client (nom_prenoms, telephone, email, adresse) VALUES (%s, %s, %s, %s)',
-                    (nom, tel, email, adresse))
+                    'INSERT INTO client (nom_prenoms, telephone, email, adresse,statut) VALUES (%s,%s,%s,%s,%s)',
+                    (nom, tel, email, adresse,statut))
                 conn.commit()
                 client_id = cursor.lastrowid
 
@@ -1691,7 +1643,7 @@ def ventes():
 
     curso = conn.cursor()
     curso.execute(
-        "select id_vente,date_vente,client.nom_prenoms,produit.nom_produit,vente.statut from vente,client,produit where vente.id_client = client.id_client and vente.id_produit=produit.id_produit ")
+        "select id_vente,date_vente,client.nom_prenoms,produit.nom_produit,vente.statut from vente,client,produit where vente.id_client = client.id_client and vente.id_produit=produit.id_produit order by date_vente desc")
     resultat = curso.fetchall()
     curso.close()
 
@@ -1888,6 +1840,90 @@ def submit_vente():
     return jsonify(response_data), 200
 
 
+@app.route('/submit_new_client_vente', methods=['POST'])
+def submit_new_client_vente():
+    if 'utilisateur_id' in session and session.get('poste') == 'vendeur':
+        utilisateur_id = session['utilisateur_id']
+        role = 'vendeur'
+    elif 'admin_id' in session:
+        utilisateur_id = session['admin_id']
+        role = 'admin'
+    else:
+        flash('Veuillez vous connecter en tant que vendeur ou administrateur.', 'danger')
+        return jsonify({'error': 'Non autorisé'}), 403
+
+    order_data = request.get_json()
+
+    print('Données reçues:', order_data)
+
+    if not order_data:
+        return jsonify({'error': 'Aucune donnée reçue'}), 400
+
+    client_data = order_data.get('client')
+    sales_data = order_data.get('order')
+
+    if not client_data or not sales_data:
+        return jsonify({'error': 'Données client ou vente manquantes'}), 400
+
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            """INSERT INTO clients (nom, tel, email, adresse, statut)
+               VALUES (%s, %s, %s, %s, %s) RETURNING id_client""",
+            (client_data['nom'], client_data['tel'], client_data['email'], client_data['adresse'], client_data['statut'])
+        )
+        client_id = cursor.fetchone()[0]
+
+        print('ID Client inséré:', client_id)
+
+        for item in sales_data:
+            product_id = item.get('produit_id')
+            quantity = item.get('nombre')
+            prix_vente = item.get('prix_vente')
+            montant = item.get('montant')
+
+            if not all([product_id, quantity, prix_vente, client_id, montant]):
+                return jsonify({'error': 'Données de vente incomplètes'}), 400
+
+            if role == 'admin':
+                cursor.execute(
+                    """INSERT INTO vente (id_client, id_produit, Quantite, prix_vente, Montant, date_vente, statut, id_admin)
+                       VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
+                    (client_id, product_id, quantity, prix_vente, montant, datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                     'Vendu', utilisateur_id)
+                )
+            else:
+                cursor.execute(
+                    """INSERT INTO vente (id_client, id_produit, Quantite, prix_vente, Montant, date_vente, statut, id_utilisateur)
+                       VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
+                    (client_id, product_id, quantity, prix_vente, montant, datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                     'Vendu', utilisateur_id)
+                )
+            conn.commit()
+
+            cursor.execute(
+                'UPDATE produit SET stock = stock - %s WHERE id_produit = %s',
+                (quantity, product_id)
+            )
+            conn.commit()
+
+        flash('Vente ajoutée avec succès', 'success')
+    except Exception as e:
+        conn.rollback()
+        print('Erreur:', e)
+        return jsonify({'error': str(e)}), 500
+    finally:
+        cursor.close()
+
+    response_data = {
+        'message': 'Ventes ajoutées avec succès',
+        'client_id': client_id  # Retourner l'ID du client nouvellement créé
+    }
+
+    return jsonify(response_data), 200
+
+
+
 @app.route('/submit_order', methods=['POST'])
 def submit_order():
     if 'admin_id' not in session:
@@ -1981,7 +2017,7 @@ def achats():
 
     curso = conn.cursor()
     curso.execute(
-        "select id_entree,date_entree,statut,fournisseur.nom_prenoms,produit.nom_produit from entree,fournisseur,produit where entree.id_fournisseur = fournisseur.id_fournisseur and entree.id_produit=produit.id_produit ")
+        "select id_entree,date_entree,statut,fournisseur.nom_prenoms,produit.nom_produit from entree,fournisseur,produit where entree.id_fournisseur = fournisseur.id_fournisseur and entree.id_produit=produit.id_produit order by date_entree desc  ")
     resultat = curso.fetchall()
     curso.close()
 
@@ -2168,7 +2204,7 @@ def stock():
         return redirect(url_for('stock'))
 
     curso = conn.cursor()
-    curso.execute("select produit.nom_produit,produit.categorie,quantite,date,id_stock FROM stock join produit on stock.id_produit=produit.id_produit WHERE stock.id_produit = produit.id_produit")
+    curso.execute("select produit.nom_produit,produit.categorie,quantite,date,id_stock FROM stock join produit on stock.id_produit=produit.id_produit WHERE stock.id_produit = produit.id_produit order by date desc")
     resultat = curso.fetchall()
     curso.close()
 
@@ -2338,7 +2374,7 @@ def commandes():
     cursor.execute(
         "SELECT id_commande, date_commande, commande.statut, client.nom_prenoms, produit.nom_produit FROM commande "
         "JOIN client ON commande.id_client = client.id_client "
-        "JOIN produit ON commande.id_produit = produit.id_produit"
+        "JOIN produit ON commande.id_produit = produit.id_produit order by date_commande desc"
     )
     resultat = cursor.fetchall()
     cursor.close()
