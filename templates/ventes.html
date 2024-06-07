@@ -615,13 +615,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const notificationItem = document.createElement("li");
         notificationItem.innerHTML = `
-            <div class="notification-date">Date: ${notificationDetails.date}</div>
-            <div class="notification-produit">Produit: ${notificationDetails.produit}</div>
-            <div class="notification-client">Client: ${notificationDetails.client}</div>
-            <div class="notification-quantite">Quantité: ${notificationDetails.quantite}</div>
+            <div class="notification-details">
+                <div class="notification-date">Date: ${notificationDetails.date}</div>
+                <div class="notification-produit">Produit: ${notificationDetails.produit}</div>
+                <div class="notification-client">Client: ${notificationDetails.client}</div>
+                <div class="notification-quantite">Quantité: ${notificationDetails.quantite}</div>
+            </div>
             <button class="mark-as-read">Lu</button>
         `;
-        notificationList.appendChild(notificationItem);
+
+        // Ajouter la notification en haut de la liste
+        notificationList.insertBefore(notificationItem, notificationList.firstChild);
 
         notificationItem.querySelector(".mark-as-read").addEventListener("click", function() {
             notificationList.removeChild(notificationItem);
@@ -636,6 +640,38 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     loadNotifications();
+
+    function addRowToTable(produitId, data, nombre, prixVente, id_client, table, stockTable) {
+        var montantTTC = nombre * prixVente;
+
+        var newRow = document.createElement('tr');
+        newRow.innerHTML = `<td>${produitId}</td>
+                            <td>${data.designation}</td>
+                            <td>${nombre}</td>
+                            <td>${prixVente}</td>
+                            <td>${montantTTC}</td>
+                            <td>${id_client || ''}</td>
+                            <td><span class="delete-icon">&times;</span></td>`;
+
+        var newRow1 = document.createElement('tr');
+        newRow1.innerHTML = `<td>${rowNum}</td>
+                             <td>${data.designation}</td>
+                             <td>${nombre}</td>
+                             <td>${prixVente}</td>
+                             <td>${montantTTC}</td>`;
+
+        table.appendChild(newRow);
+        stockTable.appendChild(newRow1);
+
+        newRow.querySelector('.delete-icon').addEventListener('click', function() {
+            table.removeChild(newRow);
+            stockTable.removeChild(newRow1);
+            updateTotal();
+        });
+
+        rowNum++;
+        updateTotal();
+    }
 
     addButton.addEventListener('click', function(event) {
         event.preventDefault();
@@ -652,35 +688,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     alert('Quantité demandée excède le stock disponible. Ajout impossible.');
                     return;
                 }
-
-                var montantTTC = nombre * prixVente;
-
-                var newRow = document.createElement('tr');
-                newRow.innerHTML = '<td>' + produitId + '</td>' +
-                                   '<td>' + data.designation + '</td>' +
-                                   '<td>' + nombre + '</td>' +
-                                   '<td>' + prixVente + '</td>' +
-                                   '<td>' + montantTTC + '</td>' +
-                                   '<td>' + id_client + '</td>' +
-                                   '<td><span class="delete-icon">&times;</span></td>';
-
-                var newRow1 = document.createElement('tr');
-                newRow1.innerHTML = '<td>' + rowNum + '</td>' +
-                                    '<td>' + data.designation + '</td>' +
-                                    '<td>' + nombre + '</td>' +
-                                    '<td>' + prixVente + '</td>' +
-                                    '<td>' + montantTTC + '</td>';
-
-                ventTable.appendChild(newRow);
-                stockTable1.appendChild(newRow1);
-
-                newRow.querySelector('.delete-icon').addEventListener('click', function() {
-                    ventTable.removeChild(newRow);
-                    updateTotal();
-                });
-
-                rowNum++;
-                updateTotal();
+                addRowToTable(produitId, data, nombre, prixVente, id_client, ventTable, stockTable1);
             })
             .catch(error => {
                 console.error('Erreur lors de la récupération des informations du produit :', error);
@@ -701,34 +709,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     alert('Quantité demandée excède le stock disponible. Ajout impossible.');
                     return;
                 }
-
-                var montantTTC = nombre * prixVente;
-
-                var newRow1 = document.createElement('tr');
-                newRow1.innerHTML = '<td>' + produitId + '</td>' +
-                                    '<td>' + data.designation + '</td>' +
-                                    '<td>' + nombre + '</td>' +
-                                    '<td>' + prixVente + '</td>' +
-                                    '<td>' + montantTTC + '</td>' +
-                                    '<td><span class="delete-icon">&times;</span></td>';
-
-                var newRow2 = document.createElement('tr');
-                newRow2.innerHTML = '<td>' + rowNum + '</td>' +
-                                    '<td>' + data.designation + '</td>' +
-                                    '<td>' + nombre + '</td>' +
-                                    '<td>' + prixVente + '</td>' +
-                                    '<td>' + montantTTC + '</td>';
-
-                ventTable1.appendChild(newRow1);
-                stockTable1.appendChild(newRow2);
-
-                newRow1.querySelector('.delete-icon').addEventListener('click', function() {
-                    ventTable1.removeChild(newRow1);
-                    updateTotal1();
-                });
-
-                rowNum++;
-                updateTotal1();
+                addRowToTable(produitId, data, nombre, prixVente, null, ventTable1, stockTable1);
             })
             .catch(error => {
                 console.error('Erreur lors de la récupération des informations du produit :', error);
@@ -737,45 +718,43 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function updateTotal() {
         var total = 0;
+        var total1 = 0;
         var rows = ventTable.querySelectorAll('tr');
+        var rows1 = ventTable1.querySelectorAll('tr');
 
         rows.forEach(row => {
             var cellValue = row.querySelectorAll('td')[4].textContent;
             total += parseFloat(cellValue);
         });
 
-        document.querySelector('.total').textContent = total;
-    }
-
-    function updateTotal1() {
-        var total1 = 0;
-        var rows = ventTable1.querySelectorAll('tr');
-
-        rows.forEach(row => {
+        rows1.forEach(row => {
             var cellValue = row.querySelectorAll('td')[4].textContent;
             total1 += parseFloat(cellValue);
         });
 
+        document.querySelector('.total').textContent = total;
         document.querySelector('.total1').textContent = total1;
     }
 
-    submitButton.addEventListener('click', function(event) {
-        event.preventDefault();
-
-        var rows = ventTable.querySelectorAll('tr');
+    function getOrderData(table) {
         var orderData = [];
-
-        rows.forEach(row => {
+        table.querySelectorAll('tr').forEach(row => {
             var rowData = {
                 produit_id: parseInt(row.cells[0].textContent),
                 nombre: parseInt(row.cells[2].textContent),
                 prix_vente: parseFloat(row.cells[3].textContent),
                 montant: parseFloat(row.cells[4].textContent),
-                id_client: parseInt(row.cells[5].textContent),
+                id_client: parseInt(row.cells[5]?.textContent) || null,
             };
-
             orderData.push(rowData);
         });
+        return orderData;
+    }
+
+    submitButton.addEventListener('click', function(event) {
+        event.preventDefault();
+
+        var orderData = getOrderData(ventTable);
 
         fetch('/submit_vente', {
             method: 'POST',
@@ -810,19 +789,7 @@ document.addEventListener('DOMContentLoaded', function() {
     submitButton1.addEventListener('click', function(event) {
         event.preventDefault();
 
-        var rows = ventTable1.querySelectorAll('tr');
-        var orderData = [];
-
-        rows.forEach(row => {
-            var rowData = {
-                produit_id: parseInt(row.cells[0].textContent),
-                nombre: parseInt(row.cells[2].textContent),
-                prix_vente: parseFloat(row.cells[3].textContent),
-                montant: parseFloat(row.cells[4].textContent),
-            };
-
-            orderData.push(rowData);
-        });
+        var orderData = getOrderData(ventTable1);
 
         var newClientData = {
             client: {
@@ -848,7 +815,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             console.log('Vente pour le nouveau client soumise avec succès:', data);
             ventTable1.innerHTML = '';
-            updateTotal1();
+            updateTotal();
             alert('Vente pour le nouveau client soumise avec succès!');
 
             // Ajouter la notification
@@ -869,7 +836,5 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 </script>
-
-
 
 {% endblock %}

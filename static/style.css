@@ -1399,3 +1399,8 @@ nav .profile-details i{
 .notification-popup.show {
     right: 0;
 }
+
+#notificationList {
+    max-height: 100%;
+    overflow-y: auto;
+}

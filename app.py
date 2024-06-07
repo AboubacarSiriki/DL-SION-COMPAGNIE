@@ -1783,6 +1783,7 @@ def status_vente(entry_id):
         if new_status == "Retourné":
             # Marquer la vente comme inactive
             cursor.execute("UPDATE vente SET statut = %s, is_active = FALSE WHERE id_vente = %s", (new_status, entry_id))
+            cursor.execute("UPDATE produit JOIN vente ON produit.id_produit = vente.id_produit SET produit.stock = produit.stock + vente.quantite where id_vente = %s",(entry_id))
         else:
             # Mettre à jour le statut dans la base de données
             cursor.execute("UPDATE vente SET statut = %s, is_active = TRUE WHERE id_vente = %s", (new_status, entry_id))
@@ -1899,10 +1900,12 @@ def submit_new_client_vente():
     cursor = conn.cursor()
     try:
         cursor.execute(
-            """INSERT INTO clients (nom, tel, email, adresse, statut)
-               VALUES (%s, %s, %s, %s, %s) RETURNING id_client""",
+            """INSERT INTO client (nom_prenoms, telephone, email, adresse, statut)
+               VALUES (%s, %s, %s, %s, %s)""",
             (client_data['nom'], client_data['tel'], client_data['email'], client_data['adresse'], client_data['statut'])
         )
+        conn.commit()
+        cursor.execute("SELECT LAST_INSERT_ID()")
         client_id = cursor.fetchone()[0]
 
         print('ID Client inséré:', client_id)

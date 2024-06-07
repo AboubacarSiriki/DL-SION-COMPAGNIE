@@ -233,38 +233,60 @@
     <button type="submit" id="submit-button">Valider la vente</button>
 </form>
 
-    <form class="form2" id="form2" method="post" action="{{url_for('vente_clients')}}">
-        <div id="response-message"></div>
-        {% with messages = get_flashed_messages() %}
-          {% if messages %}
-            {% for message in messages %}
-              <p class="alert" style="color:green;">{{ message }}</p><br>
-            {% endfor %}
-          {% endif %}
-        {% endwith %}
-      <label for="nom">Nom et prénoms</label>
-      <input type="text" id="nom" name="nom" required>
+    <form class="form2" id="form2" method="post" action="{{url_for('ventes')}}">
+  <label for="nom">Nom et prénoms</label>
+  <input type="text" id="nom" name="nom" required>
 
-      <label for="tel">Téléphone</label>
-      <input type="tel" id="tel" name="tel" required>
+  <label for="tel">Téléphone</label>
+  <input type="tel" id="tel" name="tel" required>
 
-      <label for="email">Email</label>
-      <input type="email" id="email" name="email" required>
+  <label for="email">Email</label>
+  <input type="email" id="email" name="email" required>
 
-      <label for="adresse">Adresse</label>
-      <input type="text" id="adresse" name="adresse" required>
-        <label for="statut">Choisissez un statut pour ce client</label>
-        <select id="statut" name="statut" required>
-            <option value="" disabled selected>Sélectionnez un statut</option>
-            <option >Client</option>
-            <option >Niche</option>
-            <option >Prospect</option>
-            <option >VIP</option>
-            <option >Ambassadeur</option>
-        </select><br>
+  <label for="adresse">Adresse</label>
+  <input type="text" id="adresse" name="adresse" required>
+    <label for="statut">Choisissez un statut pour ce client</label>
+    <select id="statut" name="statut" required>
+        <option value="" disabled selected>Sélectionnez un statut</option>
+        <option >Client</option>
+        <option >Niche</option>
+        <option >Prospect</option>
+        <option >VIP</option>
+        <option >Ambassadeur</option>
+        <!-- Ajoutez d'autres options selon vos besoins -->
+    </select><br>
 
-        <button type="submit">Enregistrer le client</button>
-    </form><br>
+    <label for="produit">Produit</label>
+    <select id="produit1" name="produit" required>
+        <option value="" disabled selected>Sélectionnez un produit</option>
+        {% for produit in produits %}
+        <option value="{{ produit[0] }}">{{ produit[1] }}</option>
+        {% endfor %}
+    </select>
+    <label for="nombre1">Nombre</label>
+    <input type="number" id="nombre1" name="nombre" required>
+    <label for="prix_vente1">Entrez le prix unitaire de vente</label>
+    <input type="number" id="prix_vente1" name="prix_vente" required>
+
+    <button type="button" id="add-button1">Ajouter</button>
+
+    <table id="ventes-table1">
+        <thead>
+            <tr>
+                <td>Réf</td>
+                <td>Désignation</td>
+                <td>Quantité</td>
+                <td>PU TTC</td>
+                <td>Montant TTC</td>
+                <td>Action</td>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    <div>Total: <span class="total1">0</span></div>
+    <button type="submit" id="submit-button1">Valider la vente</button>
+  </form><br>
 
   </div>
 </div>
@@ -359,12 +381,117 @@
 
 
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function() {
     var addButton = document.querySelector('#add-button');
+    var addButton1 = document.querySelector('#add-button1');
     var ventTable = document.querySelector('#ventes-table tbody');
+    var ventTable1 = document.querySelector('#ventes-table1 tbody');
     var stockTable1 = document.querySelector('#stock-table1 tbody');
-    var submitButton = document.querySelector('button[type="submit"]');
+    var submitButton = document.querySelector('#submit-button');
+    var submitButton1 = document.querySelector('#submit-button1');
     var rowNum = 1;
+
+    var notificationIcon = document.getElementById("notificationIcon");
+    var notificationPopup = document.getElementById("notificationPopup");
+    var notificationCount = document.getElementById("notificationCount");
+    var notificationList = document.getElementById("notificationList");
+
+    var count = 0;
+
+    // Charger les notifications depuis localStorage
+    function loadNotifications() {
+        const notifications = JSON.parse(localStorage.getItem('notifications')) || [];
+        notifications.forEach(notification => addNotification(notification, false));
+    }
+
+    // Enregistrer les notifications dans localStorage
+    function saveNotifications() {
+        const notifications = [];
+        notificationList.querySelectorAll('li').forEach(notificationItem => {
+            const notificationDetails = {
+                date: notificationItem.querySelector('.notification-date').textContent,
+                produit: notificationItem.querySelector('.notification-produit').textContent,
+                client: notificationItem.querySelector('.notification-client').textContent,
+                quantite: notificationItem.querySelector('.notification-quantite').textContent
+            };
+            notifications.push(notificationDetails);
+        });
+        localStorage.setItem('notifications', JSON.stringify(notifications));
+    }
+
+    notificationIcon.addEventListener("click", function() {
+        notificationPopup.classList.toggle("show");
+    });
+
+    window.addEventListener("click", function(event) {
+        if (!notificationPopup.contains(event.target) && !notificationIcon.contains(event.target)) {
+            notificationPopup.classList.remove("show");
+        }
+    });
+
+    function addNotification(notificationDetails, save = true) {
+        count++;
+        notificationCount.textContent = count;
+
+        const notificationItem = document.createElement("li");
+        notificationItem.innerHTML = `
+            <div class="notification-details">
+                <div class="notification-date">Date: ${notificationDetails.date}</div>
+                <div class="notification-produit">Produit: ${notificationDetails.produit}</div>
+                <div class="notification-client">Client: ${notificationDetails.client}</div>
+                <div class="notification-quantite">Quantité: ${notificationDetails.quantite}</div>
+            </div>
+            <button class="mark-as-read">Lu</button>
+        `;
+
+        // Ajouter la notification en haut de la liste
+        notificationList.insertBefore(notificationItem, notificationList.firstChild);
+
+        notificationItem.querySelector(".mark-as-read").addEventListener("click", function() {
+            notificationList.removeChild(notificationItem);
+            count--;
+            notificationCount.textContent = count;
+            saveNotifications();
+        });
+
+        if (save) {
+            saveNotifications();
+        }
+    }
+
+    loadNotifications();
+
+    function addRowToTable(produitId, data, nombre, prixVente, id_client, table, stockTable) {
+        var montantTTC = nombre * prixVente;
+
+        var newRow = document.createElement('tr');
+        newRow.innerHTML = `<td>${produitId}</td>
+                            <td>${data.designation}</td>
+                            <td>${nombre}</td>
+                            <td>${prixVente}</td>
+                            <td>${montantTTC}</td>
+                            <td>${id_client || ''}</td>
+                            <td><span class="delete-icon">&times;</span></td>`;
+
+        var newRow1 = document.createElement('tr');
+        newRow1.innerHTML = `<td>${rowNum}</td>
+                             <td>${data.designation}</td>
+                             <td>${nombre}</td>
+                             <td>${prixVente}</td>
+                             <td>${montantTTC}</td>`;
+
+        table.appendChild(newRow);
+        stockTable.appendChild(newRow1);
+
+        newRow.querySelector('.delete-icon').addEventListener('click', function() {
+            table.removeChild(newRow);
+            stockTable.removeChild(newRow1);
+            updateTotal();
+        });
+
+        rowNum++;
+        updateTotal();
+    }
 
     addButton.addEventListener('click', function(event) {
         event.preventDefault();
@@ -374,83 +501,80 @@
         var id_client = document.querySelector('#client').value;
         var prixVente = parseFloat(document.querySelector('#prix_vente').value);
 
-        // Récupérer les informations sur le produit et vérifier le stock
         fetch('/get_product_infos/' + produitId)
             .then(response => response.json())
             .then(data => {
                 if (nombre > data.stock) {
-                    alert('Quantité demandée excède le stock disponible. Ajoute impossible.');
+                    alert('Quantité demandée excède le stock disponible. Ajout impossible.');
                     return;
                 }
-
-                var montantTTC = nombre * prixVente;
-
-                var newRow = document.createElement('tr');
-                newRow.innerHTML = '<td>' + produitId + '</td>' +
-                                   '<td>' + data.designation + '</td>' +
-                                   '<td>' + nombre + '</td>' +
-                                   '<td>' + prixVente + '</td>' +
-                                   '<td>' + montantTTC + '</td>' +
-                                   '<td>' + id_client + '</td>' +
-                                   '<td><span class="delete-icon">&times;</span></td>';
-
-                var newRow1 = document.createElement('tr');
-                newRow1.innerHTML = '<td>' + rowNum + '</td>' +
-                                    '<td>' + data.designation + '</td>' +
-                                    '<td>' + nombre + '</td>' +
-                                    '<td>' + prixVente + '</td>' +
-                                    '<td>' + montantTTC + '</td>';
-
-                ventTable.appendChild(newRow);
-                stockTable1.appendChild(newRow1);
-
-                // Ajouter un écouteur d'événement à l'icône de suppression
-                newRow.querySelector('.delete-icon').addEventListener('click', function() {
-                    ventTable.removeChild(newRow);
-                    stockTable1.removeChild(newRow1);
-                    updateTotal();
-                });
-
-                rowNum++;
-                updateTotal();
+                addRowToTable(produitId, data, nombre, prixVente, id_client, ventTable, stockTable1);
             })
             .catch(error => {
                 console.error('Erreur lors de la récupération des informations du produit :', error);
             });
     });
 
-    // Fonction pour mettre à jour le total
+    addButton1.addEventListener('click', function(event) {
+        event.preventDefault();
+
+        var produitId = document.querySelector('#produit1').value;
+        var nombre = parseInt(document.querySelector('#nombre1').value, 10);
+        var prixVente = parseFloat(document.querySelector('#prix_vente1').value);
+
+        fetch('/get_product_infos/' + produitId)
+            .then(response => response.json())
+            .then(data => {
+                if (nombre > data.stock) {
+                    alert('Quantité demandée excède le stock disponible. Ajout impossible.');
+                    return;
+                }
+                addRowToTable(produitId, data, nombre, prixVente, null, ventTable1, stockTable1);
+            })
+            .catch(error => {
+                console.error('Erreur lors de la récupération des informations du produit :', error);
+            });
+    });
+
     function updateTotal() {
         var total = 0;
-        var rows = stockTable1.querySelectorAll('tr');
+        var total1 = 0;
+        var rows = ventTable.querySelectorAll('tr');
+        var rows1 = ventTable1.querySelectorAll('tr');
 
-        // Calculer le total à partir des lignes du tableau 1
         rows.forEach(row => {
             var cellValue = row.querySelectorAll('td')[4].textContent;
             total += parseFloat(cellValue);
         });
 
-        // Mettre à jour le contenu de la balise div avec la classe "total"
+        rows1.forEach(row => {
+            var cellValue = row.querySelectorAll('td')[4].textContent;
+            total1 += parseFloat(cellValue);
+        });
+
         document.querySelector('.total').textContent = total;
+        document.querySelector('.total1').textContent = total1;
     }
 
-    submitButton.addEventListener('click', function(event) {
-        event.preventDefault();
-
-        var rows = ventTable.querySelectorAll('tr');
+    function getOrderData(table) {
         var orderData = [];
-
-        rows.forEach(row => {
+        table.querySelectorAll('tr').forEach(row => {
             var rowData = {
                 produit_id: parseInt(row.cells[0].textContent),
                 nombre: parseInt(row.cells[2].textContent),
                 prix_vente: parseFloat(row.cells[3].textContent),
                 montant: parseFloat(row.cells[4].textContent),
-                id_client: parseInt(row.cells[5].textContent),
+                id_client: parseInt(row.cells[5]?.textContent) || null,
             };
-
             orderData.push(rowData);
         });
+        return orderData;
+    }
+
+    submitButton.addEventListener('click', function(event) {
+        event.preventDefault();
+
+        var orderData = getOrderData(ventTable);
 
         fetch('/submit_vente', {
             method: 'POST',
@@ -462,28 +586,72 @@
         .then(response => response.json())
         .then(data => {
             console.log('Vente soumise avec succès:', data);
+            ventTable.innerHTML = '';
+            updateTotal();
+            alert('Vente soumise avec succès!');
 
-            var total = 0;
-            var rows = stockTable1.querySelectorAll('tr');
-
-            // Calculer le total à partir des lignes du tableau 1
-            rows.forEach(row => {
-                var cellValue = row.querySelectorAll('td')[4].textContent;
-                total += parseFloat(cellValue);
+            // Ajouter la notification
+            addNotification({
+                date: new Date().toLocaleString(),
+                produit: orderData[0].produit_id,
+                client: orderData[0].id_client,
+                quantite: orderData.reduce((sum, item) => sum + item.nombre, 0)
             });
 
-            // Mettre à jour le contenu de la balise div avec la classe "total"
-            document.querySelector('.total').textContent = total;
-
-            ventTable.innerHTML = '';
-            alert('Vente soumise avec succès!');
+            document.querySelector(".popup12").style.display = "block";
         })
         .catch(error => {
             console.error('Erreur lors de la soumission de la vente:', error);
             alert('Erreur lors de la soumission de la vente.');
         });
+    });
 
-        document.querySelector(".popup12").style.display = "block";
+    submitButton1.addEventListener('click', function(event) {
+        event.preventDefault();
+
+        var orderData = getOrderData(ventTable1);
+
+        var newClientData = {
+            client: {
+                nom: document.querySelector('#nom').value,
+                tel: document.querySelector('#tel').value,
+                email: document.querySelector('#email').value,
+                adresse: document.querySelector('#adresse').value,
+                statut: document.querySelector('#statut').value,
+            },
+            order: orderData
+        };
+
+        console.log('Données envoyées:', newClientData);
+
+        fetch('/submit_new_client_vente', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(newClientData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Vente pour le nouveau client soumise avec succès:', data);
+            ventTable1.innerHTML = '';
+            updateTotal();
+            alert('Vente pour le nouveau client soumise avec succès!');
+
+            // Ajouter la notification
+            addNotification({
+                date: new Date().toLocaleString(),
+                produit: orderData[0].produit_id,
+                client: newClientData.client.nom,
+                quantite: orderData.reduce((sum, item) => sum + item.nombre, 0)
+            });
+
+            document.querySelector(".popup12").style.display = "block";
+        })
+        .catch(error => {
+            console.error('Erreur lors de la soumission de la vente pour le nouveau client:', error);
+            alert('Erreur lors de la soumission de la vente pour le nouveau client.');
+        });
     });
 });
 
