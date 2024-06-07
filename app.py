@@ -567,7 +567,7 @@ def dashboard_vendeur():
         total_ventes = cursor.fetchone()[0]
 
         # Total des commandes
-        cursor.execute('SELECT count(*) FROM commande WHERE id_utilisateur = %s', (utilisateur_id,))
+        cursor.execute("SELECT count(*) FROM commande WHERE  statut='En cours' and id_utilisateur = %s", (utilisateur_id,))
         total_commande = cursor.fetchone()[0]
 
         # Total des clients
@@ -575,11 +575,11 @@ def dashboard_vendeur():
         total_client = cursor.fetchone()[0]
 
         # Nombre de ventes retournées
-        cursor.execute('SELECT count(*) FROM vente WHERE statut = "Retourné" AND id_utilisateur = %s', (utilisateur_id,))
+        cursor.execute('SELECT sum(montant) FROM vente WHERE is_active =TRUE AND id_utilisateur = %s', (utilisateur_id,))
         retourne = cursor.fetchone()[0]
 
         # Meilleurs produits
-        cursor.execute('SELECT produit.image, produit.nom_produit, SUM(vente.quantite) AS total_quantite FROM vente INNER JOIN produit ON produit.id_produit = vente.id_produit WHERE vente.id_utilisateur = %s GROUP BY produit.nom_produit ORDER BY total_quantite DESC LIMIT 10', (utilisateur_id,))
+        cursor.execute('SELECT produit.image, produit.nom_produit, SUM(vente.quantite) AS total_quantite FROM vente INNER JOIN produit ON produit.id_produit = vente.id_produit WHERE vente.id_utilisateur = %s GROUP BY produit.nom_produit ORDER BY total_quantite DESC LIMIT 20', (utilisateur_id,))
         meilleurs = cursor.fetchall()
 
         products = []
@@ -1672,6 +1672,26 @@ def ventes():
     resultat = curso.fetchall()
     curso.close()
 
+    curso = conn.cursor()
+    curso.execute(
+        "select count(*) from vente")
+    ventetotal = curso.fetchone()
+    curso.close()
+
+    date_actuelle = datetime.now().strftime('%Y-%m-%d')
+
+    curso = conn.cursor()
+    curso.execute(
+        "select count(*) from vente WHERE DATE(date_vente) = %s", (date_actuelle,))
+    ventejour = curso.fetchone()
+    curso.close()
+
+    curso = conn.cursor()
+    curso.execute(
+        "SELECT SUM(montant) FROM vente WHERE DATE(date_vente) = %s", (date_actuelle,))
+    montanttotal = curso.fetchone()
+    curso.close()
+
     admin_id = session['admin_id']
     cursor = conn.cursor()
     # Récupérer les informations de l'administrateur en utilisant son ID
@@ -1679,7 +1699,8 @@ def ventes():
     infos_admin = cursor.fetchone()
     filename = infos_admin[7].decode('utf-8')
 
-    return render_template("ventes.html", produits=produits, clients=clients,resultat=resultat,filename=filename)
+    return render_template("ventes.html", produits=produits, clients=clients,resultat=resultat,filename=filename,
+                           ventetotal=ventetotal,montanttotal=montanttotal,ventejour=ventejour)
 
 @app.route('/get_product_infos/<int:produit_id>', methods=['GET'])
 def get_product_infos(produit_id):
@@ -1787,6 +1808,9 @@ def status_vente(entry_id):
         else:
             # Mettre à jour le statut dans la base de données
             cursor.execute("UPDATE vente SET statut = %s, is_active = TRUE WHERE id_vente = %s", (new_status, entry_id))
+            cursor.execute(
+                "UPDATE produit JOIN vente ON produit.id_produit = vente.id_produit SET produit.stock = produit.stock - vente.quantite where id_vente = %s",
+                (entry_id))
 
         conn.commit()
         cursor.close()
@@ -2055,6 +2079,26 @@ def achats():
     resultat = curso.fetchall()
     curso.close()
 
+    date_actuelle = datetime.now().strftime('%Y-%m-%d')
+
+    curso = conn.cursor()
+    curso.execute(
+        "select count(*) from entree where statut='En cours' ")
+    achatmensuel = curso.fetchone()
+    curso.close()
+
+    curso = conn.cursor()
+    curso.execute(
+        "select count(*) from entree WHERE statut='livré' ")
+    achatlivre = curso.fetchone()
+    curso.close()
+
+    curso = conn.cursor()
+    curso.execute(
+        "select sum(prix) from entree WHERE statut='livré'")
+    montantachat = curso.fetchone()
+    curso.close()
+
     admin_id = session['admin_id']
     cursor = conn.cursor()
     # Récupérer les informations de l'administrateur en utilisant son ID
@@ -2062,7 +2106,8 @@ def achats():
     infos_admin = cursor.fetchone()
     filename = infos_admin[7].decode('utf-8')
 
-    return render_template("achats.html", produits=produits, fournisseurs=fournisseurs,resultat=resultat,filename=filename)
+    return render_template("achats.html", produits=produits, fournisseurs=fournisseurs,resultat=resultat,filename=filename,
+                           montantachat=montantachat,achatlivre=achatlivre,achatmensuel=achatmensuel)
 
 @app.route('/admin/modifier_achat/<int:id_entree>', methods=['GET', 'POST'])
 def modifier_achat(id_entree):
@@ -2248,6 +2293,26 @@ def stock():
     resultat1 = curso.fetchall()
     curso.close()
 
+    curso = conn.cursor()
+    curso.execute(
+        "select sum(stock) from produit")
+    stocktotal = curso.fetchone()
+    curso.close()
+
+    date_actuelle = datetime.now().strftime('%Y-%m-%d')
+
+    curso = conn.cursor()
+    curso.execute(
+        "select count(*) from produit WHERE stock < 10")
+    stockfaible = curso.fetchone()
+    curso.close()
+
+    curso = conn.cursor()
+    curso.execute(
+        "SELECT SUM(stock * prix) FROM produit")
+    montantstock = curso.fetchone()
+    curso.close()
+
     admin_id = session['admin_id']
     cursor = conn.cursor()
     # Récupérer les informations de l'administrateur en utilisant son ID
@@ -2255,7 +2320,8 @@ def stock():
     infos_admin = cursor.fetchone()
     filename = infos_admin[7].decode('utf-8')
 
-    return render_template("stock.html", produits=produits,resultat=resultat,resultat1=resultat1,filename=filename)
+    return render_template("stock.html", produits=produits,resultat=resultat,resultat1=resultat1,filename=filename,
+                           stockfaible=stockfaible,stocktotal=stocktotal,montantstock=montantstock)
 
 @app.route('/admin/modifier_stock/<int:id_stock>', methods=['GET', 'POST'])
 def modifier_stock(id_stock):
@@ -2413,7 +2479,28 @@ def commandes():
     resultat = cursor.fetchall()
     cursor.close()
 
-    return render_template('commandes.html', produits=produits, clients=clients, resultat=resultat, filename=filename)
+    date_actuelle = datetime.now().strftime('%Y-%m-%d')
+
+    curso = conn.cursor()
+    curso.execute(
+        "select count(*) from commande WHERE DATE(date_commande) = %s", (date_actuelle,))
+    commandejour = curso.fetchone()
+    curso.close()
+
+    curso = conn.cursor()
+    curso.execute(
+        "select count(*) from commande WHERE statut='vendu' and DATE(date_commande) = %s", (date_actuelle,))
+    commandelivre = curso.fetchone()
+    curso.close()
+
+    curso = conn.cursor()
+    curso.execute(
+        "select sum(montant) from commande ")
+    montantcommande = curso.fetchone()
+    curso.close()
+
+    return render_template('commandes.html', produits=produits, clients=clients, resultat=resultat, filename=filename,
+                           montantcommande=montantcommande,commandelivre=commandelivre,commandejour=commandejour)
 
 
 @app.route('/admin/modifier_commande/<int:id_commande>', methods=['GET', 'POST'])

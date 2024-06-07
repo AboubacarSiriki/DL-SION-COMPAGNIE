@@ -5,7 +5,7 @@
     <div class="box">
       <div class="right-side">
         <div class="box-topic">Vente</div>
-        <div class="number">{{ total_ventes[0] }}</div>
+        <div class="number">{{ total_ventes }}</div>
         <div class="indicator">
           <i class="bx bx-up-arrow-alt"></i>
           <span class="text">cumulée</span>
@@ -16,10 +16,10 @@
     <div class="box">
       <div class="right-side">
         <div class="box-topic">Commande</div>
-        <div class="number">{{ total_commande[0] }}</div>
+        <div class="number">{{ total_commande }}</div>
         <div class="indicator">
           <i class="bx bx-up-arrow-alt"></i>
-          <span class="text">cumulée</span>
+          <span class="text">En cours</span>
         </div>
       </div>
       <i class="bx bxs-cart-add cart two"></i>
@@ -27,21 +27,21 @@
     <div class="box">
       <div class="right-side">
         <div class="box-topic">Clients</div>
-        <div class="number">{{ total_client[0] }}</div>
+        <div class="number">{{ total_client }}</div>
         <div class="indicator">
           <i class="bx bx-up-arrow-alt"></i>
-          <span class="text">cumulée</span>
+          <span class="text">Total des clients</span>
         </div>
       </div>
       <i class="bx bx-cart cart three"></i>
     </div>
     <div class="box">
       <div class="right-side">
-        <div class="box-topic">Retourné</div>
-        <div class="number">{{ retourne[0] }}</div>
+        <div class="box-topic">Montant</div>
+        <div class="number">{{ retourne }}</div>
         <div class="indicator">
           <i class="bx bx-down-arrow-alt down"></i>
-          <span class="text">Hier</span>
+          <span class="text">Ventes effectuées</span>
         </div>
       </div>
       <i class="bx bxs-cart-download cart four"></i>

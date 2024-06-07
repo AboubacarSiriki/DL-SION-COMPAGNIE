@@ -5,7 +5,7 @@
     <div class="box">
       <div class="right-side">
         <div class="box-topic">Ventes</div>
-        <div class="number">60</div>
+        <div class="number">{{ventejour[0]}}</div>
         <div class="indicator">
           <i class="bx bx-up-arrow-alt"></i>
           <span class="text">Aujourd'hui</span>
@@ -16,7 +16,7 @@
     <div class="box">
       <div class="right-side">
         <div class="box-topic">Total vente</div>
-        <div class="number">50</div>
+        <div class="number">{{ventetotal[0]}}</div>
         <div class="indicator">
           <i class="bx bx-up-arrow-alt"></i>
           <span class="text">cumulées</span>
@@ -27,10 +27,10 @@
     <div class="box">
       <div class="right-side">
         <div class="box-topic">Montant</div>
-        <div class="number">120 000 K</div>
+        <div class="number">{{montanttotal[0]}}</div>
         <div class="indicator">
           <i class="bx bx-down-arrow-alt down"></i>
-          <span class="text"></span>
+          <span class="text">Montant vente du jour</span>
         </div>
       </div>
       <i class="bx bxs-cart-download cart four"></i>
@@ -834,7 +834,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
-
 </script>
 
 {% endblock %}
