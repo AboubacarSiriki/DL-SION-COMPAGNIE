@@ -4,8 +4,8 @@
         <div class="overview-boxes">
           <div class="box">
             <div class="right-side">
-              <div class="box-topic">Commandés</div>
-              <div class="number">60</div>
+              <div class="box-topic">Commandes</div>
+              <div class="number">{{commandejour[0]}}</div>
               <div class="indicator">
                 <i class="bx bx-up-arrow-alt"></i>
                 <span class="text">Aujourd'hui</span>
@@ -15,22 +15,22 @@
           </div>
           <div class="box">
             <div class="right-side">
-              <div class="box-topic">Commandes</div>
-              <div class="number">50</div>
+              <div class="box-topic">En cours</div>
+              <div class="number">{{commandelivre[0]}}</div>
               <div class="indicator">
                 <i class="bx bx-up-arrow-alt"></i>
-                <span class="text">Total</span>
+                <span class="text">Commande en cours</span>
               </div>
             </div>
             <i class="bx bxs-cart-add cart two"></i>
           </div>
           <div class="box">
             <div class="right-side">
-              <div class="box-topic">Cout total</div>
-              <div class="number">11</div>
+              <div class="box-topic">Montant</div>
+              <div class="number">{{montantcommande[0]}}</div>
               <div class="indicator">
                 <i class="bx bx-down-arrow-alt down"></i>
-                <span class="text">Hier</span>
+                <span class="text">Commande en cours</span>
               </div>
             </div>
             <i class="bx bxs-cart-download cart four"></i>
@@ -443,37 +443,6 @@ function printSection(sectionId) {
 }
 </script>
 
-<script>
-    // Fonction pour afficher ou masquer la liste déroulante
-function toggleDropdown(link, color) {
-    var select = link.nextElementSibling.querySelector('.select');
-    select.classList.toggle('active');
-    link.style.color = getColor(color); // Mettre à jour la couleur du texte
-
-}
-
-// Fonction pour masquer la liste déroulante et soumettre le formulaire
-function hideDropdownAndSubmit(form, color) {
-    var select = form.querySelector('.select');
-    select.classList.remove('active'); // Masquer la liste déroulante
-    form.submit(); // Soumettre le formulaire
-    link.style.color = getColor(color); // Mettre à jour la couleur du texte
-}
-
-// Fonction pour obtenir la couleur en fonction du statut sélectionné
-function getColor(status) {
-    switch (status) {
-        case 'En cours':
-            return 'green'; // Vert
-        case 'Livré':
-            return 'blue'; // Bleu
-        case 'Annuler':
-            return 'red'; // Rouge
-        default:
-            return 'black'; // Noir par défaut
-    }
-}
-</script>
 
 <script>
 function printSection(sectionId) {

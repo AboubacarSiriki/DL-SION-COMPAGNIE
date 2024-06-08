@@ -734,8 +734,28 @@ def vendeur_ventes():
         # Fermer le curseur et la connexion après avoir terminé toutes les opérations
         cursor.close()
 
+        curso = conn.cursor()
+        curso.execute(
+            "select count(*) from vente where id_utilisateur = %s and is_active =TRUE", (utilisateur_id,))
+        ventetotal = curso.fetchone()
+        curso.close()
+
+        date_actuelle = datetime.now().strftime('%Y-%m-%d')
+
+        curso = conn.cursor()
+        curso.execute(
+            "select count(*) from vente WHERE DATE(date_vente) = %s and id_utilisateur = %s and is_active =TRUE", (date_actuelle,utilisateur_id,))
+        ventejour = curso.fetchone()
+        curso.close()
+
+        curso = conn.cursor()
+        curso.execute(
+            "SELECT SUM(montant) FROM vente WHERE DATE(date_vente) = %s and id_utilisateur = %s and is_active =TRUE ", (date_actuelle,utilisateur_id,))
+        montanttotal = curso.fetchone()
+        curso.close()
+
         return render_template("membres/vendeur/vendeur_vente.html", produits=produits, clients=clients,
-                               resultat=resultat, filename=filename)
+                               resultat=resultat, filename=filename,ventejour=ventejour,ventetotal=ventetotal,montanttotal=montanttotal)
     else:
         flash('Veuillez vous connecter en tant que vendeur ou administrateur.', 'danger')
         return redirect('/userlogin')
@@ -806,7 +826,28 @@ def vendeur_commande():
     filename = infos_membre[8].decode('utf-8')  # Convertir bytes en str
     cursor.close()
 
-    return render_template('membres/vendeur/vendeur_commande.html', produits=produits, clients=clients, resultat=resultat, filename=filename)
+    date_actuelle = datetime.now().strftime('%Y-%m-%d')
+
+    curso = conn.cursor()
+    curso.execute(
+        "select count(*) from commande WHERE DATE(date_commande) = %s and id_utilisateur= %s ", (date_actuelle,utilisateur_id,))
+    commandejour = curso.fetchone()
+    curso.close()
+
+    curso = conn.cursor()
+    curso.execute(
+        "select count(*) from commande WHERE statut='vendu' and id_utilisateur= %s", (utilisateur_id,))
+    commandelivre = curso.fetchone()
+    curso.close()
+
+    curso = conn.cursor()
+    curso.execute(
+        "select sum(montant) from commande where statut='En cours' and id_utilisateur= %s", (utilisateur_id,))
+    montantcommande = curso.fetchone()
+    curso.close()
+
+    return render_template('membres/vendeur/vendeur_commande.html', produits=produits, clients=clients, resultat=resultat, filename=filename,
+                           montantcommande=montantcommande,commandelivre=commandelivre,commandejour=commandejour)
 
 @app.route('/vendeur/modifier_profil', methods=['GET', 'POST'])
 def modifier_profil_membre():
@@ -985,12 +1026,31 @@ def dashboard_gestionnaire():
         resultat1 = cursor.fetchall()
         cursor.close()
 
+        curso = conn.cursor()
+        curso.execute(
+            "select sum(stock) from produit")
+        stocktotal = curso.fetchone()
+        curso.close()
+
+        curso = conn.cursor()
+        curso.execute(
+            "select count(*) from produit WHERE stock < 20")
+        stockfaible = curso.fetchone()
+        curso.close()
+
+        curso = conn.cursor()
+        curso.execute(
+            "SELECT SUM(stock * prix) FROM produit")
+        montantstock = curso.fetchone()
+        curso.close()
+
         cursor = conn.cursor()
         cursor.execute('SELECT * FROM utilisateur WHERE id_utilisateur = %s', (utilisateur_id,))
         infos_membre = cursor.fetchone()
         filename = infos_membre[8].decode('utf-8')
 
-        return render_template('membres/gestionnaire/dashboard_gestionnaire.html', produits=produits, resultat=resultat, resultat1=resultat1, filename=filename)
+        return render_template('membres/gestionnaire/dashboard_gestionnaire.html', produits=produits, resultat=resultat, resultat1=resultat1, filename=filename,
+                               stockfaible=stockfaible,montantstock=montantstock,stocktotal=stocktotal)
     else:
         flash('Please login first', 'danger')
         return redirect('/userlogin')
@@ -1121,6 +1181,26 @@ def gestion_commande():
     resultat = curso.fetchall()
     curso.close()
 
+    date_actuelle = datetime.now().strftime('%Y-%m-%d')
+
+    curso = conn.cursor()
+    curso.execute(
+        "select count(*) from commande where DATE(date_commande)=%s",(date_actuelle))
+    commandejour = curso.fetchone()
+    curso.close()
+
+    curso = conn.cursor()
+    curso.execute(
+        "select count(*) from commande WHERE statut='vendu'")
+    commandelivre = curso.fetchone()
+    curso.close()
+
+    curso = conn.cursor()
+    curso.execute(
+        "select sum(montant) from commande where statut='En cours'")
+    montantcommande = curso.fetchone()
+    curso.close()
+
     utilisateur_id = session['utilisateur_id']
 
     cursor = conn.cursor()
@@ -1131,7 +1211,8 @@ def gestion_commande():
     conn.commit()
     cursor.close()
 
-    return render_template('membres/gestionnaire/gestion_commande.html', produits=produits, clients=clients,resultat=resultat,filename=filename)
+    return render_template('membres/gestionnaire/gestion_commande.html', produits=produits, clients=clients,resultat=resultat,filename=filename,
+                           commandelivre=commandelivre,commandejour=commandejour,montantcommande=montantcommande)
 
 @app.route('/gestionnaire/ventes/', methods=["POST", "GET"])
 def gestion_ventes():
@@ -1194,6 +1275,26 @@ def gestion_ventes():
     resultat = curso.fetchall()
     curso.close()
 
+    date_actuelle = datetime.now().strftime('%Y-%m-%d')
+
+    curso = conn.cursor()
+    curso.execute(
+        "select count(*) from vente where is_active =TRUE")
+    ventetotal = curso.fetchone()
+    curso.close()
+
+    curso = conn.cursor()
+    curso.execute(
+        "select count(*) from vente WHERE DATE(date_vente) = %s and is_active =TRUE", (date_actuelle,))
+    ventejour = curso.fetchone()
+    curso.close()
+
+    curso = conn.cursor()
+    curso.execute(
+        "SELECT SUM(montant) FROM vente WHERE DATE(date_vente) = %s and is_active =TRUE", (date_actuelle,))
+    montanttotal = curso.fetchone()
+    curso.close()
+
     utilisateur_id = session['utilisateur_id']
 
     cursor = conn.cursor()
@@ -1205,7 +1306,7 @@ def gestion_ventes():
     cursor.close()
 
     return render_template("membres/gestionnaire/gestion_ventes.html", produits=produits, clients=clients, resultat=resultat,
-                           filename=filename)
+                           filename=filename,ventejour=ventejour,ventetotal=ventetotal,montanttotal=montanttotal)
 
 @app.route('/gestionnaire/stock/', methods=["POST", "GET"])
 def gestion_stock():
@@ -1247,6 +1348,29 @@ def gestion_stock():
     resultat1 = curso.fetchall()
     curso.close()
 
+    cursor = conn.cursor()
+    cursor.execute("select nom_produit, categorie, stock, stock_min FROM produit")
+    resultat1 = cursor.fetchall()
+    cursor.close()
+
+    curso = conn.cursor()
+    curso.execute(
+        "select sum(stock) from produit")
+    stocktotal = curso.fetchone()
+    curso.close()
+
+    curso = conn.cursor()
+    curso.execute(
+        "select count(*) from produit WHERE stock < 20")
+    stockfaible = curso.fetchone()
+    curso.close()
+
+    curso = conn.cursor()
+    curso.execute(
+        "SELECT SUM(stock * prix) FROM produit")
+    montantstock = curso.fetchone()
+    curso.close()
+
     utilisateur_id = session['utilisateur_id']
     cursor = conn.cursor()
     # Récupérer les informations de l'administrateur en utilisant son ID
@@ -1254,7 +1378,8 @@ def gestion_stock():
     infos_membre = cursor.fetchone()
     filename = infos_membre[8].decode('utf-8')
 
-    return render_template("membres/Gestionnaire/gestion_stock.html", produits=produits,resultat=resultat,resultat1=resultat1,filename=filename)
+    return render_template("membres/Gestionnaire/gestion_stock.html", produits=produits,resultat=resultat,resultat1=resultat1,filename=filename,
+                           montantstock=montantstock,stocktotal=stocktotal,stockfaible=stockfaible)
 
 @app.route('/gestionnaire/modifier_produit/<int:id>',methods=['POST','GET'])
 def gestion_modifier_produit(id):
@@ -1674,7 +1799,7 @@ def ventes():
 
     curso = conn.cursor()
     curso.execute(
-        "select count(*) from vente")
+        "select count(*) from vente where is_active =TRUE")
     ventetotal = curso.fetchone()
     curso.close()
 
@@ -1682,13 +1807,13 @@ def ventes():
 
     curso = conn.cursor()
     curso.execute(
-        "select count(*) from vente WHERE DATE(date_vente) = %s", (date_actuelle,))
+        "select count(*) from vente WHERE DATE(date_vente) = %s and is_active =TRUE", (date_actuelle,))
     ventejour = curso.fetchone()
     curso.close()
 
     curso = conn.cursor()
     curso.execute(
-        "SELECT SUM(montant) FROM vente WHERE DATE(date_vente) = %s", (date_actuelle,))
+        "SELECT SUM(montant) FROM vente WHERE DATE(date_vente) = %s and is_active =TRUE", (date_actuelle,))
     montanttotal = curso.fetchone()
     curso.close()
 
@@ -2495,7 +2620,7 @@ def commandes():
 
     curso = conn.cursor()
     curso.execute(
-        "select sum(montant) from commande ")
+        "select sum(montant) from commande where statut='En cours' ")
     montantcommande = curso.fetchone()
     curso.close()
 
