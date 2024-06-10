@@ -980,6 +980,16 @@ nav .profile-details i{
   justify-content:space-evenly;
 }
 
+.popup-content1 .signe1 .total2 {
+  width: 30%;
+  height: 100%;
+  margin: 0 3px; /* Ajoute de l'espace sur les côtés gauche et droit */
+  display:flex;
+  border: 1px solid orange;
+  flex-direction:column;
+  justify-content:space-evenly;
+}
+
 /* Style de la liste déroulante */
     .select {
         appearance: none; /* Supprimer la flèche par défaut */
