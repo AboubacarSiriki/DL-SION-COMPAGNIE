@@ -233,7 +233,6 @@
                 <td>PU TTC</td>
                 <td>Montant TTC</td>
                 <td>ID Client</td>
-                <td>Action</td>
             </tr>
         </thead>
         <tbody>
@@ -288,7 +287,7 @@
                 <td>Quantité</td>
                 <td>PU TTC</td>
                 <td>Montant TTC</td>
-                <td>Action</td>
+                <td>ID Client</td>
             </tr>
         </thead>
         <tbody>
@@ -366,7 +365,7 @@
                     </table>
                 <div class="signe1">
                 <div class="signature1">Montant total TTC</div>
-                <div class="total"></div>
+                <div class="total2"></div>
             </div>
                 <p style="color:orange;">Arreté de la presente facture à la somme de .........................................................</p>
                  <p style="color:orange;">.....................................................................................................................................................................</p><br>
@@ -717,10 +716,17 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function updateTotal() {
+        var stocktotal = 0;
         var total = 0;
         var total1 = 0;
+        var rows0 = stockTable1.querySelectorAll('tr');
         var rows = ventTable.querySelectorAll('tr');
         var rows1 = ventTable1.querySelectorAll('tr');
+
+        rows0.forEach(row => {
+            var cellValue = row.querySelectorAll('td')[4].textContent;
+            stocktotal += parseFloat(cellValue);
+        });
 
         rows.forEach(row => {
             var cellValue = row.querySelectorAll('td')[4].textContent;
@@ -731,7 +737,7 @@ document.addEventListener('DOMContentLoaded', function() {
             var cellValue = row.querySelectorAll('td')[4].textContent;
             total1 += parseFloat(cellValue);
         });
-
+        document.querySelector('.total2').textContent = stocktotal;
         document.querySelector('.total').textContent = total;
         document.querySelector('.total1').textContent = total1;
     }
