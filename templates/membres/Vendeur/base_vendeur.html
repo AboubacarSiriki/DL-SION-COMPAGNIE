@@ -108,5 +108,29 @@ window.onclick = function (event) {
 })
     </script>
 
+   <script>
+     function addNotification(notificationDetails) {
+    count++;
+    notificationCount.textContent = count;
+
+    const notificationItem = document.createElement("li");
+    notificationItem.innerHTML = `
+        <div>Date: ${notificationDetails.date}</div>
+        <div>Produit: ${notificationDetails.produit}</div>
+        <div>Client: ${notificationDetails.client}</div>
+        <div>Quantité: ${notificationDetails.quantite}</div>
+        <button class="mark-as-read">Lu</button>
+    `;
+    notificationList.appendChild(notificationItem);
+
+    notificationItem.querySelector(".mark-as-read").addEventListener("click", function() {
+        notificationList.removeChild(notificationItem);
+        count--;
+        notificationCount.textContent = count;
+    });
+}
+
+</script>
+
   </body>
 </html>
