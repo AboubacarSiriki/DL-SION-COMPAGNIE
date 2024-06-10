@@ -7,7 +7,7 @@ import re
 from werkzeug.utils import secure_filename
 from datetime import datetime
 from flask import jsonify
-from infobipConfig import envoyer_sms_api
+from yallikaConfig import envoyer_sms_api
 
 
 # Créer une instance de l'application Flask
@@ -615,9 +615,9 @@ def vendeur_client():
         adresse = request.form['adresse']
 
         # Ajout automatique du préfixe +225 si nécessaire et validation du numéro
-        telephone = '+225' + telephone.lstrip('+225')
-        if len(telephone) != 14 or not telephone[4:].isdigit() or not (telephone[4:6] in ['07', '05', '01']):
-            flash('Le numéro de téléphone doit être valide et contenir 14 chiffres y compris le préfixe +225.', 'danger')
+        telephone = '225' + telephone.lstrip('225')
+        if len(telephone) != 13 or not telephone[3:].isdigit() or not (telephone[3:5] in ['07', '05', '01']):
+            flash('Le numéro de téléphone doit être valide et contenir 14 chiffres y compris le préfixe 225.', 'danger')
             return redirect(url_for("vendeur_client"))
 
         # Vérifier si le numéro de téléphone est unique
@@ -863,9 +863,9 @@ def vendeur_modifier_client(id):
         adresse = request.form['adresse']
 
         # Ajout automatique du préfixe +225 si nécessaire et validation du numéro
-        telephone = '+225' + telephone.lstrip('+225')
-        if len(telephone) != 14 or not telephone[4:].isdigit() or not (telephone[4:6] in ['07', '05', '01']):
-            flash('Le numéro de téléphone doit être valide et contenir 14 chiffres y compris le préfixe +225.', 'danger')
+        telephone = '225' + telephone.lstrip('225')
+        if len(telephone) != 13 or not telephone[3:].isdigit() or not (telephone[3:5] in ['07', '05', '01']):
+            flash('Le numéro de téléphone doit être valide et contenir 14 chiffres y compris le préfixe 225.', 'danger')
             return redirect(url_for('vendeur_modifier_client', id=id))
 
         # Vérification de l'unicité du numéro de téléphone
@@ -1005,9 +1005,9 @@ def gestion_client():
         statut = request.form['statut']
 
         # Ajout automatique du préfixe +225 si nécessaire et validation du numéro
-        telephone = '+225' + telephone.lstrip('+225')
-        if len(telephone) != 14 or not telephone[4:].isdigit() or not (telephone[4:6] in ['07', '05', '01']):
-            flash('Le numéro de téléphone doit être valide et contenir 14 chiffres y compris le préfixe +225.', 'danger')
+        telephone = '225' + telephone.lstrip('225')
+        if len(telephone) != 13 or not telephone[3:].isdigit() or not (telephone[3:5] in ['07', '05', '01']):
+            flash('Le numéro de téléphone doit être valide et contenir 14 chiffres y compris le préfixe 225.', 'danger')
             return redirect(url_for("gestion_client"))
 
         # Vérifier si le numéro de téléphone est unique
@@ -1433,9 +1433,9 @@ def clients():
         statut = request.form['statut']
 
         # Ajout automatique du préfixe +225 si nécessaire et validation du numéro
-        telephone = '+225' + telephone.lstrip('+225')
-        if len(telephone) != 14 or not telephone[4:].isdigit() or not (telephone[4:6] in ['07', '05', '01']):
-            flash('Le numéro de téléphone doit être valide et contenir 14 chiffres y compris le préfixe +225.', 'danger')
+        telephone = '225' + telephone.lstrip('225')
+        if len(telephone) != 13 or not telephone[3:].isdigit() or not (telephone[3:5] in ['07', '05', '01']):
+            flash('Le numéro de téléphone doit être valide et contenir 13 chiffres y compris le préfixe 225.', 'danger')
             return redirect(url_for("clients"))
 
         # Vérifier si le numéro de téléphone est unique
@@ -1486,10 +1486,10 @@ def vente_clients():
         adresse = data['adresse']
         statut = data['statut']
 
-        # Ajout automatique du préfixe +225 si nécessaire et validation du numéro
-        telephone = '+225' + tel.lstrip('+225')
-        if len(telephone) != 14 or not telephone[4:].isdigit() or not (telephone[4:6] in ['07', '05', '01']):
-            return jsonify({'message': 'Le numéro de téléphone doit être valide et contenir 14 chiffres y compris le préfixe +225.'}), 200
+        # Ajout automatique du préfixe 225 si nécessaire et validation du numéro
+        telephone = '225' + tel.lstrip('225')
+        if len(telephone) != 13 or not telephone[3:].isdigit() or not (telephone[3:5] in ['07', '05', '01']):
+            return jsonify({'message': 'Le numéro de téléphone doit être valide et contenir 13 chiffres y compris le préfixe 225.'}), 200
 
         # Vérifier si le numéro de téléphone est unique
         cursor = conn.cursor()
@@ -1799,7 +1799,7 @@ def status_vente(entry_id):
 
 from flask import request, jsonify, flash
 from datetime import datetime
-
+ 
 @app.route('/submit_vente', methods=['POST'])
 def submit_vente():
     # Vérifiez si l'utilisateur est connecté en tant que vendeur ou administrateur
@@ -2635,9 +2635,9 @@ def modifier_client(id):
         adresse = request.form['adresse']
 
         # Ajout automatique du préfixe +225 si nécessaire et validation du numéro
-        telephone = '+225' + telephone.lstrip('+225')
-        if len(telephone) != 14 or not telephone[4:].isdigit() or not (telephone[4:6] in ['07', '05', '01']):
-            flash('Le numéro de téléphone doit être valide et contenir 14 chiffres y compris le préfixe +225.', 'danger')
+        telephone = '225' + telephone.lstrip('225')
+        if len(telephone) != 13 or not telephone[3:].isdigit() or not (telephone[3:5] in ['07', '05', '01']):
+            flash('Le numéro de téléphone doit être valide et contenir 13 chiffres y compris le préfixe 225.', 'danger')
             return redirect(url_for('modifier_client', id=id))
 
         # Vérification de l'unicité du numéro de téléphone
@@ -2802,6 +2802,17 @@ def status_client(entry_id):
 
 @app.route('/admin/supprimer_client/<int:id>', methods=['GET', 'POST'])
 def supprimer_client(id):
+    # Vérifiez si l'utilisateur est connecté en tant qu'administrateur
+    if 'admin_id' not in session:
+        flash('Veuillez vous connecter en tant qu\'administrateur.', 'danger')
+        return redirect(url_for('userLogin'))
+    
+    admin_id = session['admin_id']
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
+    infos_admin = cursor.fetchone()
+    filename = infos_admin[7].decode('utf-8')
+
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM client WHERE id_client = %s", (id,))
     resultat = cursor.fetchone()
@@ -2820,7 +2831,7 @@ def supprimer_client(id):
         return redirect(url_for('clients'))
 
     # Si vous voulez afficher une page de confirmation via une route GET, vous pouvez inclure cela :
-    return render_template('clients.html', client=resultat)
+    return render_template('clients.html', client=resultat, filename=filename)
 
 @app.route('/admin/supprimer_fournisseur/<int:id>', methods=['GET', 'POST'])
 def supprimer_fournisseur(id):
@@ -2923,35 +2934,72 @@ def supprimer_achat(id):
     # Si vous voulez afficher une page de confirmation via une route GET, vous pouvez inclure cela :
     return render_template('achats.html', vente=resultat)
 
+def get_client_phones():
+    cursor = conn.cursor()
+    cursor.execute("SELECT telephone FROM client")
+    phones = cursor.fetchall()
+    cursor.close()
+    return [str(phone[0]) for phone in phones]
+
+def validate_and_format_phone(phone):
+    # This is a simple validation and formatting example.
+    # Modify this function based on the expected format of your phone numbers.
+    phone = str(phone).strip()
+    if phone.startswith("225"):
+        return phone
+    elif phone.startswith("0"):
+        return "225" + phone[1:]
+    else:
+        return "225" + phone
 
 @app.route("/admin/emailing//")
 def emailing():
-    # Rendre le template index.html
-    admin_id = session['admin_id']
-    cursor = conn.cursor()
-    # Récupérer les informations de l'administrateur en utilisant son ID
-    cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
-    infos_admin = cursor.fetchone()
-    filename = infos_admin[7].decode('utf-8')
+    if 'admin_id' in session:
+        admin_id = session['admin_id']
+        cursor = conn.cursor()
+        cursor.execute('SELECT * FROM administrateur WHERE id_admin = %s', (admin_id,))
+        infos_admin = cursor.fetchone()
+        cursor.close()
+        filename = infos_admin[7].decode('utf-8')
 
-    return render_template('emailing.html',filename=filename)
+        return render_template('emailing.html', filename=filename)
+    else:
+        flash('Veuillez vous connecter', 'danger')
+        return redirect(url_for('adminIndex'))
 
 
 @app.route('/admin/envoyer_sms', methods=['POST'])
 def envoyer_sms():
-    message = request.form['message']
-    sender = "InnovTech"  # Changez cette valeur pour votre nom d'expéditeur souhaité
-    if not message:
-        flash('Message non fourni', 'error')
-        return redirect(url_for('index'))
-    
-    response = envoyer_sms_api(message, sender)
-    if 'requestError' in response:
-        flash(f'Erreur lors de l\'envoi du SMS : {response}', 'error')
+    if 'admin_id' in session:
+        message = request.form['message']
+        sender_id = "YellikaSMS"  # Changez cette valeur pour votre nom d'expéditeur souhaité
+
+        if not message:
+            flash('Message non fourni', 'error')
+            return redirect(url_for('emailing'))
+
+        client_phones = get_client_phones()
+        responses = []
+
+        for phone in client_phones:
+            formatted_phone = validate_and_format_phone(phone)
+            print(f"Formatted phone: {formatted_phone}")  # Print formatted phone for debugging
+            response = envoyer_sms_api(formatted_phone, sender_id, message)
+            responses.append(response)
+
+        # Print all responses for debugging
+        for response in responses:
+            print(response)
+
+        if any('requestError' in response for response in responses):
+            flash('Erreur lors de l\'envoi de certains SMS', 'error')
+        else:
+            flash('SMS envoyés avec succès', 'success')
+
+        return redirect(url_for('emailing'))
     else:
-        flash('SMS envoyé avec succès', 'success')
-    
-    return redirect(url_for('emailing'))
+        flash('Veuillez vous connecter', 'danger')
+        return redirect(url_for('adminIndex'))
 
 
 # Route pour la recherche
@@ -2981,8 +3029,11 @@ def search_in_database(mot):
 
 # Point d'entrée de l'application
 if __name__ == '__main__':
-    # Lancer l'application sur le serveur local
+    with app.app_context():
+        phones = get_client_phones()
+        print("Client phones:", phones)
     app.run(debug=True)
+
 
 
 
